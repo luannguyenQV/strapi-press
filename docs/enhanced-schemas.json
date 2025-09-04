@@ -1,0 +1,827 @@
+{
+  "contentTypes": {
+    "article": {
+      "kind": "collectionType",
+      "collectionName": "articles",
+      "info": {
+        "singularName": "article",
+        "pluralName": "articles", 
+        "displayName": "Article",
+        "description": "News articles with WordPress-like features"
+      },
+      "options": {
+        "draftAndPublish": true,
+        "timestamps": true
+      },
+      "attributes": {
+        "title": {
+          "type": "string",
+          "required": true,
+          "maxLength": 200,
+          "configurable": false
+        },
+        "slug": {
+          "type": "uid",
+          "targetField": "title",
+          "required": true,
+          "maxLength": 100
+        },
+        "excerpt": {
+          "type": "text",
+          "maxLength": 300,
+          "required": true
+        },
+        "content": {
+          "type": "richtext",
+          "required": true
+        },
+        "featuredImage": {
+          "type": "media",
+          "multiple": false,
+          "required": false,
+          "allowedTypes": ["images"]
+        },
+        "gallery": {
+          "type": "media",
+          "multiple": true,
+          "required": false,
+          "allowedTypes": ["images", "videos"]
+        },
+        "status": {
+          "type": "enumeration",
+          "enum": ["draft", "published", "archived"],
+          "default": "draft",
+          "required": true
+        },
+        "featured": {
+          "type": "boolean",
+          "default": false,
+          "required": true
+        },
+        "viewCount": {
+          "type": "integer",
+          "default": 0,
+          "min": 0
+        },
+        "readingTime": {
+          "type": "integer",
+          "default": 5,
+          "min": 1,
+          "max": 60
+        },
+        "author": {
+          "type": "relation",
+          "relation": "manyToOne",
+          "target": "api::author.author",
+          "inversedBy": "articles",
+          "required": true
+        },
+        "coAuthors": {
+          "type": "relation",
+          "relation": "manyToMany",
+          "target": "api::author.author"
+        },
+        "categories": {
+          "type": "relation",
+          "relation": "manyToMany",
+          "target": "api::category.category",
+          "inversedBy": "articles"
+        },
+        "tags": {
+          "type": "relation",
+          "relation": "manyToMany", 
+          "target": "api::tag.tag",
+          "inversedBy": "articles"
+        },
+        "seo": {
+          "type": "component",
+          "component": "shared.seo",
+          "required": false
+        },
+        "socialShare": {
+          "type": "component",
+          "component": "shared.social-share",
+          "required": false
+        },
+        "relatedArticles": {
+          "type": "relation",
+          "relation": "manyToMany",
+          "target": "api::article.article"
+        },
+        "comments": {
+          "type": "relation",
+          "relation": "oneToMany",
+          "target": "api::comment.comment",
+          "mappedBy": "article"
+        },
+        "newsletter": {
+          "type": "boolean",
+          "default": false,
+          "description": "Include in newsletter"
+        },
+        "sponsored": {
+          "type": "boolean",
+          "default": false,
+          "description": "Sponsored content"
+        },
+        "scheduledPublishAt": {
+          "type": "datetime",
+          "required": false,
+          "description": "Schedule publication"
+        }
+      }
+    },
+
+    "author": {
+      "kind": "collectionType", 
+      "collectionName": "authors",
+      "info": {
+        "singularName": "author",
+        "pluralName": "authors",
+        "displayName": "Author",
+        "description": "Content authors and contributors"
+      },
+      "options": {
+        "draftAndPublish": false
+      },
+      "attributes": {
+        "name": {
+          "type": "string",
+          "required": true,
+          "maxLength": 100
+        },
+        "slug": {
+          "type": "uid",
+          "targetField": "name",
+          "required": true,
+          "maxLength": 50
+        },
+        "email": {
+          "type": "email",
+          "required": true,
+          "unique": true
+        },
+        "bio": {
+          "type": "text",
+          "maxLength": 500,
+          "required": false
+        },
+        "avatar": {
+          "type": "media",
+          "multiple": false,
+          "required": false,
+          "allowedTypes": ["images"]
+        },
+        "role": {
+          "type": "enumeration",
+          "enum": ["admin", "editor", "author", "contributor"],
+          "default": "author",
+          "required": true
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 100,
+          "required": false,
+          "description": "Professional title"
+        },
+        "organization": {
+          "type": "string",
+          "maxLength": 100,
+          "required": false
+        },
+        "website": {
+          "type": "string",
+          "required": false
+        },
+        "socialLinks": {
+          "type": "component",
+          "component": "shared.social-links",
+          "required": false
+        },
+        "articlesCount": {
+          "type": "integer",
+          "default": 0,
+          "min": 0
+        },
+        "isPublic": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show in author directory"
+        },
+        "emailNotifications": {
+          "type": "boolean",
+          "default": true
+        },
+        "articles": {
+          "type": "relation",
+          "relation": "oneToMany",
+          "target": "api::article.article",
+          "mappedBy": "author"
+        }
+      }
+    },
+
+    "category": {
+      "kind": "collectionType",
+      "collectionName": "categories",
+      "info": {
+        "singularName": "category",
+        "pluralName": "categories",
+        "displayName": "Category",
+        "description": "Article categories with hierarchy"
+      },
+      "options": {
+        "draftAndPublish": false
+      },
+      "attributes": {
+        "name": {
+          "type": "string",
+          "required": true,
+          "maxLength": 50,
+          "unique": true
+        },
+        "slug": {
+          "type": "uid",
+          "targetField": "name",
+          "required": true,
+          "maxLength": 50
+        },
+        "description": {
+          "type": "text",
+          "maxLength": 200,
+          "required": false
+        },
+        "color": {
+          "type": "string",
+          "required": false,
+          "regex": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$",
+          "default": "#6B7280"
+        },
+        "icon": {
+          "type": "string",
+          "required": false,
+          "maxLength": 50,
+          "description": "Icon name or emoji"
+        },
+        "featuredImage": {
+          "type": "media",
+          "multiple": false,
+          "required": false,
+          "allowedTypes": ["images"]
+        },
+        "parentCategory": {
+          "type": "relation",
+          "relation": "manyToOne",
+          "target": "api::category.category"
+        },
+        "subcategories": {
+          "type": "relation",
+          "relation": "oneToMany",
+          "target": "api::category.category",
+          "mappedBy": "parentCategory"
+        },
+        "articles": {
+          "type": "relation",
+          "relation": "manyToMany",
+          "target": "api::article.article",
+          "mappedBy": "categories"
+        },
+        "seo": {
+          "type": "component",
+          "component": "shared.seo",
+          "required": false
+        },
+        "isVisible": {
+          "type": "boolean",
+          "default": true
+        },
+        "sortOrder": {
+          "type": "integer",
+          "default": 0
+        }
+      }
+    },
+
+    "tag": {
+      "kind": "collectionType",
+      "collectionName": "tags",
+      "info": {
+        "singularName": "tag",
+        "pluralName": "tags",
+        "displayName": "Tag",
+        "description": "Article tags for content organization"
+      },
+      "options": {
+        "draftAndPublish": false
+      },
+      "attributes": {
+        "name": {
+          "type": "string",
+          "required": true,
+          "maxLength": 30,
+          "unique": true
+        },
+        "slug": {
+          "type": "uid",
+          "targetField": "name",
+          "required": true,
+          "maxLength": 30
+        },
+        "description": {
+          "type": "text",
+          "maxLength": 150,
+          "required": false
+        },
+        "color": {
+          "type": "string",
+          "required": false,
+          "regex": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$",
+          "default": "#EF4444"
+        },
+        "articles": {
+          "type": "relation",
+          "relation": "manyToMany",
+          "target": "api::article.article",
+          "mappedBy": "tags"
+        },
+        "usageCount": {
+          "type": "integer",
+          "default": 0,
+          "min": 0
+        }
+      }
+    },
+
+    "comment": {
+      "kind": "collectionType",
+      "collectionName": "comments",
+      "info": {
+        "singularName": "comment",
+        "pluralName": "comments",
+        "displayName": "Comment",
+        "description": "Article comments with moderation"
+      },
+      "options": {
+        "draftAndPublish": false,
+        "timestamps": true
+      },
+      "attributes": {
+        "content": {
+          "type": "text",
+          "required": true,
+          "maxLength": 1000
+        },
+        "authorName": {
+          "type": "string",
+          "required": true,
+          "maxLength": 100
+        },
+        "authorEmail": {
+          "type": "email",
+          "required": true
+        },
+        "authorWebsite": {
+          "type": "string",
+          "required": false
+        },
+        "authorIP": {
+          "type": "string",
+          "required": false,
+          "private": true
+        },
+        "approved": {
+          "type": "boolean",
+          "default": false,
+          "required": true
+        },
+        "spam": {
+          "type": "boolean",
+          "default": false,
+          "required": true
+        },
+        "article": {
+          "type": "relation",
+          "relation": "manyToOne",
+          "target": "api::article.article",
+          "inversedBy": "comments",
+          "required": true
+        },
+        "parentComment": {
+          "type": "relation",
+          "relation": "manyToOne",
+          "target": "api::comment.comment"
+        },
+        "replies": {
+          "type": "relation",
+          "relation": "oneToMany",
+          "target": "api::comment.comment",
+          "mappedBy": "parentComment"
+        },
+        "moderatedBy": {
+          "type": "relation",
+          "relation": "manyToOne",
+          "target": "api::author.author",
+          "required": false
+        },
+        "moderatedAt": {
+          "type": "datetime",
+          "required": false
+        }
+      }
+    },
+
+    "newsletter": {
+      "kind": "collectionType",
+      "collectionName": "newsletter_subscribers",
+      "info": {
+        "singularName": "newsletter-subscriber",
+        "pluralName": "newsletter-subscribers",
+        "displayName": "Newsletter Subscriber",
+        "description": "Newsletter subscription management"
+      },
+      "options": {
+        "draftAndPublish": false,
+        "timestamps": true
+      },
+      "attributes": {
+        "email": {
+          "type": "email",
+          "required": true,
+          "unique": true
+        },
+        "name": {
+          "type": "string",
+          "required": false,
+          "maxLength": 100
+        },
+        "status": {
+          "type": "enumeration",
+          "enum": ["subscribed", "unsubscribed", "bounced"],
+          "default": "subscribed",
+          "required": true
+        },
+        "preferences": {
+          "type": "json",
+          "required": false
+        },
+        "subscribeDate": {
+          "type": "datetime",
+          "required": true
+        },
+        "unsubscribeDate": {
+          "type": "datetime",
+          "required": false
+        },
+        "confirmationToken": {
+          "type": "string",
+          "required": false,
+          "private": true
+        },
+        "confirmed": {
+          "type": "boolean",
+          "default": false,
+          "required": true
+        }
+      }
+    },
+
+    "menu": {
+      "kind": "collectionType",
+      "collectionName": "menus",
+      "info": {
+        "singularName": "menu",
+        "pluralName": "menus",
+        "displayName": "Menu",
+        "description": "Site navigation menus"
+      },
+      "options": {
+        "draftAndPublish": false
+      },
+      "attributes": {
+        "name": {
+          "type": "string",
+          "required": true,
+          "maxLength": 50,
+          "unique": true
+        },
+        "location": {
+          "type": "enumeration",
+          "enum": ["header", "footer", "sidebar", "mobile"],
+          "required": true
+        },
+        "items": {
+          "type": "component",
+          "repeatable": true,
+          "component": "navigation.menu-item"
+        },
+        "isActive": {
+          "type": "boolean",
+          "default": true,
+          "required": true
+        }
+      }
+    }
+  },
+
+  "components": {
+    "shared.seo": {
+      "collectionName": "components_shared_seos",
+      "info": {
+        "displayName": "SEO",
+        "description": "SEO meta data"
+      },
+      "attributes": {
+        "metaTitle": {
+          "type": "string",
+          "maxLength": 60,
+          "required": false
+        },
+        "metaDescription": {
+          "type": "text",
+          "maxLength": 160,
+          "required": false
+        },
+        "metaRobots": {
+          "type": "string",
+          "maxLength": 100,
+          "default": "index,follow"
+        },
+        "canonicalURL": {
+          "type": "string",
+          "required": false
+        },
+        "focusKeyword": {
+          "type": "string",
+          "maxLength": 50,
+          "required": false
+        },
+        "ogTitle": {
+          "type": "string",
+          "maxLength": 60,
+          "required": false
+        },
+        "ogDescription": {
+          "type": "text",
+          "maxLength": 160,
+          "required": false
+        },
+        "ogImage": {
+          "type": "media",
+          "multiple": false,
+          "required": false,
+          "allowedTypes": ["images"]
+        },
+        "twitterTitle": {
+          "type": "string",
+          "maxLength": 60,
+          "required": false
+        },
+        "twitterDescription": {
+          "type": "text",
+          "maxLength": 160,
+          "required": false
+        },
+        "twitterImage": {
+          "type": "media",
+          "multiple": false,
+          "required": false,
+          "allowedTypes": ["images"]
+        },
+        "structuredData": {
+          "type": "json",
+          "required": false
+        }
+      }
+    },
+
+    "shared.social-links": {
+      "collectionName": "components_shared_social_links",
+      "info": {
+        "displayName": "Social Links",
+        "description": "Social media links"
+      },
+      "attributes": {
+        "twitter": {
+          "type": "string",
+          "required": false
+        },
+        "linkedin": {
+          "type": "string", 
+          "required": false
+        },
+        "facebook": {
+          "type": "string",
+          "required": false
+        },
+        "instagram": {
+          "type": "string",
+          "required": false
+        },
+        "github": {
+          "type": "string",
+          "required": false
+        },
+        "website": {
+          "type": "string",
+          "required": false
+        },
+        "youtube": {
+          "type": "string",
+          "required": false
+        }
+      }
+    },
+
+    "shared.social-share": {
+      "collectionName": "components_shared_social_share",
+      "info": {
+        "displayName": "Social Share",
+        "description": "Social sharing configuration"
+      },
+      "attributes": {
+        "twitter": {
+          "type": "boolean",
+          "default": true
+        },
+        "facebook": {
+          "type": "boolean",
+          "default": true
+        },
+        "linkedin": {
+          "type": "boolean",
+          "default": true
+        },
+        "reddit": {
+          "type": "boolean",
+          "default": false
+        },
+        "whatsapp": {
+          "type": "boolean",
+          "default": true
+        },
+        "telegram": {
+          "type": "boolean",
+          "default": false
+        },
+        "customMessage": {
+          "type": "text",
+          "maxLength": 280,
+          "required": false
+        }
+      }
+    },
+
+    "navigation.menu-item": {
+      "collectionName": "components_navigation_menu_items",
+      "info": {
+        "displayName": "Menu Item",
+        "description": "Navigation menu item"
+      },
+      "attributes": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxLength": 50
+        },
+        "url": {
+          "type": "string",
+          "required": false
+        },
+        "target": {
+          "type": "enumeration",
+          "enum": ["_self", "_blank", "_parent", "_top"],
+          "default": "_self"
+        },
+        "icon": {
+          "type": "string",
+          "required": false,
+          "maxLength": 50
+        },
+        "description": {
+          "type": "text",
+          "maxLength": 100,
+          "required": false
+        },
+        "isVisible": {
+          "type": "boolean",
+          "default": true,
+          "required": true
+        },
+        "sortOrder": {
+          "type": "integer",
+          "default": 0
+        },
+        "submenu": {
+          "type": "component",
+          "repeatable": true,
+          "component": "navigation.submenu-item"
+        }
+      }
+    },
+
+    "navigation.submenu-item": {
+      "collectionName": "components_navigation_submenu_items",
+      "info": {
+        "displayName": "Submenu Item",
+        "description": "Navigation submenu item"
+      },
+      "attributes": {
+        "label": {
+          "type": "string",
+          "required": true,
+          "maxLength": 50
+        },
+        "url": {
+          "type": "string",
+          "required": false
+        },
+        "target": {
+          "type": "enumeration",
+          "enum": ["_self", "_blank", "_parent", "_top"],
+          "default": "_self"
+        },
+        "icon": {
+          "type": "string",
+          "required": false,
+          "maxLength": 50
+        },
+        "isVisible": {
+          "type": "boolean",
+          "default": true,
+          "required": true
+        },
+        "sortOrder": {
+          "type": "integer",
+          "default": 0
+        }
+      }
+    }
+  },
+
+  "optimization": {
+    "database": {
+      "indexes": [
+        {
+          "table": "articles",
+          "columns": ["slug"],
+          "unique": true
+        },
+        {
+          "table": "articles", 
+          "columns": ["status", "published_at"],
+          "type": "btree"
+        },
+        {
+          "table": "articles",
+          "columns": ["featured", "published_at"],
+          "type": "btree"
+        },
+        {
+          "table": "articles",
+          "columns": ["view_count"],
+          "type": "btree"
+        },
+        {
+          "table": "authors",
+          "columns": ["slug"],
+          "unique": true
+        },
+        {
+          "table": "categories",
+          "columns": ["slug"],
+          "unique": true
+        },
+        {
+          "table": "tags",
+          "columns": ["slug"],
+          "unique": true
+        },
+        {
+          "table": "comments",
+          "columns": ["article_id", "approved", "created_at"],
+          "type": "btree"
+        },
+        {
+          "table": "newsletter_subscribers",
+          "columns": ["email"],
+          "unique": true
+        }
+      ],
+      "sizeMonitoring": {
+        "maxTableSizes": {
+          "articles": "800MB",
+          "media_files": "150MB",
+          "comments": "30MB",
+          "authors": "10MB",
+          "categories": "5MB",
+          "tags": "5MB"
+        },
+        "cleanupRules": {
+          "articles": "archive articles older than 2 years",
+          "comments": "delete spam comments older than 30 days",
+          "media_files": "compress images older than 6 months"
+        }
+      }
+    }
+  }
+}

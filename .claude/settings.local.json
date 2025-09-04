@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm run:*)",
+      "Bash(pnpm rebuild:*)",
+      "Bash(pnpm add:*)",
+      "Bash(lsof:*)",
+      "Bash(rm:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(true)",
+      "Bash(pnpm install:*)",
+      "Bash(mv:*)",
+      "mcp__puppeteer__puppeteer_navigate",
+      "mcp__puppeteer__puppeteer_screenshot",
+      "mcp__puppeteer__puppeteer_click",
+      "mcp__puppeteer__puppeteer_evaluate",
+      "Bash(pnpm typecheck:*)",
+      "Bash(pnpm dev:*)",
+      "Bash(curl:*)",
+      "Bash(pnpm --filter @repo/next-config typecheck)",
+      "Bash(pnpm build:*)"
+    ],
+    "deny": []
+  },
+  "autoapprove": {
+    "read": true,
+    "write": true,
+    "run": true
+  }
+}
