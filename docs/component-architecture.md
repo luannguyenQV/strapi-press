@@ -1,75 +1,112 @@
-# Component Architecture for News Site
+# Component Architecture for Strapi + Next.js News Site
 
 ## Component Hierarchy
 
 ```
-app/
+apps/web/app/
 ├── [locale]/
 │   ├── layout.tsx                      // Root layout with providers
 │   ├── page.tsx                        // Homepage
-│   ├── (news)/
-│   │   ├── layout.tsx                  // News section layout
+│   ├── blog/
+│   │   ├── layout.tsx                  // Blog section layout
 │   │   ├── page.tsx                    // Articles listing
-│   │   ├── [slug]/
-│   │   │   └── page.tsx               // Article detail
-│   │   ├── category/
-│   │   │   ├── page.tsx              // Categories index
-│   │   │   └── [slug]/
-│   │   │       └── page.tsx          // Category articles
-│   │   ├── author/
-│   │   │   ├── page.tsx              // Authors directory
-│   │   │   └── [slug]/
-│   │   │       └── page.tsx          // Author profile
-│   │   ├── tag/
-│   │   │   └── [slug]/
-│   │   │       └── page.tsx          // Tag articles
-│   │   └── archive/
-│   │       └── [year]/
-│   │           └── [month]/
-│   │               └── page.tsx      // Monthly archives
+│   │   └── [slug]/
+│   │       └── page.tsx                // Article detail
+│   ├── category/
+│   │   ├── page.tsx                    // Categories index
+│   │   └── [slug]/
+│   │       └── page.tsx                // Category articles
+│   ├── author/
+│   │   ├── page.tsx                    // Authors directory
+│   │   └── [slug]/
+│   │       └── page.tsx                // Author profile
+│   ├── tag/
+│   │   └── [slug]/
+│   │       └── page.tsx                // Tag articles
+│   ├── archive/
+│   │   └── [[...date]]/
+│   │       └── page.tsx                // Date-based archives
 │   ├── search/
-│   │   └── page.tsx                  // Search results
-│   └── components/
-│       ├── layout/
-│       │   ├── header/
-│       │   │   ├── index.tsx         // Main header
-│       │   │   ├── navigation.tsx    // Navigation menu
-│       │   │   ├── search-bar.tsx    // Search component
-│       │   │   └── user-menu.tsx     // User actions
-│       │   ├── footer/
-│       │   │   ├── index.tsx         // Main footer
-│       │   │   ├── newsletter.tsx    // Newsletter signup
-│       │   │   └── social-links.tsx  // Social media
-│       │   └── sidebar/
-│       │       ├── index.tsx         // Sidebar container
-│       │       ├── trending.tsx      // Trending articles
-│       │       ├── categories.tsx    // Category list
-│       │       ├── tags.tsx          // Tag cloud
-│       │       └── archives.tsx      // Archive links
-│       ├── article/
-│       │   ├── article-card.tsx      // Article preview card
-│       │   ├── article-grid.tsx      // Grid layout
-│       │   ├── article-list.tsx      // List layout
-│       │   ├── article-hero.tsx      // Featured article
-│       │   ├── article-content.tsx   // Rich content renderer
-│       │   ├── article-meta.tsx      // Author, date, reading time
-│       │   ├── article-share.tsx     // Social sharing
-│       │   ├── article-tags.tsx      // Tag display
-│       │   └── related-articles.tsx  // Related content
-│       ├── comment/
-│       │   ├── comment-form.tsx      // Comment submission
-│       │   ├── comment-list.tsx      // Comments display
-│       │   ├── comment-item.tsx      // Single comment
-│       │   └── comment-thread.tsx    // Nested replies
-│       ├── author/
-│       │   ├── author-card.tsx       // Author preview
-│       │   ├── author-bio.tsx        // Full bio
-│       │   └── author-articles.tsx   // Author's articles
-│       └── ui/
-│           ├── pagination.tsx        // Pagination controls
-│           ├── loading.tsx           // Loading states
-│           ├── error.tsx             // Error boundaries
-│           └── empty.tsx             // Empty states
+│   │   └── page.tsx                    // Search results
+│   ├── pricing/
+│   │   └── page.tsx                    // Subscription plans
+│   ├── contact/
+│   │   └── page.tsx                    // Contact form
+│   └── legal/
+│       ├── layout.tsx                  // Legal pages layout
+│       ├── privacy/
+│       │   └── page.tsx                // Privacy policy
+│       └── terms/
+│           └── page.tsx                // Terms of service
+
+components/
+├── layout/
+│   ├── header.tsx                      // Main header component
+│   ├── navigation.tsx                  // Primary navigation
+│   ├── mobile-menu.tsx                 // Mobile navigation
+│   ├── search-command.tsx              // Command palette search
+│   ├── user-menu.tsx                   // User account menu
+│   ├── footer.tsx                      // Main footer
+│   ├── newsletter-form.tsx             // Newsletter subscription
+│   └── theme-toggle.tsx                // Dark/light mode switch
+├── article/
+│   ├── article-card.tsx                // Article preview card
+│   ├── article-grid.tsx                // Grid layout container
+│   ├── article-list.tsx                // List layout container
+│   ├── article-hero.tsx                // Featured article display
+│   ├── article-content.tsx             // Rich content renderer
+│   ├── article-meta.tsx                // Metadata display
+│   ├── article-share.tsx               // Social sharing buttons
+│   ├── article-tags.tsx                // Tag pills
+│   ├── related-articles.tsx            // Related content
+│   └── reading-progress.tsx            // Reading progress bar
+├── author/
+│   ├── author-card.tsx                 // Author preview card
+│   ├── author-bio.tsx                  // Full author bio
+│   ├── author-articles.tsx             // Author's article list
+│   └── author-social.tsx               // Social media links
+├── category/
+│   ├── category-card.tsx               // Category preview
+│   ├── category-list.tsx               // Category listing
+│   └── category-filter.tsx             // Category filter UI
+├── comment/
+│   ├── comment-form.tsx                // Comment submission
+│   ├── comment-list.tsx                // Comments display
+│   ├── comment-item.tsx                // Single comment
+│   ├── comment-thread.tsx              // Nested replies
+│   └── comment-moderation.tsx          // Moderation tools
+├── search/
+│   ├── search-bar.tsx                  // Search input
+│   ├── search-results.tsx              // Results display
+│   ├── search-filters.tsx              // Advanced filters
+│   └── search-suggestions.tsx          // Autocomplete
+└── common/
+    ├── pagination.tsx                  // Pagination controls
+    ├── infinite-scroll.tsx             // Infinite scroll
+    ├── loading-skeleton.tsx            // Skeleton loaders
+    ├── error-boundary.tsx              // Error handling
+    ├── empty-state.tsx                 // Empty states
+    └── breadcrumbs.tsx                 // Navigation breadcrumbs
+
+packages/design-system/components/ui/
+├── accordion.tsx                       // Accordion component
+├── alert.tsx                           // Alert notifications
+├── avatar.tsx                          // User avatars
+├── badge.tsx                           // Status badges
+├── button.tsx                          // Button variants
+├── card.tsx                            // Card containers
+├── dialog.tsx                          // Modal dialogs
+├── dropdown-menu.tsx                   // Dropdown menus
+├── form.tsx                            // Form components
+├── input.tsx                           // Input fields
+├── select.tsx                          // Select dropdowns
+├── separator.tsx                       // Visual separators
+├── skeleton.tsx                        // Loading skeletons
+├── table.tsx                           // Data tables
+├── tabs.tsx                            // Tab navigation
+├── textarea.tsx                        // Text areas
+├── toast.tsx                           // Toast notifications
+└── tooltip.tsx                         // Tooltips
 ```
 
 ## Component Specifications
@@ -77,26 +114,58 @@ app/
 ### Core Layout Components
 
 ```typescript
-// components/layout/header/index.tsx
+// apps/web/components/layout/header.tsx
+import { Button } from '@repo/design-system/components/ui/button';
+import { ModeToggle } from '@repo/design-system/components/mode-toggle';
+import { useTranslations } from '@repo/internationalization';
+import { SearchCommand } from './search-command';
+import { MobileMenu } from './mobile-menu';
+import { UserMenu } from './user-menu';
+import Link from 'next/link';
+
 interface HeaderProps {
   locale: string;
-  navigation: NavigationItem[];
-  user?: User;
+  navigation?: NavigationItem[];
+  user?: User | null;
 }
 
 export function Header({ locale, navigation, user }: HeaderProps) {
+  const t = useTranslations();
+  
   return (
-    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur">
-      <div className="container mx-auto">
-        <div className="flex h-16 items-center justify-between">
-          <Logo />
-          <Navigation items={navigation} />
-          <div className="flex items-center gap-4">
-            <SearchBar />
-            <ThemeToggle />
-            <LanguageSwitcher locale={locale} />
-            {user ? <UserMenu user={user} /> : <SignInButton />}
-          </div>
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 items-center">
+        <div className="mr-4 flex">
+          <Link href={`/${locale}`} className="mr-6 flex items-center space-x-2">
+            <span className="hidden font-bold sm:inline-block">
+              NewsHub
+            </span>
+          </Link>
+          <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
+            {navigation?.map((item) => (
+              <Link
+                key={item.href}
+                href={`/${locale}${item.href}`}
+                className="transition-colors hover:text-foreground/80"
+              >
+                {item.title}
+              </Link>
+            ))}
+          </nav>
+        </div>
+        <div className="flex flex-1 items-center justify-end space-x-2">
+          <SearchCommand />
+          <nav className="flex items-center space-x-2">
+            <ModeToggle />
+            {user ? (
+              <UserMenu user={user} />
+            ) : (
+              <Button variant="secondary" size="sm" asChild>
+                <Link href={`/${locale}/sign-in`}>{t('auth.signIn')}</Link>
+              </Button>
+            )}
+            <MobileMenu navigation={navigation} />
+          </nav>
         </div>
       </div>
     </header>
@@ -107,13 +176,23 @@ export function Header({ locale, navigation, user }: HeaderProps) {
 ### Article Components
 
 ```typescript
-// components/article/article-card.tsx
+// apps/web/components/article/article-card.tsx
+import { Card, CardContent, CardHeader } from '@repo/design-system/components/ui/card';
+import { Badge } from '@repo/design-system/components/ui/badge';
+import { Avatar, AvatarImage, AvatarFallback } from '@repo/design-system/components/ui/avatar';
+import { strapi } from '@repo/strapi-client';
+import { formatDate } from 'date-fns';
+import Image from 'next/image';
+import Link from 'next/link';
+import { cn } from '@repo/design-system/lib/utils';
+
 interface ArticleCardProps {
-  article: Article;
+  article: StrapiArticle;
   variant?: 'default' | 'featured' | 'compact';
   showAuthor?: boolean;
   showCategory?: boolean;
   showExcerpt?: boolean;
+  locale?: string;
 }
 
 export function ArticleCard({ 
@@ -121,323 +200,624 @@ export function ArticleCard({
   variant = 'default',
   showAuthor = true,
   showCategory = true,
-  showExcerpt = true 
+  showExcerpt = true,
+  locale = 'en'
 }: ArticleCardProps) {
+  const { attributes } = article;
+  const coverImage = attributes.cover?.data?.attributes;
+  const author = attributes.author?.data?.attributes;
+  const categories = attributes.categories?.data;
+  
   return (
-    <article className={cn(
-      "group relative flex flex-col overflow-hidden rounded-lg border",
+    <Card className={cn(
+      "group relative overflow-hidden transition-all hover:shadow-lg",
       variant === 'featured' && "md:col-span-2 md:row-span-2",
-      variant === 'compact' && "flex-row"
+      variant === 'compact' && "flex flex-row"
     )}>
-      {article.featuredImage && (
-        <div className="relative aspect-[16/9] overflow-hidden">
+      {coverImage && (
+        <div className={cn(
+          "relative overflow-hidden bg-muted",
+          variant === 'compact' ? "w-40" : "aspect-[16/9]"
+        )}>
           <Image
-            src={article.featuredImage.url}
-            alt={article.featuredImage.alternativeText || article.title}
+            src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${coverImage.url}`}
+            alt={coverImage.alternativeText || attributes.title}
             fill
-            className="object-cover transition-transform group-hover:scale-105"
-            sizes={variant === 'featured' ? '(max-width: 768px) 100vw, 50vw' : '(max-width: 768px) 100vw, 33vw'}
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            sizes={variant === 'featured' 
+              ? '(max-width: 768px) 100vw, 50vw' 
+              : '(max-width: 768px) 100vw, 33vw'}
           />
-          {article.categories?.[0] && showCategory && (
-            <Badge className="absolute top-2 left-2">
-              {article.categories[0].name}
+          {categories?.[0] && showCategory && (
+            <Badge className="absolute top-2 left-2 z-10">
+              {categories[0].attributes.name}
             </Badge>
           )}
         </div>
       )}
       
-      <div className="flex flex-1 flex-col p-4">
-        <h3 className={cn(
-          "font-bold line-clamp-2 group-hover:text-primary transition-colors",
-          variant === 'featured' ? "text-2xl md:text-3xl" : "text-lg"
-        )}>
-          <Link href={`/news/${article.slug}`}>
-            <span className="absolute inset-0" />
-            {article.title}
-          </Link>
-        </h3>
+      <CardContent className="flex flex-1 flex-col p-6">
+        <CardHeader className="p-0">
+          <h3 className={cn(
+            "font-bold line-clamp-2 transition-colors group-hover:text-primary",
+            variant === 'featured' ? "text-2xl md:text-3xl" : "text-lg"
+          )}>
+            <Link href={`/${locale}/blog/${attributes.slug}`}>
+              <span className="absolute inset-0 z-10" />
+              {attributes.title}
+            </Link>
+          </h3>
+        </CardHeader>
         
-        {showExcerpt && article.excerpt && (
-          <p className="mt-2 text-sm text-muted-foreground line-clamp-3">
-            {article.excerpt}
+        {showExcerpt && attributes.description && (
+          <p className="mt-3 text-sm text-muted-foreground line-clamp-3">
+            {attributes.description}
           </p>
         )}
         
         <div className="mt-auto flex items-center gap-4 pt-4 text-sm text-muted-foreground">
-          {showAuthor && article.author && (
+          {showAuthor && author && (
             <div className="flex items-center gap-2">
-              {article.author.avatar && (
+              {author.avatar?.data && (
                 <Avatar className="h-6 w-6">
-                  <AvatarImage src={article.author.avatar.url} />
-                  <AvatarFallback>{article.author.name[0]}</AvatarFallback>
+                  <AvatarImage 
+                    src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${author.avatar.data.attributes.url}`} 
+                  />
+                  <AvatarFallback>{author.name[0]}</AvatarFallback>
                 </Avatar>
               )}
-              <span>{article.author.name}</span>
+              <span className="font-medium">{author.name}</span>
             </div>
           )}
           
-          <time dateTime={article.publishedAt}>
-            {formatDate(article.publishedAt)}
+          <time dateTime={attributes.publishedAt}>
+            {formatDate(new Date(attributes.publishedAt), 'MMM dd, yyyy')}
           </time>
           
-          {article.readingTime && (
-            <span>{article.readingTime} min read</span>
+          {attributes.readingTime && (
+            <span className="flex items-center gap-1">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {attributes.readingTime} min read
+            </span>
           )}
         </div>
-      </div>
-    </article>
+      </CardContent>
+    </Card>
   );
 }
 ```
 
-### Comment System Components
+### Strapi Content Integration
 
 ```typescript
-// components/comment/comment-form.tsx
-interface CommentFormProps {
-  articleId: number;
-  parentCommentId?: number;
-  onSuccess?: () => void;
+// apps/web/components/article/article-content.tsx
+import { strapi } from '@repo/strapi-client';
+import { Card, CardContent } from '@repo/design-system/components/ui/card';
+import { Badge } from '@repo/design-system/components/ui/badge';
+import { Separator } from '@repo/design-system/components/ui/separator';
+import { MDXRemote } from 'next-mdx-remote/rsc';
+import Image from 'next/image';
+import Link from 'next/link';
+
+interface ArticleContentProps {
+  article: StrapiArticle;
+  locale: string;
 }
 
-export function CommentForm({ articleId, parentCommentId, onSuccess }: CommentFormProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const form = useForm<CommentInput>({
-    resolver: zodResolver(commentSchema),
-    defaultValues: {
-      content: '',
-      authorName: '',
-      authorEmail: '',
-    },
-  });
-  
-  async function onSubmit(data: CommentInput) {
-    setIsSubmitting(true);
-    
-    try {
-      await articleService.createComment(articleId, {
-        ...data,
-        parentCommentId,
-      });
-      
-      toast.success('Comment submitted for moderation');
-      form.reset();
-      onSuccess?.();
-    } catch (error) {
-      toast.error('Failed to submit comment');
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
+export function ArticleContent({ article, locale }: ArticleContentProps) {
+  const { attributes } = article;
+  const blocks = attributes.blocks || [];
   
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="content"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <Textarea
-                  placeholder="Share your thoughts..."
-                  className="min-h-[100px]"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+    <div className="prose prose-slate dark:prose-invert max-w-none">
+      {/* Article Header */}
+      <header className="mb-8">
+        <h1 className="text-4xl font-bold mb-4">{attributes.title}</h1>
+        {attributes.description && (
+          <p className="text-xl text-muted-foreground">{attributes.description}</p>
+        )}
         
-        <div className="grid gap-4 sm:grid-cols-2">
-          <FormField
-            control={form.control}
-            name="authorName"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input placeholder="Your name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-          <FormField
-            control={form.control}
-            name="authorEmail"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input type="email" placeholder="Your email" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <div className="flex flex-wrap gap-2 mt-4">
+          {attributes.categories?.data?.map((category) => (
+            <Badge key={category.id} variant="secondary">
+              <Link href={`/${locale}/category/${category.attributes.slug}`}>
+                {category.attributes.name}
+              </Link>
+            </Badge>
+          ))}
         </div>
         
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Submitting...
-            </>
-          ) : (
-            'Post Comment'
-          )}
-        </Button>
-      </form>
-    </Form>
+        <Separator className="mt-6" />
+      </header>
+      
+      {/* Article Content Blocks */}
+      <div className="space-y-8">
+        {blocks.map((block, index) => (
+          <ContentBlock key={index} block={block} />
+        ))}
+      </div>
+      
+      {/* Rich Text Content */}
+      {attributes.content && (
+        <div className="mt-8">
+          <MDXRemote source={attributes.content} />
+        </div>
+      )}
+    </div>
   );
+}
+
+interface ContentBlockProps {
+  block: StrapiContentBlock;
+}
+
+function ContentBlock({ block }: ContentBlockProps) {
+  switch (block.__component) {
+    case 'shared.rich-text':
+      return (
+        <div className="prose prose-slate dark:prose-invert max-w-none">
+          <MDXRemote source={block.body} />
+        </div>
+      );
+      
+    case 'shared.media':
+      return (
+        <figure className="not-prose">
+          <div className="relative aspect-video rounded-lg overflow-hidden">
+            <Image
+              src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${block.file.data.attributes.url}`}
+              alt={block.file.data.attributes.alternativeText || ''}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 80vw"
+            />
+          </div>
+          {block.file.data.attributes.caption && (
+            <figcaption className="text-center text-sm text-muted-foreground mt-2">
+              {block.file.data.attributes.caption}
+            </figcaption>
+          )}
+        </figure>
+      );
+      
+    case 'shared.quote':
+      return (
+        <Card className="border-l-4 border-l-primary">
+          <CardContent className="p-6">
+            <blockquote className="text-lg italic font-medium">
+              "{block.body}"
+            </blockquote>
+            {block.author && (
+              <cite className="block mt-4 text-sm text-muted-foreground">
+                — {block.author}
+              </cite>
+            )}
+          </CardContent>
+        </Card>
+      );
+      
+    case 'shared.slider':
+      return (
+        <div className="not-prose">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {block.files.data.map((file, index) => (
+              <div key={index} className="relative aspect-video rounded-lg overflow-hidden">
+                <Image
+                  src={`${process.env.NEXT_PUBLIC_STRAPI_URL}${file.attributes.url}`}
+                  alt={file.attributes.alternativeText || ''}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+      
+    default:
+      return null;
+  }
 }
 ```
 
 ## Performance Optimizations
 
-### Image Optimization
+### Server Components with React Cache
 ```typescript
-// components/ui/optimized-image.tsx
-export function OptimizedImage({ 
-  src, 
-  alt, 
-  priority = false,
-  ...props 
-}: ImageProps) {
-  // Use Cloudinary transformations for optimal delivery
-  const optimizedSrc = getCloudinaryUrl(src, {
-    width: props.width,
-    height: props.height,
-    quality: 'auto',
-    format: 'auto',
-    crop: props.fill ? 'fill' : 'scale',
+// apps/web/lib/strapi-queries.ts
+import { strapi, cachedFind, cachedFindOne } from '@repo/strapi-client';
+import { cache } from 'react';
+
+// Cache article queries for 5 minutes
+export const getArticles = cache(async (params?: {
+  page?: number;
+  pageSize?: number;
+  populate?: string[];
+  filters?: any;
+  sort?: string[];
+}) => {
+  return await cachedFind('articles', {
+    populate: ['author', 'categories', 'cover'],
+    sort: ['publishedAt:desc'],
+    ...params,
   });
-  
-  return (
-    <Image
-      {...props}
-      src={optimizedSrc}
-      alt={alt}
-      priority={priority}
-      placeholder="blur"
-      blurDataURL={getBlurDataUrl(src)}
-    />
-  );
-}
+});
+
+export const getArticleBySlug = cache(async (slug: string) => {
+  const { data } = await cachedFind('articles', {
+    filters: { slug: { $eq: slug } },
+    populate: ['author', 'categories', 'cover', 'blocks'],
+  });
+  return data[0] || null;
+});
+
+export const getCategoriesWithCount = cache(async () => {
+  return await cachedFind('categories', {
+    populate: ['articles'],
+    sort: ['name:asc'],
+  });
+});
 ```
 
-### Infinite Scroll
+### Infinite Scroll with React Suspense
 ```typescript
-// components/article/article-infinite-list.tsx
-export function ArticleInfiniteList({ initialArticles }: { initialArticles: Article[] }) {
+// apps/web/components/article/article-infinite-list.tsx
+'use client';
+
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInView } from 'react-intersection-observer';
+import { strapi } from '@repo/strapi-client';
+import { ArticleCard } from './article-card';
+import { Skeleton } from '@repo/design-system/components/ui/skeleton';
+import { useEffect } from 'react';
+
+interface ArticleInfiniteListProps {
+  initialArticles: StrapiArticle[];
+  locale: string;
+  filters?: any;
+}
+
+export function ArticleInfiniteList({ 
+  initialArticles, 
+  locale, 
+  filters = {} 
+}: ArticleInfiniteListProps) {
   const { ref, inView } = useInView();
-  const [articles, setArticles] = useState(initialArticles);
-  const [page, setPage] = useState(2);
-  const [hasMore, setHasMore] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
   
+  const {
+    data,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    status,
+  } = useInfiniteQuery({
+    queryKey: ['articles', filters],
+    queryFn: async ({ pageParam = 1 }) => {
+      return await strapi.find('articles', {
+        page: pageParam,
+        pageSize: 12,
+        populate: ['author', 'categories', 'cover'],
+        sort: ['publishedAt:desc'],
+        filters,
+      });
+    },
+    getNextPageParam: (lastPage, pages) => {
+      const { pagination } = lastPage.meta;
+      return pagination.page < pagination.pageCount 
+        ? pagination.page + 1 
+        : undefined;
+    },
+    initialData: {
+      pages: [{ data: initialArticles, meta: { pagination: { page: 1 } } }],
+      pageParams: [1],
+    },
+  });
+
   useEffect(() => {
-    if (inView && hasMore && !isLoading) {
-      loadMore();
+    if (inView && hasNextPage) {
+      fetchNextPage();
     }
-  }, [inView, hasMore, isLoading]);
-  
-  async function loadMore() {
-    setIsLoading(true);
-    
-    try {
-      const response = await articleService.getArticles({ page });
-      
-      if (response.data.length === 0) {
-        setHasMore(false);
-      } else {
-        setArticles(prev => [...prev, ...response.data]);
-        setPage(prev => prev + 1);
-      }
-    } catch (error) {
-      console.error('Failed to load more articles:', error);
-    } finally {
-      setIsLoading(false);
-    }
+  }, [inView, fetchNextPage, hasNextPage]);
+
+  if (status === 'error') {
+    return <div>Error loading articles: {error?.message}</div>;
   }
-  
+
   return (
     <>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {articles.map(article => (
-          <ArticleCard key={article.id} article={article} />
+        {data?.pages.map((group, i) => (
+          group.data.map((article: StrapiArticle) => (
+            <ArticleCard 
+              key={article.id} 
+              article={article} 
+              locale={locale}
+            />
+          ))
         ))}
       </div>
-      
-      {hasMore && (
+
+      {hasNextPage && (
         <div ref={ref} className="mt-8 flex justify-center">
-          {isLoading && <Spinner />}
+          {isFetchingNextPage && (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <ArticleCardSkeleton key={i} />
+              ))}
+            </div>
+          )}
         </div>
       )}
     </>
   );
 }
+
+function ArticleCardSkeleton() {
+  return (
+    <div className="space-y-3">
+      <Skeleton className="h-48 w-full rounded-lg" />
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-3 w-1/2" />
+      </div>
+    </div>
+  );
+}
 ```
 
-## State Management
+## State Management & Data Flow
 
+### Client State with Zustand
 ```typescript
-// stores/news-store.ts
+// apps/web/stores/reading-preferences.ts
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { subscribeWithSelector } from 'zustand/middleware';
 
-interface NewsStore {
-  // User preferences
+interface ReadingPreferencesStore {
+  // UI preferences
   theme: 'light' | 'dark' | 'system';
   fontSize: 'small' | 'medium' | 'large';
-  layout: 'grid' | 'list';
+  layout: 'grid' | 'list' | 'cards';
   
-  // Reading history
+  // Reading behavior
   readArticles: Set<string>;
-  bookmarks: Set<string>;
+  bookmarkedArticles: Set<string>;
+  readingPosition: Record<string, number>;
+  
+  // User interactions
+  searchHistory: string[];
+  categoryPreferences: string[];
   
   // Actions
-  setTheme: (theme: NewsStore['theme']) => void;
-  setFontSize: (size: NewsStore['fontSize']) => void;
-  setLayout: (layout: NewsStore['layout']) => void;
+  setTheme: (theme: ReadingPreferencesStore['theme']) => void;
+  setFontSize: (size: ReadingPreferencesStore['fontSize']) => void;
+  setLayout: (layout: ReadingPreferencesStore['layout']) => void;
   markAsRead: (articleId: string) => void;
   toggleBookmark: (articleId: string) => void;
+  updateReadingPosition: (articleId: string, position: number) => void;
+  addToSearchHistory: (query: string) => void;
+  toggleCategoryPreference: (categoryId: string) => void;
 }
 
-export const useNewsStore = create<NewsStore>()(
-  persist(
-    (set) => ({
-      theme: 'system',
-      fontSize: 'medium',
-      layout: 'grid',
-      readArticles: new Set(),
-      bookmarks: new Set(),
-      
-      setTheme: (theme) => set({ theme }),
-      setFontSize: (fontSize) => set({ fontSize }),
-      setLayout: (layout) => set({ layout }),
-      
-      markAsRead: (articleId) =>
-        set((state) => ({
-          readArticles: new Set([...state.readArticles, articleId]),
-        })),
-      
-      toggleBookmark: (articleId) =>
-        set((state) => {
-          const bookmarks = new Set(state.bookmarks);
-          if (bookmarks.has(articleId)) {
-            bookmarks.delete(articleId);
-          } else {
-            bookmarks.add(articleId);
-          }
-          return { bookmarks };
+export const useReadingPreferences = create<ReadingPreferencesStore>()(
+  subscribeWithSelector(
+    persist(
+      (set, get) => ({
+        // Initial state
+        theme: 'system',
+        fontSize: 'medium',
+        layout: 'grid',
+        readArticles: new Set(),
+        bookmarkedArticles: new Set(),
+        readingPosition: {},
+        searchHistory: [],
+        categoryPreferences: [],
+        
+        // Theme actions
+        setTheme: (theme) => set({ theme }),
+        setFontSize: (fontSize) => set({ fontSize }),
+        setLayout: (layout) => set({ layout }),
+        
+        // Reading actions
+        markAsRead: (articleId) =>
+          set((state) => ({
+            readArticles: new Set([...state.readArticles, articleId]),
+          })),
+        
+        toggleBookmark: (articleId) =>
+          set((state) => {
+            const bookmarked = new Set(state.bookmarkedArticles);
+            if (bookmarked.has(articleId)) {
+              bookmarked.delete(articleId);
+            } else {
+              bookmarked.add(articleId);
+            }
+            return { bookmarkedArticles: bookmarked };
+          }),
+        
+        updateReadingPosition: (articleId, position) =>
+          set((state) => ({
+            readingPosition: {
+              ...state.readingPosition,
+              [articleId]: position,
+            },
+          })),
+        
+        addToSearchHistory: (query) =>
+          set((state) => {
+            const history = [query, ...state.searchHistory.filter(q => q !== query)];
+            return { searchHistory: history.slice(0, 10) }; // Keep last 10
+          }),
+        
+        toggleCategoryPreference: (categoryId) =>
+          set((state) => {
+            const preferences = [...state.categoryPreferences];
+            const index = preferences.indexOf(categoryId);
+            if (index > -1) {
+              preferences.splice(index, 1);
+            } else {
+              preferences.push(categoryId);
+            }
+            return { categoryPreferences: preferences };
+          }),
+      }),
+      {
+        name: 'reading-preferences',
+        // Custom serializer for Sets
+        serialize: (state) => JSON.stringify({
+          ...state.state,
+          readArticles: Array.from(state.state.readArticles),
+          bookmarkedArticles: Array.from(state.state.bookmarkedArticles),
         }),
-    }),
-    {
-      name: 'news-preferences',
-    }
+        deserialize: (str) => {
+          const parsed = JSON.parse(str);
+          return {
+            ...parsed,
+            readArticles: new Set(parsed.readArticles || []),
+            bookmarkedArticles: new Set(parsed.bookmarkedArticles || []),
+          };
+        },
+      }
+    )
   )
 );
+```
+
+### Server State with TanStack Query
+```typescript
+// apps/web/hooks/use-articles.ts
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { strapi } from '@repo/strapi-client';
+
+export function useArticles(filters: any = {}, pageSize = 12) {
+  return useInfiniteQuery({
+    queryKey: ['articles', filters],
+    queryFn: async ({ pageParam = 1 }) => {
+      return await strapi.find('articles', {
+        page: pageParam,
+        pageSize,
+        populate: ['author', 'categories', 'cover'],
+        sort: ['publishedAt:desc'],
+        filters,
+      });
+    },
+    getNextPageParam: (lastPage) => {
+      const { pagination } = lastPage.meta;
+      return pagination.page < pagination.pageCount 
+        ? pagination.page + 1 
+        : undefined;
+    },
+  });
+}
+
+export function useArticle(slug: string) {
+  return useQuery({
+    queryKey: ['article', slug],
+    queryFn: async () => {
+      const { data } = await strapi.find('articles', {
+        filters: { slug: { $eq: slug } },
+        populate: ['author', 'categories', 'cover', 'blocks'],
+      });
+      return data[0] || null;
+    },
+    enabled: !!slug,
+  });
+}
+
+export function useCategories() {
+  return useQuery({
+    queryKey: ['categories'],
+    queryFn: () => strapi.find('categories', {
+      sort: ['name:asc'],
+      populate: ['articles'],
+    }),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+}
+```
+
+### Type Definitions
+```typescript
+// apps/web/types/strapi.ts
+export interface StrapiResponse<T> {
+  data: T;
+  meta: {
+    pagination?: {
+      page: number;
+      pageSize: number;
+      pageCount: number;
+      total: number;
+    };
+  };
+}
+
+export interface StrapiArticle {
+  id: number;
+  attributes: {
+    title: string;
+    slug: string;
+    description?: string;
+    content?: string;
+    publishedAt: string;
+    createdAt: string;
+    updatedAt: string;
+    readingTime?: number;
+    
+    // Relations
+    author?: {
+      data: {
+        id: number;
+        attributes: {
+          name: string;
+          email: string;
+          bio?: string;
+          avatar?: StrapiImage;
+        };
+      };
+    };
+    
+    categories?: {
+      data: Array<{
+        id: number;
+        attributes: {
+          name: string;
+          slug: string;
+          description?: string;
+        };
+      }>;
+    };
+    
+    cover?: StrapiImage;
+    blocks?: StrapiContentBlock[];
+  };
+}
+
+export interface StrapiImage {
+  data: {
+    id: number;
+    attributes: {
+      name: string;
+      alternativeText?: string;
+      caption?: string;
+      width: number;
+      height: number;
+      formats: Record<string, any>;
+      url: string;
+    };
+  };
+}
+
+export interface StrapiContentBlock {
+  id: number;
+  __component: string;
+  [key: string]: any;
+}
+```
 ```

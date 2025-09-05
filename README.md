@@ -1,31 +1,25 @@
-# ▲ / next-forge
-
-**Production-grade Turborepo template for Next.js apps.**
-
-<div>
-  <img src="https://img.shields.io/npm/dy/next-forge" alt="" />
-  <img src="https://img.shields.io/npm/v/next-forge" alt="" />
-  <img src="https://img.shields.io/github/license/vercel/next-forge" alt="" />
-</div>
+# Jamstack
 
 ## Overview
 
-[next-forge](https://github.com/vercel/next-forge) is a [Next.js](https://nextjs.org/) project boilerplate for modern web application. It is designed to be a comprehensive starting point for new apps, providing a solid, opinionated foundation with a minimal amount of configuration.
+This monorepo contains my work building a modern web stack:
 
-## Getting Started
+- Backend powered by Strapi
+- Frontend built with Next.js
+- Target use case: a blog
 
-Clone the repo using:
+## Tech Stack
 
-```sh
-npx next-forge@latest init
-```
+- **Backend**: Strapi (Headless CMS)
+- **Frontend**: Next.js (React)
 
-Then read the [docs](https://www.next-forge.com/docs) for more information.
+## Apps
 
-## Contributors
+- `apps/strapi`: Strapi backend (content models, APIs, admin panel)
+- `apps/web`: Next.js frontend (public site UI)
 
-<a href="https://github.com/vercel/next-forge/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=vercel/next-forge" />
-</a>
+## Goals
 
-Made with [contrib.rocks](https://contrib.rocks).
+- Manage content easily via Strapi
+- Deliver a fast, SEO-friendly site with Next.js
+- Support a blog and company profile pages out of the box
