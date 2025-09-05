@@ -21,7 +21,8 @@
       "Bash(pnpm --filter @repo/next-config typecheck)",
       "Bash(pnpm build:*)",
       "Bash(mkdir:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": []
   },
