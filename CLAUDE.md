@@ -4,6 +4,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
+**StrapiPress** is a production-ready headless CMS starter that combines Strapi with Next.js. It's designed as a modern WordPress alternative for developers who want quick, cheap, and professional website building capabilities.
+
 This is a hybrid monorepo combining next-forge (a Turborepo template) with Strapi CMS. It provides a headless CMS backend with a modern Next.js frontend, using shared packages for common functionality.
 
 ## Key Commands

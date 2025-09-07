@@ -1,8 +1,16 @@
 {
-  "name": "next-forge",
-  "version": "5.0.2",
+  "name": "strapipress",
+  "version": "1.0.0",
+  "description": "The Modern WordPress Alternative - Build professional websites with Strapi + Next.js in minutes",
+  "keywords": ["strapi", "nextjs", "headless-cms", "wordpress-alternative", "jamstack", "blog", "cms"],
+  "author": "StrapiPress Team",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/strapipress.git"
+  },
+  "homepage": "https://strapipress.com",
   "bin": {
-    "next-forge": "dist/index.js"
+    "strapipress": "dist/index.js"
   },
   "files": [
     "dist/index.js"

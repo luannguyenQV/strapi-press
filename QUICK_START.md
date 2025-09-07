@@ -1,12 +1,15 @@
-# Headless News Site Quick Start Guide
+# StrapiPress Quick Start Guide
 
-**Get up and running with Strapi + Next.js news platform in minutes**
+**The Modern WordPress Alternative - Get up and running in 5 minutes**
+
+> Build professional websites with Strapi + Next.js. Quick, cheap, and powerful.
 
 ## 🚀 Installation
 
 ```bash
-# Clone or navigate to project
-cd strapi
+# Clone StrapiPress
+git clone [your-repo] strapipress
+cd strapipress
 
 # Install dependencies
 pnpm install
@@ -16,13 +19,12 @@ pnpm install
 
 ### Start All Applications
 ```bash
-# Start both frontend and backend
+# Start StrapiPress (both frontend and backend)
 pnpm dev
 
-# Applications will be available at:
-# - Frontend (Next.js): http://localhost:3000
-# - Backend (Strapi): http://localhost:1337
-# - Strapi Admin: http://localhost:1337/admin
+# Your site will be available at:
+# - Website: http://localhost:3000
+# - Strapi CMS: http://localhost:1337/admin
 ```
 
 ### Start Individual Applications
@@ -235,4 +237,6 @@ strapi/
 
 ---
 
-**Ready to build your news platform? Start with `pnpm dev` and create content!** 🎉
+**Ready to build with StrapiPress? Start with `pnpm dev` and create amazing websites!** 🚀
+
+*StrapiPress - The Modern WordPress Alternative That Actually Works* ⚡
