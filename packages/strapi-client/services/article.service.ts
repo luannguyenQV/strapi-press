@@ -3,10 +3,78 @@
  * Handles all article-related API operations with optimization
  */
 
-import strapi, { cachedFind, cachedFindOne } from '../index.js';
-import type { QueryParams } from '../index.js';
+import strapi, { cachedFind, cachedFindOne } from '../index';
+import type { QueryParams } from '../index';
 
+// Strapi v5 Media interface
+export interface Media {
+  id: number;
+  documentId?: string;
+  name: string;
+  alternativeText?: string;
+  caption?: string;
+  width: number;
+  height: number;
+  formats?: {
+    thumbnail?: MediaFormat;
+    small?: MediaFormat;
+    medium?: MediaFormat;
+    large?: MediaFormat;
+  };
+  url: string;
+  previewUrl?: string;
+  provider?: string;
+  mime?: string;
+  size?: number;
+}
+
+export interface MediaFormat {
+  name: string;
+  url: string;
+  width: number;
+  height: number;
+  size: number;
+}
+
+// Strapi v5 flat interface (actual return structure)
 export interface Article {
+  id: number;
+  documentId: string;
+  title: string;
+  slug: string;
+  description?: string;
+  content?: string;
+  publishedAt: string;
+  updatedAt: string;
+  createdAt: string;
+  featured?: boolean;
+  viewCount?: number;
+  readingTime?: number;
+  author?: {
+    id: number;
+    name: string;
+    email?: string;
+    bio?: string;
+    avatar?: Media;
+  };
+  category?: {
+    id: number;
+    name: string;
+    slug: string;
+    description?: string;
+  };
+  cover?: Media;
+  seo?: {
+    metaTitle?: string;
+    metaDescription?: string;
+    metaRobots?: string;
+    canonicalURL?: string;
+    structuredData?: any;
+  };
+}
+
+// Legacy Strapi v4 interface (for backwards compatibility)
+export interface LegacyArticle {
   id: number;
   attributes: {
     title: string;
@@ -172,23 +240,21 @@ class ArticleService {
     populate?: string | string[] | object;
   }) {
     const defaultParams: QueryParams = {
-      populate: [
-        'author',
-        'author.avatar',
-        'categories',
-        'tags',
-        'featuredImage',
-        'seo',
-      ],
+      populate: {
+        author: {
+          populate: ['avatar'],
+        },
+        categories: true,
+        tags: true,
+        featuredImage: true,
+        seo: true,
+      },
       sort: ['publishedAt:desc'],
       pagination: {
         page: params?.page || 1,
         pageSize: params?.pageSize || 10,
       },
-      filters: {
-        status: { $eq: 'published' },
-        ...params?.filters,
-      },
+      ...params?.filters && { filters: params.filters },
     };
 
     return cachedFind<Article>('articles', {
@@ -243,11 +309,18 @@ class ArticleService {
    */
   async getFeaturedArticles(limit = 6) {
     return cachedFind<Article>('articles', {
-      filters: {
-        featured: { $eq: true },
-        status: { $eq: 'published' },
+      fields: ['title', 'description', 'slug', 'publishedAt'],
+      populate: {
+        author: {
+          fields: ['name'],
+        },
+        category: {
+          fields: ['name'],
+        },
+        cover: {
+          fields: ['url', 'alternativeText', 'width', 'height'],
+        },
       },
-      populate: ['author', 'featuredImage', 'categories'],
       sort: ['publishedAt:desc'],
       pagination: {
         limit,

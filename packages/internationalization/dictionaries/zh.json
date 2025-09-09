@@ -1,8 +1,7 @@
 {
   "web": {
     "global": {
-      "primaryCta": "预约电话",
-      "secondaryCta": "注册"
+      "primaryCta": "预约通话"
     },
     "header": {
       "home": "首页",
@@ -13,9 +12,7 @@
       },
       "blog": "博客",
       "docs": "文档",
-      "contact": "联系",
-      "signIn": "登录",
-      "signUp": "开始使用"
+      "contact": "Contact"
     },
     "home": {
       "meta": {

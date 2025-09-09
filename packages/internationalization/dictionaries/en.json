@@ -2,7 +2,10 @@
   "web": {
     "global": {
       "primaryCta": "Book a call",
-      "secondaryCta": "Sign up"
+      "secondaryCta": "Subscribe"
+    },
+    "common": {
+      "siteName": "StrapiPress"
     },
     "header": {
       "home": "Home",
@@ -13,9 +16,7 @@
       },
       "blog": "Blog",
       "docs": "Docs",
-      "contact": "Contact",
-      "signIn": "Sign in",
-      "signUp": "Get started"
+      "contact": "Contact"
     },
     "home": {
       "meta": {

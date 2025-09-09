@@ -32,16 +32,6 @@ export const Header = ({ dictionary }: HeaderProps) => {
       description: '',
     },
     {
-      title: dictionary.web.header.product.title,
-      description: dictionary.web.header.product.description,
-      items: [
-        {
-          title: dictionary.web.header.product.pricing,
-          href: '/pricing',
-        },
-      ],
-    },
-    {
       title: dictionary.web.header.blog,
       href: '/blog',
       description: '',
@@ -57,6 +47,7 @@ export const Header = ({ dictionary }: HeaderProps) => {
   }
 
   const [isOpen, setOpen] = useState(false);
+  
   return (
     <header className="sticky top-0 left-0 z-40 w-full border-b bg-background">
       <div className="container relative mx-auto flex min-h-20 flex-row items-center gap-4 lg:grid lg:grid-cols-3">
@@ -114,7 +105,7 @@ export const Header = ({ dictionary }: HeaderProps) => {
             </NavigationMenuList>
           </NavigationMenu>
         </div>
-        <div className="flex items-center gap-2 lg:justify-center">
+        <Link href="/" className="flex items-center gap-2 lg:justify-center">
           <Image
             src={Logo}
             alt="Logo"
@@ -122,8 +113,8 @@ export const Header = ({ dictionary }: HeaderProps) => {
             height={24}
             className="dark:invert"
           />
-          <p className="whitespace-nowrap font-semibold">next-forge</p>
-        </div>
+          <p className="whitespace-nowrap font-semibold">StrapiPress</p>
+        </Link>
         <div className="flex w-full justify-end gap-4">
           <Button variant="ghost" className="hidden md:inline" asChild>
             <Link href="/contact">{dictionary.web.header.contact}</Link>
@@ -135,16 +126,6 @@ export const Header = ({ dictionary }: HeaderProps) => {
           <div className="hidden md:inline">
             <ModeToggle />
           </div>
-          <Button variant="outline" asChild className="hidden md:inline">
-            <Link href={`${env.NEXT_PUBLIC_APP_URL}/sign-in`}>
-              {dictionary.web.header.signIn}
-            </Link>
-          </Button>
-          <Button asChild>
-            <Link href={`${env.NEXT_PUBLIC_APP_URL}/sign-up`}>
-              {dictionary.web.header.signUp}
-            </Link>
-          </Button>
         </div>
         <div className="flex w-12 shrink items-end justify-end lg:hidden">
           <Button variant="ghost" onClick={() => setOpen(!isOpen)}>

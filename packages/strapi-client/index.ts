@@ -68,7 +68,23 @@ class StrapiClient {
         } else if (Array.isArray(value)) {
           value.forEach(item => searchParams.append('populate', item));
         } else if (typeof value === 'object') {
-          searchParams.append('populate', JSON.stringify(value));
+          // For Strapi v5, use proper object notation  
+          Object.entries(value).forEach(([popKey, popValue]) => {
+            if (popValue === true) {
+              searchParams.append(`populate[${popKey}]`, '*');
+            } else if (typeof popValue === 'object' && popValue !== null) {
+              // Handle nested object structure for fields
+              if (Array.isArray(popValue.fields)) {
+                popValue.fields.forEach((field: string, index: number) => {
+                  searchParams.append(`populate[${popKey}][fields][${index}]`, field);
+                });
+              } else {
+                searchParams.append(`populate[${popKey}]`, '*');
+              }
+            } else {
+              searchParams.append(`populate[${popKey}]`, String(popValue));
+            }
+          });
         }
       } else if (key === 'sort') {
         if (Array.isArray(value)) {
@@ -78,6 +94,18 @@ class StrapiClient {
         }
       } else if (key === 'filters') {
         searchParams.append('filters', JSON.stringify(value));
+      } else if (key === 'pagination') {
+        if (typeof value === 'object') {
+          Object.entries(value).forEach(([pKey, pValue]) => {
+            if (pValue !== undefined && pValue !== null) {
+              searchParams.append(`pagination[${pKey}]`, pValue.toString());
+            }
+          });
+        }
+      } else if (key === 'fields' && Array.isArray(value)) {
+        value.forEach((field, index) => {
+          searchParams.append(`fields[${index}]`, field);
+        });
       } else {
         searchParams.append(key, value.toString());
       }
@@ -148,6 +176,7 @@ class StrapiClient {
     this.checkRateLimit();
     
     const url = `${this.config.apiUrl}/api/${endpoint}`;
+    console.log('🔍 Strapi request URL:', url);
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
       ...options?.headers,
@@ -275,5 +304,9 @@ export const strapi = new StrapiClient({
 // React Server Component cache wrapper
 export const cachedFind = cache(strapi.find.bind(strapi));
 export const cachedFindOne = cache(strapi.findOne.bind(strapi));
+
+// Export services
+export { articleService } from './services/article.service';
+export { categoryService } from './services/category.service';
 
 export default strapi;

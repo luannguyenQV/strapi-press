@@ -1,8 +1,7 @@
 {
   "web": {
     "global": {
-      "primaryCta": "Reservar una llamada",
-      "secondaryCta": "Regístrate"
+      "primaryCta": "Reservar una llamada"
     },
     "header": {
       "home": "Inicio",
@@ -13,9 +12,7 @@
       },
       "blog": "Blog",
       "docs": "Documentos",
-      "contact": "Contacto",
-      "signIn": "Iniciar sesión",
-      "signUp": "Comenzar"
+      "contact": "Contact"
     },
     "home": {
       "meta": {

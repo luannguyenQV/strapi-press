@@ -1,13 +1,10 @@
 import { getDictionary } from '@repo/internationalization';
 import { createMetadata } from '@repo/seo/metadata';
+import { articleService } from '@repo/strapi-client';
 import type { Metadata } from 'next';
-import { Cases } from './components/cases';
-import { CTA } from './components/cta';
-import { FAQ } from './components/faq';
-import { Features } from './components/features';
-import { Hero } from './components/hero';
-import { Stats } from './components/stats';
-import { Testimonials } from './components/testimonials';
+import { Categories } from './components/categories';
+import { FeaturedArticles } from './components/featured-articles';
+import { ContentTabs } from './components/content-tabs';
 
 type HomeProps = {
   params: Promise<{
@@ -28,15 +25,22 @@ const Home = async ({ params }: HomeProps): Promise<React.JSX.Element> => {
   const { locale } = await params;
   const dictionary = await getDictionary(locale);
 
+  // Fetch articles for the home page layout
+  let articles: any[] = [];
+  try {
+    const response = await articleService.getFeaturedArticles(12);
+    articles = response?.data || [];
+  } catch (error) {
+    console.error('Error fetching articles for home page:', error);
+  }
+
   return (
     <>
-      <Hero dictionary={dictionary} />
-      <Cases dictionary={dictionary} />
-      <Features dictionary={dictionary} />
-      <Stats dictionary={dictionary} />
-      <Testimonials dictionary={dictionary} />
-      <FAQ dictionary={dictionary} />
-      <CTA dictionary={dictionary} />
+      <FeaturedArticles dictionary={dictionary} articles={articles} />
+      
+      <ContentTabs dictionary={dictionary} articles={articles} />
+      
+      <Categories dictionary={dictionary} />
     </>
   );
 };
