@@ -1,0 +1,26 @@
+{
+  "collectionName": "components_footer_navigation_links",
+  "info": {
+    "displayName": "Navigation Link",
+    "description": "Single navigation link",
+    "icon": "link"
+  },
+  "attributes": {
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "url": {
+      "type": "string",
+      "required": true
+    },
+    "isExternal": {
+      "type": "boolean",
+      "default": false
+    },
+    "openInNewTab": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}
