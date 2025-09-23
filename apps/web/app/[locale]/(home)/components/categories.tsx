@@ -1,69 +1,52 @@
 import React from 'react';
 import { categoryService } from '@repo/strapi-client';
 import { Badge } from '@repo/design-system/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@repo/design-system/components/ui/card';
 import Link from 'next/link';
-import Image from 'next/image';
 
-interface CategoriesProps {
-  dictionary: any;
+interface CategoriesMenuProps {
+  className?: string;
 }
 
-export async function Categories({ dictionary }: CategoriesProps): Promise<React.JSX.Element | null> {
+export async function CategoriesMenu({  className = '' }: CategoriesMenuProps): Promise<React.JSX.Element | null> {
   try {
     const { data: categories } = await categoryService.getAll({
       sort: ['name:asc'],
-      pagination: { limit: 10 }
+      pagination: { limit: 15 }
     });
 
     if (!categories || categories.length === 0) {
-      return null
+      return null;
     }
 
     return (
-      <section className="py-16 bg-muted/50">
-        <div className="container">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 max-w-4xl mx-auto">
+      <aside className={`w-full ${className}`}>
+        <div className="sticky top-24 space-y-4">
+          <nav className="space-y-2">
             {categories.map((category) => (
               <Link 
                 key={category.id} 
                 href={`/category/${category.slug}`}
-                className="transition-transform hover:scale-105"
+                className="block group"
               >
-                <Card className="h-full hover:shadow-lg transition-all">
-                  <CardContent className="p-6 text-center">
-                    {category.image && (
-                      <div className="w-16 h-16 mx-auto mb-4 relative rounded-full overflow-hidden bg-muted">
-                        <Image
-                          src={category.image.url}
-                          alt={category.image.alternativeText || category.name}
-                          fill
-                          className="object-cover"
-                          sizes="64px"
-                        />
-                      </div>
-                    )}
-                    <Badge variant="secondary" className="mb-2 capitalize">
-                      {category.name}
-                    </Badge>
-                    {category.description && (
-                      <p className="text-sm text-muted-foreground mt-2">
-                        {category.description}
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
+                <div className="flex items-center space-x-2 py-2 px-3 rounded-lg hover:bg-muted/50 transition-colors">
+                  <span className="text-sm font-medium capitalize group-hover:text-primary transition-colors">
+                    {category.name}
+                  </span>
+                </div>
               </Link>
             ))}
-          </div>
-
-          {/* Alternative: Simple Badge List */}
-          <div className="mt-12">
-            <h3 className="text-lg font-semibold text-center mb-6">Quick Browse</h3>
-            <div className="flex flex-wrap gap-2 justify-center">
-              {categories.map((category) => (
-                <Link key={`badge-${category.id}`} href={`/category/${category.slug}`}>
-                  <Badge variant="outline" className="hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer text-sm py-1 px-3 capitalize">
+          </nav>
+          
+          {/* Quick Browse Tags */}
+          <div className="pt-6 border-t">
+            <h4 className="font-medium text-sm mb-3 text-muted-foreground">Quick Browse</h4>
+            <div className="flex flex-wrap gap-1">
+              {categories.slice(0, 8).map((category) => (
+                <Link key={`tag-${category.id}`} href={`/category/${category.slug}`}>
+                  <Badge 
+                    variant="outline" 
+                    className="hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer text-xs px-2 py-1 capitalize"
+                  >
                     {category.name}
                   </Badge>
                 </Link>
@@ -71,21 +54,59 @@ export async function Categories({ dictionary }: CategoriesProps): Promise<React
             </div>
           </div>
         </div>
-      </section>
+      </aside>
     );
   } catch (error) {
     console.error('Error fetching categories:', error);
     return (
-      <section className="py-16">
-        <div className="container">
-          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-8">
-            Categories
-          </h2>
-          <p className="text-center text-muted-foreground">
-            Unable to load categories at the moment. Please try again later.
+      <aside className={`w-full ${className}`}>
+        <div className="sticky top-24">
+          <h3 className="font-semibold text-lg mb-4">Categories</h3>
+          <p className="text-sm text-muted-foreground">
+            Unable to load categories at the moment.
           </p>
         </div>
-      </section>
+      </aside>
     );
   }
 }
+
+// Keep the original Categories component as CategoriesGrid for other uses
+export async function CategoriesGrid({ dictionary }: CategoriesProps): Promise<React.JSX.Element | null> {
+  try {
+    const { data: categories } = await categoryService.getAll({
+      sort: ['name:asc'],
+      pagination: { limit: 10 }
+    });
+
+    if (!categories || categories.length === 0) {
+      return null;
+    }
+
+    return (
+      <section className="py-16 bg-muted/50">
+        <div className="container">
+          <div className="flex flex-wrap gap-2 justify-center">
+            {categories.map((category) => (
+              <Link key={`badge-${category.id}`} href={`/category/${category.slug}`}>
+                <Badge variant="outline" className="hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer text-sm py-1 px-3 capitalize">
+                  {category.name}
+                </Badge>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    return null;
+  }
+}
+
+interface CategoriesProps {
+  dictionary: any;
+}
+
+// Export the sidebar version as the default
+export const Categories = CategoriesMenu;

@@ -1,10 +1,8 @@
 import { getDictionary } from '@repo/internationalization';
 import { createMetadata } from '@repo/seo/metadata';
 import { articleService } from '@repo/strapi-client';
-import type { Metadata } from 'next';
-import { Categories } from './components/categories';
 import { FeaturedArticles } from './components/featured-articles';
-import { ContentTabs } from './components/content-tabs';
+import type { Metadata } from 'next';
 
 type HomeProps = {
   params: Promise<{
@@ -35,13 +33,9 @@ const Home = async ({ params }: HomeProps): Promise<React.JSX.Element> => {
   }
 
   return (
-    <>
+    <div className="container mx-auto px-4 py-8">
       <FeaturedArticles dictionary={dictionary} articles={articles} />
-      
-      <ContentTabs dictionary={dictionary} articles={articles} />
-      
-      <Categories dictionary={dictionary} />
-    </>
+    </div>
   );
 };
 

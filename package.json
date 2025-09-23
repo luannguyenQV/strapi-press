@@ -2,7 +2,15 @@
   "name": "strapipress",
   "version": "1.0.0",
   "description": "The Modern WordPress Alternative - Build professional websites with Strapi + Next.js in minutes",
-  "keywords": ["strapi", "nextjs", "headless-cms", "wordpress-alternative", "jamstack", "blog", "cms"],
+  "keywords": [
+    "strapi",
+    "nextjs",
+    "headless-cms",
+    "wordpress-alternative",
+    "jamstack",
+    "blog",
+    "cms"
+  ],
   "author": "StrapiPress Team",
   "repository": {
     "type": "git",
@@ -17,9 +25,9 @@
   ],
   "scripts": {
     "build": "turbo build",
-    "dev": "turbo dev",
+    "dev": "concurrently \"turbo dev --filter=web\" \"cd apps/strapi && pnpm develop\"",
     "dev:web": "turbo dev --filter=web",
-    "dev:strapi": "turbo dev --filter=@repo/strapi",
+    "dev:strapi": "cd apps/strapi && pnpm develop",
     "lint": "ultracite lint",
     "format": "ultracite format",
     "test": "turbo test",
@@ -38,6 +46,7 @@
     "@repo/typescript-config": "workspace:*",
     "@turbo/gen": "^2.5.3",
     "@types/node": "^22.15.21",
+    "concurrently": "^9.2.1",
     "tsup": "^8.5.0",
     "turbo": "^2.5.3",
     "typescript": "^5.8.3",

@@ -30,6 +30,7 @@ This is a hybrid monorepo combining next-forge (a Turborepo template) with Strap
 ### Testing
 - `pnpm test` - Run all tests using Vitest
 - `pnpm test --filter=web` - Run tests for web app only
+- `pnpm test --filter=@repo/[package]` - Run tests for specific package
 
 ### Strapi Specific
 - `cd apps/strapi && pnpm seed:example` - Seed Strapi with example data
@@ -41,6 +42,8 @@ This is a hybrid monorepo combining next-forge (a Turborepo template) with Strap
 
 ### Utilities
 - `pnpm bump-deps` - Update all dependencies to latest versions
+- `pnpm bump-ui` - Update shadcn/ui components in design system
+- `pnpm boundaries` - Check workspace boundaries and dependencies
 - `pnpm clean` - Clean all node_modules and generated files
 
 ## Architecture
@@ -108,3 +111,6 @@ The project uses Turborepo with pnpm workspaces:
 - Strapi generates TypeScript types automatically in `apps/strapi/types/generated/`
 - Content API accessible at `http://localhost:1337/api/` in development
 - Upload files stored in `apps/strapi/public/uploads/` with multiple size variants
+- Web app runs on port 3001 in development (not 3000)
+- Strapi client includes built-in rate limiting and caching for free tier optimization
+- Internationalization middleware handles locale routing automatically

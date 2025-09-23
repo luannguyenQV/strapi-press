@@ -69,7 +69,7 @@ export interface Article {
     metaDescription?: string;
     metaRobots?: string;
     canonicalURL?: string;
-    structuredData?: any;
+    structuredData?: Record<string, unknown>;
   };
 }
 
@@ -92,7 +92,7 @@ export interface LegacyArticle {
       metaDescription?: string;
       metaRobots?: string;
       canonicalURL?: string;
-      structuredData?: any;
+      structuredData?: Record<string, unknown>;
     };
     author?: {
       data: Author;
@@ -232,7 +232,7 @@ class ArticleService {
   /**
    * Get paginated articles with optional filters
    */
-  async getArticles(params?: {
+  getArticles(params?: {
     page?: number;
     pageSize?: number;
     filters?: ArticleFilters;
@@ -254,7 +254,7 @@ class ArticleService {
         page: params?.page || 1,
         pageSize: params?.pageSize || 10,
       },
-      ...params?.filters && { filters: params.filters },
+      ...(params?.filters && { filters: params.filters }),
     };
 
     return cachedFind<Article>('articles', {
@@ -307,7 +307,7 @@ class ArticleService {
   /**
    * Get featured articles for homepage
    */
-  async getFeaturedArticles(limit = 6) {
+  getFeaturedArticles(limit = 6) {
     return cachedFind<Article>('articles', {
       fields: ['title', 'description', 'slug', 'publishedAt'],
       populate: {
@@ -331,10 +331,13 @@ class ArticleService {
   /**
    * Get articles by category
    */
-  async getArticlesByCategory(categorySlug: string, params?: {
-    page?: number;
-    pageSize?: number;
-  }) {
+  getArticlesByCategory(
+    categorySlug: string,
+    params?: {
+      page?: number;
+      pageSize?: number;
+    }
+  ) {
     return this.getArticles({
       ...params,
       filters: {
@@ -348,10 +351,13 @@ class ArticleService {
   /**
    * Get articles by author
    */
-  async getArticlesByAuthor(authorSlug: string, params?: {
-    page?: number;
-    pageSize?: number;
-  }) {
+  getArticlesByAuthor(
+    authorSlug: string,
+    params?: {
+      page?: number;
+      pageSize?: number;
+    }
+  ) {
     return this.getArticles({
       ...params,
       filters: {
@@ -365,10 +371,13 @@ class ArticleService {
   /**
    * Get articles by tag
    */
-  async getArticlesByTag(tagSlug: string, params?: {
-    page?: number;
-    pageSize?: number;
-  }) {
+  getArticlesByTag(
+    tagSlug: string,
+    params?: {
+      page?: number;
+      pageSize?: number;
+    }
+  ) {
     return this.getArticles({
       ...params,
       filters: {
@@ -382,10 +391,13 @@ class ArticleService {
   /**
    * Search articles
    */
-  async searchArticles(query: string, params?: {
-    page?: number;
-    pageSize?: number;
-  }) {
+  searchArticles(
+    query: string,
+    params?: {
+      page?: number;
+      pageSize?: number;
+    }
+  ) {
     return this.getArticles({
       ...params,
       filters: {
@@ -406,10 +418,13 @@ class ArticleService {
       populate: ['categories', 'tags'],
     });
 
-    if (!article.data) return { data: [] };
+    if (!article.data) {
+      return { data: [] };
+    }
 
-    const categoryIds = article.data.attributes.categories?.data.map(c => c.id) || [];
-    const tagIds = article.data.attributes.tags?.data.map(t => t.id) || [];
+    const categoryIds =
+      article.data.attributes.categories?.data.map((c) => c.id) || [];
+    const tagIds = article.data.attributes.tags?.data.map((t) => t.id) || [];
 
     return cachedFind<Article>('articles', {
       filters: {
@@ -433,7 +448,7 @@ class ArticleService {
   /**
    * Get trending articles based on view count
    */
-  async getTrendingArticles(limit = 5) {
+  getTrendingArticles(limit = 5) {
     return cachedFind<Article>('articles', {
       filters: {
         status: { $eq: 'published' },
@@ -454,7 +469,7 @@ class ArticleService {
     try {
       const article = await strapi.findOne<Article>('articles', articleId);
       const currentCount = article.data.attributes.viewCount || 0;
-      
+
       await strapi.update('articles', articleId, {
         viewCount: currentCount + 1,
       });
@@ -466,12 +481,15 @@ class ArticleService {
   /**
    * Create article comment
    */
-  async createComment(articleId: number, comment: {
-    content: string;
-    authorName: string;
-    authorEmail: string;
-    parentCommentId?: number;
-  }) {
+  createComment(
+    articleId: number,
+    comment: {
+      content: string;
+      authorName: string;
+      authorEmail: string;
+      parentCommentId?: number;
+    }
+  ) {
     return strapi.create('comments', {
       ...comment,
       article: articleId,
@@ -495,18 +513,18 @@ class ArticleService {
 
     // Group by month
     const archives = new Map<string, number>();
-    
-    articles.data.forEach(article => {
+
+    for (const article of articles.data) {
       const date = new Date(article.attributes.publishedAt);
       const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
       archives.set(key, (archives.get(key) || 0) + 1);
-    });
+    }
 
     return Array.from(archives.entries()).map(([month, count]) => ({
       month,
       count,
-      year: parseInt(month.split('-')[0]),
-      monthNum: parseInt(month.split('-')[1]),
+      year: Number.parseInt(month.split('-')[0]),
+      monthNum: Number.parseInt(month.split('-')[1]),
     }));
   }
 }

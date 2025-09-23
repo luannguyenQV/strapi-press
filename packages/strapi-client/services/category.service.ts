@@ -1,4 +1,4 @@
-import { cachedFind, cachedFindOne, strapi } from '../index';
+import { cachedFind } from '../index';
 
 export interface Category {
   id: number;
@@ -22,7 +22,7 @@ class CategoryService {
   /**
    * Get all categories
    */
-  async getAll(params?: {
+  getAll(params?: {
     sort?: string[];
     pagination?: { limit?: number; page?: number };
   }) {
@@ -47,14 +47,14 @@ class CategoryService {
         image: true,
       },
     });
-    
+
     return response.data[0] || null;
   }
 
   /**
    * Get category with article count
    */
-  async getCategoriesWithArticleCount() {
+  getCategoriesWithArticleCount() {
     return cachedFind<Category>('categories', {
       populate: {
         articles: {
@@ -69,7 +69,7 @@ class CategoryService {
   /**
    * Get featured categories (limit to featured ones if you have that field)
    */
-  async getFeaturedCategories(limit = 6) {
+  getFeaturedCategories(limit = 6) {
     return cachedFind<Category>('categories', {
       sort: ['name:asc'],
       pagination: { limit },
