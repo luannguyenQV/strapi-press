@@ -1,0 +1,68 @@
+{
+  "name": "strapipress",
+  "version": "1.0.0",
+  "description": "The Modern WordPress Alternative - Build professional websites with Strapi + Next.js in minutes",
+  "keywords": [
+    "strapi",
+    "nextjs",
+    "headless-cms",
+    "wordpress-alternative",
+    "jamstack",
+    "blog",
+    "cms"
+  ],
+  "author": "StrapiPress Team",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/strapipress.git"
+  },
+  "homepage": "https://strapipress.com",
+  "bin": {
+    "strapipress": "dist/index.js"
+  },
+  "files": [
+    "dist/index.js"
+  ],
+  "scripts": {
+    "build": "turbo build",
+    "dev": "concurrently \"turbo dev --filter=web\" \"cd apps/strapi && pnpm develop\"",
+    "dev:web": "turbo dev --filter=web",
+    "dev:strapi": "cd apps/strapi && pnpm develop",
+    "lint": "ultracite lint",
+    "format": "ultracite format",
+    "test": "turbo test",
+    "analyze": "turbo analyze",
+    "translate": "turbo translate",
+    "boundaries": "turbo boundaries",
+    "bump-deps": "npx npm-check-updates --deep -u -x react-day-picker",
+    "bump-ui": "npx shadcn@latest add --all --overwrite -c packages/design-system",
+    "migrate": "cd packages/database && npx prisma format && npx prisma generate && npx prisma db push",
+    "clean": "git clean -xdf node_modules",
+    "typecheck": "turbo typecheck"
+  },
+  "devDependencies": {
+    "@auto-it/first-time-contributor": "^11.3.0",
+    "@biomejs/biome": "1.9.4",
+    "@repo/typescript-config": "workspace:*",
+    "@turbo/gen": "^2.5.3",
+    "@types/node": "^22.15.21",
+    "concurrently": "^9.2.1",
+    "tsup": "^8.5.0",
+    "turbo": "^2.5.3",
+    "typescript": "^5.8.3",
+    "ultracite": "^4.2.5",
+    "vitest": "^3.1.4"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "pnpm@10.13.1",
+  "dependencies": {
+    "@clack/prompts": "^0.11.0",
+    "@strapi/client": "^1.5.0",
+    "@tanstack/react-query": "^5.90.2",
+    "@tanstack/react-query-devtools": "^5.90.2",
+    "commander": "^14.0.0"
+  },
+  "type": "module"
+}

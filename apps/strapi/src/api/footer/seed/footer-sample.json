@@ -1,0 +1,139 @@
+{
+  "columns": [
+    {
+      "title": "Company",
+      "links": [
+        {
+          "label": "About",
+          "url": "/about",
+          "isExternal": false,
+          "openInNewTab": false
+        },
+        {
+          "label": "Blog",
+          "url": "/articles",
+          "isExternal": false,
+          "openInNewTab": false
+        },
+        {
+          "label": "Careers",
+          "url": "/careers",
+          "isExternal": false,
+          "openInNewTab": false
+        }
+      ]
+    },
+    {
+      "title": "Resources",
+      "links": [
+        {
+          "label": "Documentation",
+          "url": "https://docs.strapi.io",
+          "isExternal": true,
+          "openInNewTab": true
+        },
+        {
+          "label": "API Reference",
+          "url": "/api-docs",
+          "isExternal": false,
+          "openInNewTab": false
+        },
+        {
+          "label": "Tutorials",
+          "url": "/tutorials",
+          "isExternal": false,
+          "openInNewTab": false
+        }
+      ]
+    },
+    {
+      "title": "Community",
+      "links": [
+        {
+          "label": "Discord",
+          "url": "https://discord.gg/strapi",
+          "isExternal": true,
+          "openInNewTab": true
+        },
+        {
+          "label": "Forum",
+          "url": "https://forum.strapi.io",
+          "isExternal": true,
+          "openInNewTab": true
+        },
+        {
+          "label": "GitHub",
+          "url": "https://github.com/strapi/strapi",
+          "isExternal": true,
+          "openInNewTab": true
+        }
+      ]
+    },
+    {
+      "title": "Legal",
+      "links": [
+        {
+          "label": "Privacy Policy",
+          "url": "/privacy",
+          "isExternal": false,
+          "openInNewTab": false
+        },
+        {
+          "label": "Terms of Service",
+          "url": "/terms",
+          "isExternal": false,
+          "openInNewTab": false
+        },
+        {
+          "label": "Cookie Policy",
+          "url": "/cookies",
+          "isExternal": false,
+          "openInNewTab": false
+        }
+      ]
+    }
+  ],
+  "socialLinks": [
+    {
+      "platform": "github",
+      "url": "https://github.com/strapi/strapi",
+      "label": "GitHub"
+    },
+    {
+      "platform": "twitter",
+      "url": "https://twitter.com/strapijs",
+      "label": "Twitter"
+    },
+    {
+      "platform": "discord",
+      "url": "https://discord.gg/strapi",
+      "label": "Discord"
+    },
+    {
+      "platform": "youtube",
+      "url": "https://youtube.com/@strapi",
+      "label": "YouTube"
+    }
+  ],
+  "copyright": "© 2024 StrapiPress. Built with Strapi & Next.js",
+  "bottomLinks": [
+    {
+      "label": "Privacy",
+      "url": "/privacy",
+      "isExternal": false,
+      "openInNewTab": false
+    },
+    {
+      "label": "Terms",
+      "url": "/terms",
+      "isExternal": false,
+      "openInNewTab": false
+    },
+    {
+      "label": "Sitemap",
+      "url": "/sitemap",
+      "isExternal": false,
+      "openInNewTab": false
+    }
+  ]
+}
