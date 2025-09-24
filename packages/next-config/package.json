@@ -9,7 +9,7 @@
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
     "@types/webpack": "^5.28.5",
-    "next": "15.3.2",
+    "next": "15.5.4",
     "webpack": "^5.97.1"
   },
   "dependencies": {
