@@ -1,15 +1,15 @@
-import Link from 'next/link';
 import { footerService } from '@repo/strapi-client';
 import {
-  Github,
   Facebook,
-  Twitter,
+  Github,
   Instagram,
   Linkedin,
-  Youtube,
   MessageCircle,
-  Send
+  Send,
+  Twitter,
+  Youtube
 } from 'lucide-react';
+import Link from 'next/link';
 
 const socialIcons = {
   github: Github,
@@ -33,7 +33,7 @@ export async function Footer({ locale }: FooterProps): Promise<React.JSX.Element
   // Fallback footer if no data from Strapi
   if (!footerData) {
     return (
-      <footer className="bg-gray-50 dark:bg-gray-900 border-t">
+      <footer className='border-t bg-gray-50 dark:bg-gray-900'>
         <div className="container mx-auto px-4 py-8">
           <div className="text-center text-gray-600 dark:text-gray-400">
             <p>© 2024 StrapiPress. All rights reserved.</p>
@@ -45,14 +45,14 @@ export async function Footer({ locale }: FooterProps): Promise<React.JSX.Element
 
 
   return (
-    <footer className="bg-gray-50 dark:bg-gray-900 border-t">
+    <footer className='border-t bg-gray-50 dark:bg-gray-900'>
       <div className="container mx-auto px-4 py-12">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+        <div className='mb-8 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4'>
           {/* Footer Columns */}
           {footerData.columns?.map((column) => (
             <div key={column.id}>
-              <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-4">
+              <h3 className='mb-4 font-semibold text-gray-900 dark:text-gray-100'>
                 {column.title}
               </h3>
               <ul className="space-y-2">
@@ -63,14 +63,14 @@ export async function Footer({ locale }: FooterProps): Promise<React.JSX.Element
                         href={link.url}
                         target={link.openInNewTab ? '_blank' : undefined}
                         rel={link.openInNewTab ? 'noopener noreferrer' : undefined}
-                        className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
+                        className='text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100'
                       >
                         {link.label}
                       </a>
                     ) : (
                       <Link
                         href={link.url}
-                        className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
+                        className='text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100'
                       >
                         {link.label}
                       </Link>
@@ -84,7 +84,7 @@ export async function Footer({ locale }: FooterProps): Promise<React.JSX.Element
 
         {/* Social Links */}
         {footerData.socialLinks && footerData.socialLinks.length > 0 && (
-          <div className="flex justify-center space-x-6 mb-8">
+          <div className='mb-8 flex justify-center space-x-6'>
             {footerData.socialLinks.map((social) => {
               const Icon = socialIcons[social.platform];
               if (!Icon) return null;
@@ -96,9 +96,9 @@ export async function Footer({ locale }: FooterProps): Promise<React.JSX.Element
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.label || social.platform}
-                  className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
+                  className='text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100'
                 >
-                  <Icon className="w-5 h-5" />
+                  <Icon className='h-5 w-5' />
                 </a>
               );
             })}
@@ -106,10 +106,10 @@ export async function Footer({ locale }: FooterProps): Promise<React.JSX.Element
         )}
 
         {/* Bottom Section */}
-        <div className="pt-8 border-t border-gray-200 dark:border-gray-700">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+        <div className='border-gray-200 border-t pt-8 dark:border-gray-700'>
+          <div className='flex flex-col items-center justify-between space-y-4 md:flex-row md:space-y-0'>
             {/* Copyright */}
-            <div className="text-gray-600 dark:text-gray-400 text-sm">
+            <div className='text-gray-600 text-sm dark:text-gray-400'>
               {footerData.copyright || '© 2024 StrapiPress. All rights reserved.'}
             </div>
 
@@ -123,7 +123,7 @@ export async function Footer({ locale }: FooterProps): Promise<React.JSX.Element
                       href={link.url}
                       target={link.openInNewTab ? '_blank' : undefined}
                       rel={link.openInNewTab ? 'noopener noreferrer' : undefined}
-                      className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
+                      className='text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100'
                     >
                       {link.label}
                     </a>
@@ -131,7 +131,7 @@ export async function Footer({ locale }: FooterProps): Promise<React.JSX.Element
                     <Link
                       key={link.id}
                       href={link.url}
-                      className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
+                      className='text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100'
                     >
                       {link.label}
                     </Link>

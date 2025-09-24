@@ -59,6 +59,9 @@
   "packageManager": "pnpm@10.13.1",
   "dependencies": {
     "@clack/prompts": "^0.11.0",
+    "@strapi/client": "^1.5.0",
+    "@tanstack/react-query": "^5.90.2",
+    "@tanstack/react-query-devtools": "^5.90.2",
     "commander": "^14.0.0"
   },
   "type": "module"

@@ -1,38 +1,7 @@
 import { strapiClient } from '../client';
-import { BaseResponse } from '../types';
+import type { Footer, StrapiSingleResponse } from '../types';
 
-export interface FooterLink {
-  id: number;
-  label: string;
-  url: string;
-  isExternal?: boolean;
-  openInNewTab?: boolean;
-}
-
-export interface NavigationColumn {
-  id: number;
-  title: string;
-  links?: FooterLink[];
-}
-
-export interface SocialLink {
-  id: number;
-  platform: 'facebook' | 'twitter' | 'x' | 'instagram' | 'linkedin' | 'youtube' | 'github' | 'discord' | 'telegram' | 'tiktok';
-  url: string;
-  label?: string;
-}
-
-export interface Footer {
-  id: number;
-  columns?: NavigationColumn[];
-  socialLinks?: SocialLink[];
-  copyright?: string;
-  bottomLinks?: FooterLink[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface FooterResponse extends BaseResponse<Footer> {}
+// Note: Footer, SocialLink, MenuLink, ContactInfo are now imported from '../types'
 
 class FooterService {
   private cache: Map<string, { data: Footer | null; timestamp: number }> = new Map();
@@ -47,17 +16,15 @@ class FooterService {
     }
 
     try {
-      const params = new URLSearchParams({
-        'populate[columns][populate][links]': '*',
-        'populate[socialLinks]': '*',
-        'populate[bottomLinks]': '*',
+      const response = await strapiClient.single('footer').find({
+        populate: {
+          logo: true,
+          socialLinks: true,
+          menuLinks: true,
+          contactInfo: true,
+        },
+        ...(locale && { locale }),
       });
-
-      if (locale) {
-        params.append('locale', locale);
-      }
-
-      const response = await strapiClient.get<FooterResponse>(`/footer?${params}`);
 
       const footerData = response.data || null;
 

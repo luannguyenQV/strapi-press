@@ -6,6 +6,7 @@ import { getDictionary } from '@repo/internationalization';
 import type { Metadata, Viewport } from 'next';
 import { Footer } from './components/footer';
 import { Header } from './components/header';
+import { Providers } from '../../lib/providers';
 
 type RootLayoutProperties = {
   readonly children: React.ReactNode;
@@ -77,11 +78,13 @@ const RootLayout = async ({ children, params }: RootLayoutProperties) => {
       suppressHydrationWarning
     >
       <body>
-        <DesignSystemProvider>
-          <Header dictionary={dictionary} />
-          {children}
-          <Footer locale={locale} />
-        </DesignSystemProvider>
+        <Providers>
+          <DesignSystemProvider>
+            <Header dictionary={dictionary} />
+            {children}
+            <Footer locale={locale} />
+          </DesignSystemProvider>
+        </Providers>
       </body>
     </html>
   );

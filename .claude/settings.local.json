@@ -39,7 +39,18 @@
       "mcp__serena__search_for_pattern",
       "mcp__serena__think_about_whether_you_are_done",
       "mcp__serena__activate_project",
-      "mcp__serena__find_file"
+      "mcp__serena__find_file",
+      "Bash(git rm:*)",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs",
+      "WebSearch",
+      "Bash(git config:*)",
+      "Read(//Users/luannguyen/**)",
+      "Bash(ssh-add:*)",
+      "Bash(ssh:*)",
+      "Bash(git remote get-url:*)",
+      "Bash(pbpaste)",
+      "Bash(pnpm --filter=@repo/strapi-client typecheck)"
     ],
     "deny": []
   },
