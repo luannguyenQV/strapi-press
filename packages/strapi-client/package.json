@@ -9,12 +9,12 @@
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "react": "^19.0.0"
+    "react": "^19.1.1"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^22.15.21",
-    "@types/react": "^19.1.5",
+    "@types/react": "^19.1.13",
     "typescript": "^5.8.3"
   }
 }

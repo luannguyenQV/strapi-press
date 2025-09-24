@@ -22,14 +22,14 @@
     "fs-extra": "^10.0.0",
     "mime-types": "^2.1.27",
     "pg": "8.8.0",
-    "react": "^18.0.0",
+    "react": "^19.1.1",
     "react-dom": "^18.0.0",
     "react-router-dom": "^6.0.0",
     "styled-components": "^6.0.0"
   },
   "devDependencies": {
     "@types/node": "^20",
-    "@types/react": "^18",
+    "@types/react": "^19",
     "@types/react-dom": "^18",
     "typescript": "^5"
   },
