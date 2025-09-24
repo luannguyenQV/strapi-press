@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "@t3-oss/env-nextjs": "^0.13.4",
-    "@vercel/blob": "^1.1.1",
+    "@vercel/blob": "^2.0.0",
     "zod": "^3.25.28"
   },
   "devDependencies": {
