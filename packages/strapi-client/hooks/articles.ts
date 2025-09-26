@@ -3,10 +3,25 @@
  * Following TanStack Query best practices with proper caching and invalidation
  */
 
-import { useQuery, useMutation, useQueryClient, UseQueryOptions } from '@tanstack/react-query';
+import {
+  type UseQueryOptions,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { strapiClient } from '../client';
 import { queryKeys } from '../queries/keys';
-import type { Article, ArticleFilters, StrapiResponse, StrapiSingleResponse } from '../types';
+import type {
+  Article,
+  ArticleFilters,
+  StrapiResponse,
+  StrapiSingleResponse,
+} from '../types';
+import {
+  bridgeArticleCollection,
+  bridgeArticleSingle,
+  safeCastParams,
+} from '../types';
 
 // Types for query parameters
 export interface ArticleQueryParams {
@@ -24,26 +39,34 @@ export interface ArticleQueryParams {
  */
 export const useArticles = (
   params?: ArticleQueryParams,
-  options?: Omit<UseQueryOptions<StrapiResponse<Article>>, 'queryKey' | 'queryFn'>
+  options?: Omit<
+    UseQueryOptions<StrapiResponse<Article>>,
+    'queryKey' | 'queryFn'
+  >
 ) => {
   return useQuery({
     queryKey: [...queryKeys.articles(), params],
-    queryFn: () => strapiClient.collection('articles').find({
-      populate: {
-        author: {
-          populate: ['avatar'],
-        },
-        category: true,
-        cover: true,
-        seo: true,
-      },
-      sort: ['publishedAt:desc'],
-      pagination: {
-        page: params?.page || 1,
-        pageSize: params?.pageSize || 10,
-      },
-      ...params,
-    }),
+    queryFn: async () => {
+      const response = await strapiClient.collection('articles').find(
+        safeCastParams({
+          populate: {
+            author: {
+              populate: ['avatar'],
+            },
+            category: true,
+            cover: true,
+            seo: true,
+          },
+          sort: ['publishedAt:desc'],
+          pagination: {
+            page: params?.page || 1,
+            pageSize: params?.pageSize || 10,
+          },
+          ...params,
+        })
+      );
+      return bridgeArticleCollection(response);
+    },
     staleTime: 5 * 60 * 1000, // 5 minutes - matching your original cache TTL
     ...options,
   });
@@ -54,20 +77,29 @@ export const useArticles = (
  */
 export const useArticle = (
   id: string,
-  options?: Omit<UseQueryOptions<StrapiSingleResponse<Article>>, 'queryKey' | 'queryFn'>
+  options?: Omit<
+    UseQueryOptions<StrapiSingleResponse<Article>>,
+    'queryKey' | 'queryFn'
+  >
 ) => {
   return useQuery({
     queryKey: queryKeys.article(id),
-    queryFn: () => strapiClient.collection('articles').findOne(id, {
-      populate: {
-        author: {
-          populate: ['avatar'],
-        },
-        category: true,
-        cover: true,
-        seo: true,
-      },
-    }),
+    queryFn: async () => {
+      const response = await strapiClient.collection('articles').findOne(
+        id,
+        safeCastParams({
+          populate: {
+            author: {
+              populate: ['avatar'],
+            },
+            category: true,
+            cover: true,
+            seo: true,
+          },
+        })
+      );
+      return bridgeArticleSingle(response);
+    },
     enabled: !!id,
     staleTime: 5 * 60 * 1000,
     ...options,
@@ -79,23 +111,28 @@ export const useArticle = (
  */
 export const useArticleBySlug = (
   slug: string,
-  options?: Omit<UseQueryOptions<StrapiResponse<Article>>, 'queryKey' | 'queryFn'>
+  options?: Omit<
+    UseQueryOptions<StrapiResponse<Article>>,
+    'queryKey' | 'queryFn'
+  >
 ) => {
   return useQuery({
     queryKey: [...queryKeys.articles(), 'slug', slug],
     queryFn: async () => {
-      const response = await strapiClient.collection('articles').find({
-        filters: { slug: { $eq: slug } },
-        populate: {
-          author: {
-            populate: ['avatar'],
+      const response = await strapiClient.collection('articles').find(
+        safeCastParams({
+          filters: { slug: { $eq: slug } },
+          populate: {
+            author: {
+              populate: ['avatar'],
+            },
+            category: true,
+            cover: true,
+            seo: true,
           },
-          category: true,
-          cover: true,
-          seo: true,
-        },
-      });
-      return response;
+        })
+      );
+      return bridgeArticleCollection(response);
     },
     enabled: !!slug,
     staleTime: 5 * 60 * 1000,
@@ -108,27 +145,35 @@ export const useArticleBySlug = (
  */
 export const useFeaturedArticles = (
   limit = 6,
-  options?: Omit<UseQueryOptions<StrapiResponse<Article>>, 'queryKey' | 'queryFn'>
+  options?: Omit<
+    UseQueryOptions<StrapiResponse<Article>>,
+    'queryKey' | 'queryFn'
+  >
 ) => {
   return useQuery({
     queryKey: [...queryKeys.articles(), 'featured', limit],
-    queryFn: () => strapiClient.collection('articles').find({
-      filters: { featured: { $eq: true } },
-      fields: ['title', 'description', 'slug', 'publishedAt'],
-      populate: {
-        author: {
-          fields: ['name'],
-        },
-        category: {
-          fields: ['name'],
-        },
-        cover: {
-          fields: ['url', 'alternativeText', 'width', 'height'],
-        },
-      },
-      sort: ['publishedAt:desc'],
-      pagination: { pageSize: limit },
-    }),
+    queryFn: async () => {
+      const response = await strapiClient.collection('articles').find(
+        safeCastParams({
+          filters: { featured: { $eq: true } },
+          fields: ['title', 'description', 'slug', 'publishedAt'],
+          populate: {
+            author: {
+              fields: ['name'],
+            },
+            category: {
+              fields: ['name'],
+            },
+            cover: {
+              fields: ['url', 'alternativeText', 'width', 'height'],
+            },
+          },
+          sort: ['publishedAt:desc'],
+          pagination: { pageSize: limit },
+        })
+      );
+      return bridgeArticleCollection(response);
+    },
     staleTime: 10 * 60 * 1000, // Featured articles can be cached longer
     ...options,
   });
@@ -140,26 +185,34 @@ export const useFeaturedArticles = (
 export const useArticlesByCategory = (
   categoryId: string,
   params?: ArticleQueryParams,
-  options?: Omit<UseQueryOptions<StrapiResponse<Article>>, 'queryKey' | 'queryFn'>
+  options?: Omit<
+    UseQueryOptions<StrapiResponse<Article>>,
+    'queryKey' | 'queryFn'
+  >
 ) => {
   return useQuery({
     queryKey: queryKeys.articlesByCategory(categoryId),
-    queryFn: () => strapiClient.collection('articles').find({
-      filters: {
-        category: { documentId: { $eq: categoryId } },
-      },
-      populate: {
-        author: { populate: ['avatar'] },
-        category: true,
-        cover: true,
-      },
-      sort: ['publishedAt:desc'],
-      pagination: {
-        page: params?.page || 1,
-        pageSize: params?.pageSize || 10,
-      },
-      ...params,
-    }),
+    queryFn: async () => {
+      const response = await strapiClient.collection('articles').find(
+        safeCastParams({
+          filters: {
+            category: { documentId: { $eq: categoryId } },
+          },
+          populate: {
+            author: { populate: ['avatar'] },
+            category: true,
+            cover: true,
+          },
+          sort: ['publishedAt:desc'],
+          pagination: {
+            page: params?.page || 1,
+            pageSize: params?.pageSize || 10,
+          },
+          ...params,
+        })
+      );
+      return bridgeArticleCollection(response);
+    },
     enabled: !!categoryId,
     staleTime: 5 * 60 * 1000,
     ...options,
@@ -172,30 +225,38 @@ export const useArticlesByCategory = (
 export const useSearchArticles = (
   query: string,
   params?: ArticleQueryParams,
-  options?: Omit<UseQueryOptions<StrapiResponse<Article>>, 'queryKey' | 'queryFn'>
+  options?: Omit<
+    UseQueryOptions<StrapiResponse<Article>>,
+    'queryKey' | 'queryFn'
+  >
 ) => {
   return useQuery({
     queryKey: [...queryKeys.articles(), 'search', query, params],
-    queryFn: () => strapiClient.collection('articles').find({
-      filters: {
-        $or: [
-          { title: { $containsi: query } },
-          { description: { $containsi: query } },
-          { content: { $containsi: query } },
-        ],
-      },
-      populate: {
-        author: { populate: ['avatar'] },
-        category: true,
-        cover: true,
-      },
-      sort: ['publishedAt:desc'],
-      pagination: {
-        page: params?.page || 1,
-        pageSize: params?.pageSize || 10,
-      },
-      ...params,
-    }),
+    queryFn: async () => {
+      const response = await strapiClient.collection('articles').find(
+        safeCastParams({
+          filters: {
+            $or: [
+              { title: { $containsi: query } },
+              { description: { $containsi: query } },
+              { content: { $containsi: query } },
+            ],
+          },
+          populate: {
+            author: { populate: ['avatar'] },
+            category: true,
+            cover: true,
+          },
+          sort: ['publishedAt:desc'],
+          pagination: {
+            page: params?.page || 1,
+            pageSize: params?.pageSize || 10,
+          },
+          ...params,
+        })
+      );
+      return bridgeArticleCollection(response);
+    },
     enabled: !!query && query.length > 2, // Only search if query is meaningful
     staleTime: 2 * 60 * 1000, // Search results stale faster
     ...options,
@@ -210,8 +271,12 @@ export const useCreateArticle = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: Partial<Article>) =>
-      strapiClient.collection('articles').create(data),
+    mutationFn: async (data: Partial<Article>) => {
+      const response = await strapiClient
+        .collection('articles')
+        .create(safeCastParams(data));
+      return bridgeArticleSingle(response);
+    },
     onSuccess: () => {
       // Invalidate articles list to show new article
       queryClient.invalidateQueries({ queryKey: queryKeys.articles() });
@@ -226,14 +291,21 @@ export const useUpdateArticle = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Article> }) =>
-      strapiClient.collection('articles').update(id, data),
+    mutationFn: async ({
+      id,
+      data,
+    }: { id: string; data: Partial<Article> }) => {
+      const response = await strapiClient
+        .collection('articles')
+        .update(id, safeCastParams(data));
+      return bridgeArticleSingle(response);
+    },
     onSuccess: (updatedArticle, variables) => {
       // Update specific article cache
-      queryClient.setQueryData(
-        queryKeys.article(variables.id),
-        { data: updatedArticle.data, meta: updatedArticle.meta }
-      );
+      queryClient.setQueryData(queryKeys.article(variables.id), {
+        data: updatedArticle.data,
+        meta: updatedArticle.meta,
+      });
 
       // Invalidate articles list to reflect changes
       queryClient.invalidateQueries({ queryKey: queryKeys.articles() });
@@ -248,8 +320,10 @@ export const useDeleteArticle = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) =>
-      strapiClient.collection('articles').delete(id),
+    mutationFn: async (id: string) => {
+      const response = await strapiClient.collection('articles').delete(id);
+      return bridgeArticleSingle(response);
+    },
     onSuccess: (_, deletedId) => {
       // Remove from cache
       queryClient.removeQueries({ queryKey: queryKeys.article(deletedId) });
@@ -267,20 +341,24 @@ export const useIncrementViewCount = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, currentCount }: { id: string; currentCount: number }) => {
+    mutationFn: async ({
+      id,
+      currentCount,
+    }: { id: string; currentCount: number }) => {
       // In a real implementation, you might have a dedicated endpoint for this
-      return strapiClient.collection('articles').update(id, {
+      const response = await strapiClient.collection('articles').update(id, {
         viewCount: currentCount + 1,
       });
+      return response as unknown as StrapiSingleResponse<Article>;
     },
     onMutate: async ({ id, currentCount }) => {
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: queryKeys.article(id) });
 
       // Snapshot previous value
-      const previousData = queryClient.getQueryData<StrapiSingleResponse<Article>>(
-        queryKeys.article(id)
-      );
+      const previousData = queryClient.getQueryData<
+        StrapiSingleResponse<Article>
+      >(queryKeys.article(id));
 
       // Optimistically update
       if (previousData) {

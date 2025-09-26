@@ -9,6 +9,8 @@
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
+    "@strapi/client": "^1.5.0",
+    "@tanstack/react-query": "^5.45.0",
     "react": "^19.0.0"
   },
   "devDependencies": {

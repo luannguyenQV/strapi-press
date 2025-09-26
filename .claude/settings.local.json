@@ -51,7 +51,12 @@
       "Bash(git remote get-url:*)",
       "Bash(pbpaste)",
       "Bash(pnpm --filter=@repo/strapi-client typecheck)",
-      "Bash(git remote set-url:*)"
+      "Bash(git remote set-url:*)",
+      "Bash(pnpm --filter @repo/strapi-client typecheck)",
+      "SlashCommand(/sc:reflect)",
+      "mcp__serena__get_current_config",
+      "mcp__serena__read_memory",
+      "Bash(npx tsc:*)"
     ],
     "deny": []
   },

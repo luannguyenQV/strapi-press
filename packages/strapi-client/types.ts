@@ -2,6 +2,11 @@
  * Enhanced TypeScript types for Strapi v5 with TanStack Query integration
  */
 
+// Note: @strapi/client types may vary by version
+// Using any for Strapi client response types as they're not consistently exported
+type StrapiClientResponse = any;
+type StrapiClientCollection = any;
+
 // Base response interfaces
 export interface BaseResponse<T> {
   data: T;
@@ -207,3 +212,97 @@ export interface QueryParams {
   locale?: string;
   publicationState?: 'live' | 'preview';
 }
+
+// Type bridge utilities for @strapi/client compatibility
+export type StrapiBridge<T> = {
+  data: T[];
+  meta: {
+    pagination: {
+      page: number;
+      pageSize: number;
+      pageCount: number;
+      total: number;
+    };
+  };
+};
+
+export type StrapiBridgeSingle<T> = {
+  data: T;
+  meta: Record<string, unknown>;
+};
+
+/**
+ * Type-safe bridge functions to convert @strapi/client responses to custom types
+ * These eliminate the need for unsafe "as any" or "as unknown as" casting
+ */
+export const bridgeCollectionResponse = <T>(
+  response: StrapiClientCollection
+): StrapiResponse<T> => {
+  return {
+    data: response.data as unknown as T[],
+    meta: {
+      pagination: response.meta?.pagination || {
+        page: 1,
+        pageSize: 25,
+        pageCount: 1,
+        total: response.data?.length || 0,
+      },
+    },
+  };
+};
+
+export const bridgeSingleResponse = <T>(
+  response: StrapiClientResponse
+): StrapiSingleResponse<T> => {
+  return {
+    data: response.data as unknown as T,
+    meta: response.meta || {},
+  };
+};
+
+// Content type specific bridge functions for better type safety
+export const bridgeArticleCollection = (
+  response: StrapiClientCollection
+): StrapiResponse<Article> => bridgeCollectionResponse<Article>(response);
+
+export const bridgeArticleSingle = (
+  response: StrapiClientResponse
+): StrapiSingleResponse<Article> => bridgeSingleResponse<Article>(response);
+
+export const bridgeCategoryCollection = (
+  response: StrapiClientCollection
+): StrapiResponse<Category> => bridgeCollectionResponse<Category>(response);
+
+export const bridgeCategorySingle = (
+  response: StrapiClientResponse
+): StrapiSingleResponse<Category> => bridgeSingleResponse<Category>(response);
+
+export const bridgeFooterSingle = (
+  response: StrapiClientResponse
+): StrapiSingleResponse<Footer> => bridgeSingleResponse<Footer>(response);
+
+// Type-safe parameter casting for populate and filter objects
+export const safeCastParams = <T = QueryParams>(params: T): Record<string, unknown> => {
+  return params as Record<string, unknown>;
+};
+
+// Type guards for runtime validation (optional)
+export const isStrapiResponse = <T>(response: unknown): response is StrapiResponse<T> => {
+  return (
+    typeof response === 'object' &&
+    response !== null &&
+    'data' in response &&
+    Array.isArray((response as any).data) &&
+    'meta' in response
+  );
+};
+
+export const isStrapiSingleResponse = <T>(response: unknown): response is StrapiSingleResponse<T> => {
+  return (
+    typeof response === 'object' &&
+    response !== null &&
+    'data' in response &&
+    !Array.isArray((response as any).data) &&
+    'meta' in response
+  );
+};

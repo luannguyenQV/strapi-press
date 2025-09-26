@@ -12,14 +12,14 @@ This is a hybrid monorepo combining next-forge (a Turborepo template) with Strap
 
 ### Development
 - `pnpm dev` - Start all applications in development mode
-- `pnpm dev:web` - Start only the Next.js web app (port 3000)
+- `pnpm dev:web` - Start only the Next.js web app (port 3001)
 - `pnpm dev:strapi` - Start only the Strapi CMS backend
 - `cd apps/strapi && pnpm develop` - Alternative way to start Strapi in development
 
 ### Building
 - `pnpm build` - Build all applications and packages
 - `pnpm build --filter=web` - Build only the web app
-- `pnpm build --filter=@repo/strapi` - Build only the Strapi app
+- `pnpm build --filter=strapi` - Build only the Strapi app
 - `pnpm analyze` - Analyze bundle sizes (web app)
 
 ### Code Quality
@@ -111,6 +111,6 @@ The project uses Turborepo with pnpm workspaces:
 - Strapi generates TypeScript types automatically in `apps/strapi/types/generated/`
 - Content API accessible at `http://localhost:1337/api/` in development
 - Upload files stored in `apps/strapi/public/uploads/` with multiple size variants
-- Web app runs on port 3001 in development (not 3000)
+- Web app runs on port 3001 in development (configured in package.json dev script)
 - Strapi client includes built-in rate limiting and caching for free tier optimization
 - Internationalization middleware handles locale routing automatically

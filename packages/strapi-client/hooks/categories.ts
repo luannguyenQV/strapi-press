@@ -2,10 +2,20 @@
  * Category query hooks using TanStack Query + @strapi/client
  */
 
-import { useQuery, useMutation, useQueryClient, UseQueryOptions } from '@tanstack/react-query';
+import {
+  type UseQueryOptions,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { strapiClient } from '../client';
 import { queryKeys } from '../queries/keys';
 import type { Category, StrapiResponse, StrapiSingleResponse } from '../types';
+import {
+  bridgeCategoryCollection,
+  bridgeCategorySingle,
+  safeCastParams,
+} from '../types';
 
 // Response interfaces imported from ../types
 
@@ -13,14 +23,22 @@ import type { Category, StrapiResponse, StrapiSingleResponse } from '../types';
  * Fetch all categories
  */
 export const useCategories = (
-  options?: Omit<UseQueryOptions<StrapiResponse<Category>>, 'queryKey' | 'queryFn'>
+  options?: Omit<
+    UseQueryOptions<StrapiResponse<Category>>,
+    'queryKey' | 'queryFn'
+  >
 ) => {
   return useQuery({
     queryKey: queryKeys.categories(),
-    queryFn: () => strapiClient.collection('categories').find({
-      sort: ['name:asc'],
-      pagination: { pageSize: 100 }, // Categories are usually limited
-    }),
+    queryFn: async () => {
+      const response = await strapiClient.collection('categories').find(
+        safeCastParams({
+          sort: ['name:asc'],
+          pagination: { pageSize: 100 }, // Categories are usually limited
+        })
+      );
+      return bridgeCategoryCollection(response);
+    },
     staleTime: 10 * 60 * 1000, // Categories change less frequently
     ...options,
   });
@@ -31,11 +49,17 @@ export const useCategories = (
  */
 export const useCategory = (
   id: string,
-  options?: Omit<UseQueryOptions<StrapiSingleResponse<Category>>, 'queryKey' | 'queryFn'>
+  options?: Omit<
+    UseQueryOptions<StrapiSingleResponse<Category>>,
+    'queryKey' | 'queryFn'
+  >
 ) => {
   return useQuery({
     queryKey: queryKeys.category(id),
-    queryFn: () => strapiClient.collection('categories').findOne(id),
+    queryFn: async () => {
+      const response = await strapiClient.collection('categories').findOne(id);
+      return bridgeCategorySingle(response);
+    },
     enabled: !!id,
     staleTime: 10 * 60 * 1000,
     ...options,
@@ -47,15 +71,20 @@ export const useCategory = (
  */
 export const useCategoryBySlug = (
   slug: string,
-  options?: Omit<UseQueryOptions<StrapiResponse<Category>>, 'queryKey' | 'queryFn'>
+  options?: Omit<
+    UseQueryOptions<StrapiResponse<Category>>,
+    'queryKey' | 'queryFn'
+  >
 ) => {
   return useQuery({
     queryKey: [...queryKeys.categories(), 'slug', slug],
     queryFn: async () => {
-      const response = await strapiClient.collection('categories').find({
-        filters: { slug: { $eq: slug } },
-      });
-      return response;
+      const response = await strapiClient.collection('categories').find(
+        safeCastParams({
+          filters: { slug: { $eq: slug } },
+        })
+      );
+      return bridgeCategoryCollection(response);
     },
     enabled: !!slug,
     staleTime: 10 * 60 * 1000,
@@ -71,8 +100,12 @@ export const useCreateCategory = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: Partial<Category>) =>
-      strapiClient.collection('categories').create(data),
+    mutationFn: async (data: Partial<Category>) => {
+      const response = await strapiClient
+        .collection('categories')
+        .create(safeCastParams(data));
+      return bridgeCategorySingle(response);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.categories() });
     },
@@ -86,14 +119,21 @@ export const useUpdateCategory = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Category> }) =>
-      strapiClient.collection('categories').update(id, data),
+    mutationFn: async ({
+      id,
+      data,
+    }: { id: string; data: Partial<Category> }) => {
+      const response = await strapiClient
+        .collection('categories')
+        .update(id, safeCastParams(data));
+      return bridgeCategorySingle(response);
+    },
     onSuccess: (updatedCategory, variables) => {
       // Update specific category cache
-      queryClient.setQueryData(
-        queryKeys.category(variables.id),
-        { data: updatedCategory.data, meta: updatedCategory.meta }
-      );
+      queryClient.setQueryData(queryKeys.category(variables.id), {
+        data: updatedCategory.data,
+        meta: updatedCategory.meta,
+      });
 
       // Invalidate categories list
       queryClient.invalidateQueries({ queryKey: queryKeys.categories() });
@@ -108,8 +148,10 @@ export const useDeleteCategory = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) =>
-      strapiClient.collection('categories').delete(id),
+    mutationFn: async (id: string) => {
+      const response = await strapiClient.collection('categories').delete(id);
+      return bridgeCategorySingle(response);
+    },
     onSuccess: (_, deletedId) => {
       queryClient.removeQueries({ queryKey: queryKeys.category(deletedId) });
       queryClient.invalidateQueries({ queryKey: queryKeys.categories() });
