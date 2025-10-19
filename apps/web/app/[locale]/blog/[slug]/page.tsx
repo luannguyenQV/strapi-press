@@ -1,11 +1,6 @@
-import { Sidebar } from '@/components/sidebar';
+
 import { env } from '@/env';
-import { ArrowLeftIcon } from '@radix-ui/react-icons';
-import { JsonLd } from '@repo/seo/json-ld';
-import { createMetadata } from '@repo/seo/metadata';
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
 
 const protocol = env.VERCEL_PROJECT_PRODUCTION_URL?.startsWith('https')
   ? 'https'

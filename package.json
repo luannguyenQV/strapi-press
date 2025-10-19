@@ -20,9 +20,7 @@
   "bin": {
     "strapipress": "dist/index.js"
   },
-  "files": [
-    "dist/index.js"
-  ],
+  "files": ["dist/index.js"],
   "scripts": {
     "build": "turbo build",
     "dev": "concurrently \"turbo dev --filter=web\" \"cd apps/strapi && pnpm develop\"",

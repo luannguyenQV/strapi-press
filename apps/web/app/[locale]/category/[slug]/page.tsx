@@ -1,4 +1,4 @@
-import { categoryService, articleService } from '@repo/strapi-client';
+import { cachedFind, type Category, type Article } from '@repo/strapi-client';
 import { Badge } from '@repo/design-system/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@repo/design-system/components/ui/card';
 import { getDictionary } from '@repo/internationalization';
@@ -22,8 +22,14 @@ export const generateMetadata = async ({
   const dictionary = await getDictionary(locale);
 
   try {
-    const category = await categoryService.getBySlug(slug);
-    
+    const response = await cachedFind('categories', {
+      filters: { slug: { $eq: slug } }
+    }, {
+      revalidate: 600, // 10 minutes - category metadata changes infrequently
+      tags: ['categories', `category-${slug}`, 'metadata']
+    });
+    const category = response?.data?.[0] as unknown as Category | undefined;
+
     if (!category) {
       return createMetadata({
         title: `Category Not Found | ${dictionary.web.common.siteName}`,
@@ -49,19 +55,38 @@ const CategoryPage = async ({ params }: CategoryPageProps): Promise<React.JSX.El
 
   try {
     // Get category details
-    const category = await categoryService.getBySlug(slug);
-    
+    const categoryResponse = await cachedFind('categories', {
+      filters: { slug: { $eq: slug } }
+    }, {
+      revalidate: 600, // 10 minutes - category data changes infrequently
+      tags: ['categories', `category-${slug}`, 'category-page']
+    });
+    const category = categoryResponse?.data?.[0] as unknown as Category | undefined;
+
     if (!category) {
       notFound();
     }
 
     // Get articles for this category
-    const { data: articles } = await articleService.getFeaturedArticles(12);
-    
-    // Filter articles by category (you might want to add this filter to the API call)
-    const categoryArticles = articles.filter(article => 
-      article.category?.name?.toLowerCase() === category.name.toLowerCase()
-    );
+    const articlesResponse = await cachedFind('articles', {
+      filters: {
+        category: {
+          slug: { $eq: slug }
+        }
+      },
+      sort: ['publishedAt:desc'],
+      pagination: { pageSize: 12 },
+      populate: {
+        author: true,
+        category: true,
+        cover: true,
+      }
+    }, {
+      revalidate: 300, // 5 minutes - articles change moderately
+      tags: ['articles', `category-${slug}`, 'category-articles']
+    });
+
+    const categoryArticles = (articlesResponse?.data as unknown as Article[]) || [];
 
     return (
       <div className="container mx-auto px-4 py-8">
@@ -83,7 +108,7 @@ const CategoryPage = async ({ params }: CategoryPageProps): Promise<React.JSX.El
         {/* Articles Grid */}
         {categoryArticles && categoryArticles.length > 0 ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {categoryArticles.map((article) => (
+            {categoryArticles.map((article: Article) => (
               <Link
                 key={article.id}
                 href={`/${locale}/blog/${article.slug}`}

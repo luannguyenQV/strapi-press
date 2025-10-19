@@ -56,7 +56,18 @@
       "SlashCommand(/sc:reflect)",
       "mcp__serena__get_current_config",
       "mcp__serena__read_memory",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(tree:*)",
+      "Bash(pnpm --filter=web typecheck)",
+      "Bash(perl -pi -e:*)",
+      "Bash(pnpm dev:web:*)",
+      "Bash(pnpm -w run dev:web)",
+      "Bash(timeout 5 curl -s \"http://localhost:1337/api/articles\")",
+      "Bash(python3:*)",
+      "WebFetch(domain:docs.strapi.io)",
+      "Bash(git checkout:*)",
+      "Bash(pnpm --filter web typecheck)",
+      "mcp__serena__list_memories"
     ],
     "deny": []
   },

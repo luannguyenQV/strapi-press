@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import { env } from '@/env';
-import { strapi } from '@repo/strapi-client';
+import { type Article, cachedFind } from '@repo/strapi-client';
 import type { MetadataRoute } from 'next';
 
 const appFolders = fs.readdirSync('app', { withFileTypes: true });
@@ -11,10 +11,14 @@ const pages = appFolders
   .map((folder) => folder.name);
 
 // Get blog posts from Strapi
-const blogPosts = await strapi.find('articles', {
+const blogPostsResponse = await cachedFind('articles', {
   fields: ['slug'],
   publicationState: 'live',
+}, {
+  revalidate: 3600, // 1 hour - sitemap changes infrequently
+  tags: ['articles', 'sitemap']
 });
+const blogPosts = (blogPostsResponse?.data as unknown as Article[]) || [];
 
 // Get legal pages from Strapi (if applicable)
 const legalPages: any[] = []; // Placeholder - implement if needed
@@ -33,7 +37,7 @@ const sitemap = async (): Promise<MetadataRoute.Sitemap> => [
     url: new URL(page, url).href,
     lastModified: new Date(),
   })),
-  ...blogPosts.data.map((post: any) => ({
+  ...blogPosts.map((post: Article) => ({
     url: new URL(`blog/${post.slug}`, url).href,
     lastModified: new Date(),
   })),

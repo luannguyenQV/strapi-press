@@ -38,7 +38,6 @@ export const prefetchArticles = (
             },
             category: true,
             cover: true,
-            seo: true,
           },
           sort: ['publishedAt:desc'],
           pagination: {
@@ -67,7 +66,6 @@ export const prefetchArticle = (queryClient: QueryClient, id: string) => {
             },
             category: true,
             cover: true,
-            seo: true,
           },
         })
       );
@@ -93,7 +91,6 @@ export const prefetchArticleBySlug = (
             },
             category: true,
             cover: true,
-            seo: true,
           },
         })
       );
@@ -105,14 +102,14 @@ export const prefetchArticleBySlug = (
 
 export const prefetchFeaturedArticles = (
   queryClient: QueryClient,
-  limit = 6
+  limit = 5
 ) => {
   return queryClient.prefetchQuery({
     queryKey: [...queryKeys.articles(), 'featured', limit],
     queryFn: async () => {
       const response = await strapiClient.collection('articles').find(
         safeCastParams({
-          filters: { featured: { $eq: true } },
+          filters: { featured: true },
           fields: ['title', 'description', 'slug', 'publishedAt'],
           populate: {
             author: {

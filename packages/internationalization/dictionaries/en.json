@@ -154,6 +154,21 @@
       "meta": {
         "title": "Blog",
         "description": "Thoughts, ideas, and opinions."
+      },
+      "search": {
+        "placeholder": "Search articles...",
+        "clear": "Clear search",
+        "noResults": "No articles found",
+        "loading": "Searching..."
+      },
+      "categories": {
+        "all": "All Categories",
+        "filterBy": "Filter by Category"
+      },
+      "article": {
+        "readMore": "Read More",
+        "by": "by",
+        "publishedOn": "Published on"
       }
     },
     "contact": {

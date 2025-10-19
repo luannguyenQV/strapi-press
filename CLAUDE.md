@@ -114,3 +114,52 @@ The project uses Turborepo with pnpm workspaces:
 - Web app runs on port 3001 in development (configured in package.json dev script)
 - Strapi client includes built-in rate limiting and caching for free tier optimization
 - Internationalization middleware handles locale routing automatically
+
+### Strapi Client Patterns
+
+The `@repo/strapi-client` package uses TanStack Query for data fetching with two distinct patterns:
+
+**Server-Side Rendering (SSR):**
+```typescript
+// In Server Components
+import { prefetchArticles, createSSRQueryClient } from '@repo/strapi-client/ssr';
+import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
+
+const queryClient = createSSRQueryClient();
+await prefetchArticles(queryClient, { pageSize: 10 });
+
+return (
+  <HydrationBoundary state={dehydrate(queryClient)}>
+    <ArticleList /> {/* Client component */}
+  </HydrationBoundary>
+);
+```
+
+**Client-Side Fetching:**
+```typescript
+// In Client Components
+'use client';
+import { useArticles } from '@repo/strapi-client/hooks';
+
+const { data, isLoading } = useArticles({ pageSize: 10 });
+```
+
+**Key Patterns:**
+- Prefer SSR for public content (better SEO and initial load)
+- Use client-side for user-specific or real-time data
+- Parallel data fetching with `Promise.all()` for performance
+- Cache functions with `unstable_cache` to avoid duplicate requests
+- See `packages/strapi-client/strapi-with-tanstack-best-practice.md` for comprehensive patterns
+
+### Authentication (Planned)
+
+The project will use **Better Auth** for authentication with:
+- Email/password authentication with bcrypt hashing
+- Google and Facebook OAuth providers
+- Protected routes via Next.js middleware
+- httpOnly cookie sessions (7-day expiration)
+- Type-safe with auto-generated TypeScript types
+
+Implementation plan: `docs/plan/authentication.md`
+
+Auth will be added to `apps/web/` with database tables in PostgreSQL (can share Strapi's database or use separate instance).

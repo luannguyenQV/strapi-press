@@ -1,6 +1,9 @@
 /**
  * Article query hooks using TanStack Query + @strapi/client
- * Following TanStack Query best practices with proper caching and invalidation
+ * Only interactive features use TanStack Query - static content uses Next.js ISR
+ *
+ * For static content (articles, categories), use Server Components with cachedFind instead.
+ * See docs/data-flow.md for architecture details.
  */
 
 import {
@@ -19,7 +22,6 @@ import type {
 } from '../types';
 import {
   bridgeArticleCollection,
-  bridgeArticleSingle,
   safeCastParams,
 } from '../types';
 
@@ -32,195 +34,9 @@ export interface ArticleQueryParams {
   populate?: string | string[] | object;
 }
 
-// Response interfaces imported from ../types
-
 /**
- * Fetch all articles with pagination and filtering
- */
-export const useArticles = (
-  params?: ArticleQueryParams,
-  options?: Omit<
-    UseQueryOptions<StrapiResponse<Article>>,
-    'queryKey' | 'queryFn'
-  >
-) => {
-  return useQuery({
-    queryKey: [...queryKeys.articles(), params],
-    queryFn: async () => {
-      const response = await strapiClient.collection('articles').find(
-        safeCastParams({
-          populate: {
-            author: {
-              populate: ['avatar'],
-            },
-            category: true,
-            cover: true,
-            seo: true,
-          },
-          sort: ['publishedAt:desc'],
-          pagination: {
-            page: params?.page || 1,
-            pageSize: params?.pageSize || 10,
-          },
-          ...params,
-        })
-      );
-      return bridgeArticleCollection(response);
-    },
-    staleTime: 5 * 60 * 1000, // 5 minutes - matching your original cache TTL
-    ...options,
-  });
-};
-
-/**
- * Fetch single article by document ID
- */
-export const useArticle = (
-  id: string,
-  options?: Omit<
-    UseQueryOptions<StrapiSingleResponse<Article>>,
-    'queryKey' | 'queryFn'
-  >
-) => {
-  return useQuery({
-    queryKey: queryKeys.article(id),
-    queryFn: async () => {
-      const response = await strapiClient.collection('articles').findOne(
-        id,
-        safeCastParams({
-          populate: {
-            author: {
-              populate: ['avatar'],
-            },
-            category: true,
-            cover: true,
-            seo: true,
-          },
-        })
-      );
-      return bridgeArticleSingle(response);
-    },
-    enabled: !!id,
-    staleTime: 5 * 60 * 1000,
-    ...options,
-  });
-};
-
-/**
- * Fetch article by slug
- */
-export const useArticleBySlug = (
-  slug: string,
-  options?: Omit<
-    UseQueryOptions<StrapiResponse<Article>>,
-    'queryKey' | 'queryFn'
-  >
-) => {
-  return useQuery({
-    queryKey: [...queryKeys.articles(), 'slug', slug],
-    queryFn: async () => {
-      const response = await strapiClient.collection('articles').find(
-        safeCastParams({
-          filters: { slug: { $eq: slug } },
-          populate: {
-            author: {
-              populate: ['avatar'],
-            },
-            category: true,
-            cover: true,
-            seo: true,
-          },
-        })
-      );
-      return bridgeArticleCollection(response);
-    },
-    enabled: !!slug,
-    staleTime: 5 * 60 * 1000,
-    ...options,
-  });
-};
-
-/**
- * Fetch featured articles
- */
-export const useFeaturedArticles = (
-  limit = 6,
-  options?: Omit<
-    UseQueryOptions<StrapiResponse<Article>>,
-    'queryKey' | 'queryFn'
-  >
-) => {
-  return useQuery({
-    queryKey: [...queryKeys.articles(), 'featured', limit],
-    queryFn: async () => {
-      const response = await strapiClient.collection('articles').find(
-        safeCastParams({
-          filters: { featured: { $eq: true } },
-          fields: ['title', 'description', 'slug', 'publishedAt'],
-          populate: {
-            author: {
-              fields: ['name'],
-            },
-            category: {
-              fields: ['name'],
-            },
-            cover: {
-              fields: ['url', 'alternativeText', 'width', 'height'],
-            },
-          },
-          sort: ['publishedAt:desc'],
-          pagination: { pageSize: limit },
-        })
-      );
-      return bridgeArticleCollection(response);
-    },
-    staleTime: 10 * 60 * 1000, // Featured articles can be cached longer
-    ...options,
-  });
-};
-
-/**
- * Fetch articles by category
- */
-export const useArticlesByCategory = (
-  categoryId: string,
-  params?: ArticleQueryParams,
-  options?: Omit<
-    UseQueryOptions<StrapiResponse<Article>>,
-    'queryKey' | 'queryFn'
-  >
-) => {
-  return useQuery({
-    queryKey: queryKeys.articlesByCategory(categoryId),
-    queryFn: async () => {
-      const response = await strapiClient.collection('articles').find(
-        safeCastParams({
-          filters: {
-            category: { documentId: { $eq: categoryId } },
-          },
-          populate: {
-            author: { populate: ['avatar'] },
-            category: true,
-            cover: true,
-          },
-          sort: ['publishedAt:desc'],
-          pagination: {
-            page: params?.page || 1,
-            pageSize: params?.pageSize || 10,
-          },
-          ...params,
-        })
-      );
-      return bridgeArticleCollection(response);
-    },
-    enabled: !!categoryId,
-    staleTime: 5 * 60 * 1000,
-    ...options,
-  });
-};
-
-/**
- * Search articles
+ * Search articles (Client-side interactive feature)
+ * Use this for real-time search with user input
  */
 export const useSearchArticles = (
   query: string,
@@ -243,7 +59,7 @@ export const useSearchArticles = (
             ],
           },
           populate: {
-            author: { populate: ['avatar'] },
+            author: { populate: 'avatar' },
             category: true,
             cover: true,
           },
@@ -263,79 +79,9 @@ export const useSearchArticles = (
   });
 };
 
-// Mutations
 /**
- * Create new article
- */
-export const useCreateArticle = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (data: Partial<Article>) => {
-      const response = await strapiClient
-        .collection('articles')
-        .create(safeCastParams(data));
-      return bridgeArticleSingle(response);
-    },
-    onSuccess: () => {
-      // Invalidate articles list to show new article
-      queryClient.invalidateQueries({ queryKey: queryKeys.articles() });
-    },
-  });
-};
-
-/**
- * Update existing article
- */
-export const useUpdateArticle = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({
-      id,
-      data,
-    }: { id: string; data: Partial<Article> }) => {
-      const response = await strapiClient
-        .collection('articles')
-        .update(id, safeCastParams(data));
-      return bridgeArticleSingle(response);
-    },
-    onSuccess: (updatedArticle, variables) => {
-      // Update specific article cache
-      queryClient.setQueryData(queryKeys.article(variables.id), {
-        data: updatedArticle.data,
-        meta: updatedArticle.meta,
-      });
-
-      // Invalidate articles list to reflect changes
-      queryClient.invalidateQueries({ queryKey: queryKeys.articles() });
-    },
-  });
-};
-
-/**
- * Delete article
- */
-export const useDeleteArticle = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (id: string) => {
-      const response = await strapiClient.collection('articles').delete(id);
-      return bridgeArticleSingle(response);
-    },
-    onSuccess: (_, deletedId) => {
-      // Remove from cache
-      queryClient.removeQueries({ queryKey: queryKeys.article(deletedId) });
-
-      // Invalidate articles list
-      queryClient.invalidateQueries({ queryKey: queryKeys.articles() });
-    },
-  });
-};
-
-/**
- * Increment view count (optimistic update)
+ * Increment view count (Client-side interactive feature)
+ * Uses optimistic updates for instant UI feedback
  */
 export const useIncrementViewCount = () => {
   const queryClient = useQueryClient();

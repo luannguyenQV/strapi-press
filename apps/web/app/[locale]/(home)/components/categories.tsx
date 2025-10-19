@@ -1,18 +1,23 @@
-import React from 'react';
-import { categoryService } from '@repo/strapi-client';
 import { Badge } from '@repo/design-system/components/ui/badge';
+import type { Dictionary } from '@repo/internationalization';
+import { type Category, cachedFind } from '@repo/strapi-client';
 import Link from 'next/link';
+import type React from 'react';
 
 interface CategoriesMenuProps {
   className?: string;
 }
 
-export async function CategoriesMenu({  className = '' }: CategoriesMenuProps): Promise<React.JSX.Element | null> {
+export async function CategoriesMenu({ className = '' }: CategoriesMenuProps): Promise<React.JSX.Element | null> {
   try {
-    const { data: categories } = await categoryService.getAll({
+    const response = await cachedFind('categories', {
       sort: ['name:asc'],
-      pagination: { limit: 15 }
+      pagination: { pageSize: 15 }
+    }, {
+      revalidate: 600, // 10 minutes - categories change infrequently
+      tags: ['categories', 'categories-list', 'navigation']
     });
+    const categories = (response?.data as unknown as Category[]) || [];
 
     if (!categories || categories.length === 0) {
       return null;
@@ -22,32 +27,32 @@ export async function CategoriesMenu({  className = '' }: CategoriesMenuProps): 
       <aside className={`w-full ${className}`}>
         <div className="sticky top-24 space-y-4">
           <nav className="space-y-2">
-            {categories.map((category) => (
-              <Link 
-                key={category.id} 
+            {categories.map((category: Category) => (
+              <Link
+                key={category.id}
                 href={`/category/${category.slug}`}
-                className="block group"
+                className='group block'
               >
-                <div className="flex items-center space-x-2 py-2 px-3 rounded-lg hover:bg-muted/50 transition-colors">
-                  <span className="text-sm font-medium capitalize group-hover:text-primary transition-colors">
-                    {category.name}
+                <div className='flex items-center space-x-2 rounded-lg px-3 py-2 transition-colors hover:bg-muted/50'>
+                  <span className='font-medium text-sm capitalize transition-colors group-hover:text-primary'>
+                    {category.name}xxx
                   </span>
                 </div>
               </Link>
             ))}
           </nav>
-          
+
           {/* Quick Browse Tags */}
-          <div className="pt-6 border-t">
-            <h4 className="font-medium text-sm mb-3 text-muted-foreground">Quick Browse</h4>
+          <div className='border-t pt-6'>
+            <h4 className='mb-3 font-medium text-muted-foreground text-sm'>Quick Browse</h4>
             <div className="flex flex-wrap gap-1">
               {categories.slice(0, 8).map((category) => (
                 <Link key={`tag-${category.id}`} href={`/category/${category.slug}`}>
-                  <Badge 
-                    variant="outline" 
-                    className="hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer text-xs px-2 py-1 capitalize"
+                  <Badge
+                    variant="outline"
+                    className='cursor-pointer px-2 py-1 text-xs capitalize transition-colors hover:bg-primary hover:text-primary-foreground'
                   >
-                    {category.name}
+                    {category.name}xxxx
                   </Badge>
                 </Link>
               ))}
@@ -61,8 +66,8 @@ export async function CategoriesMenu({  className = '' }: CategoriesMenuProps): 
     return (
       <aside className={`w-full ${className}`}>
         <div className="sticky top-24">
-          <h3 className="font-semibold text-lg mb-4">Categories</h3>
-          <p className="text-sm text-muted-foreground">
+          <h3 className='mb-4 font-semibold text-lg'>Categories</h3>
+          <p className='text-muted-foreground text-sm'>
             Unable to load categories at the moment.
           </p>
         </div>
@@ -74,22 +79,26 @@ export async function CategoriesMenu({  className = '' }: CategoriesMenuProps): 
 // Keep the original Categories component as CategoriesGrid for other uses
 export async function CategoriesGrid({ dictionary }: CategoriesProps): Promise<React.JSX.Element | null> {
   try {
-    const { data: categories } = await categoryService.getAll({
+    const response = await cachedFind('categories', {
       sort: ['name:asc'],
-      pagination: { limit: 10 }
+      pagination: { pageSize: 10 }
+    }, {
+      revalidate: 600, // 10 minutes - categories change infrequently
+      tags: ['categories', 'categories-grid']
     });
+    const categories = (response?.data as unknown as Category[]) || [];
 
     if (!categories || categories.length === 0) {
       return null;
     }
 
     return (
-      <section className="py-16 bg-muted/50">
+      <section className='bg-muted/50 py-16'>
         <div className="container">
-          <div className="flex flex-wrap gap-2 justify-center">
-            {categories.map((category) => (
+          <div className='flex flex-wrap justify-center gap-2'>
+            {categories.map((category: Category) => (
               <Link key={`badge-${category.id}`} href={`/category/${category.slug}`}>
-                <Badge variant="outline" className="hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer text-sm py-1 px-3 capitalize">
+                <Badge variant="outline" className='cursor-pointer px-3 py-1 text-sm capitalize transition-colors hover:bg-primary hover:text-primary-foreground'>
                   {category.name}
                 </Badge>
               </Link>
@@ -105,7 +114,7 @@ export async function CategoriesGrid({ dictionary }: CategoriesProps): Promise<R
 }
 
 interface CategoriesProps {
-  dictionary: any;
+  dictionary: Dictionary;
 }
 
 // Export the sidebar version as the default

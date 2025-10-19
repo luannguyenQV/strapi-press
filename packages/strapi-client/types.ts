@@ -37,6 +37,11 @@ export interface StrapiError {
   details?: Record<string, unknown>;
 }
 
+// JSON-LD type for SEO
+export type WithContext<T> = T & {
+  '@context': 'https://schema.org';
+};
+
 // Media interfaces
 export interface Media {
   id: number;
@@ -156,8 +161,8 @@ export interface SEO {
 // Filter interfaces
 export interface ArticleFilters {
   title?: { $contains?: string; $containsi?: string };
-  slug?: { $eq?: string };
-  featured?: { $eq?: boolean };
+  slug?: { $eq?: string; $ne?: string };
+  featured?: boolean | { $eq?: boolean; $ne?: boolean }; // Supports both boolean and operator syntax
   publishedAt?: {
     $gte?: string;
     $lte?: string;
@@ -195,12 +200,16 @@ export interface PaginationParams {
 }
 
 export interface PopulateParams {
-  [key: string]: boolean | string | PopulateParams | {
-    populate?: PopulateParams;
-    fields?: string[];
-    sort?: string | string[];
-    filters?: FilterParams;
-  };
+  [key: string]:
+    | boolean
+    | string
+    | PopulateParams
+    | {
+        populate?: PopulateParams;
+        fields?: string[];
+        sort?: string | string[];
+        filters?: FilterParams;
+      };
 }
 
 export interface QueryParams {
@@ -282,12 +291,16 @@ export const bridgeFooterSingle = (
 ): StrapiSingleResponse<Footer> => bridgeSingleResponse<Footer>(response);
 
 // Type-safe parameter casting for populate and filter objects
-export const safeCastParams = <T = QueryParams>(params: T): Record<string, unknown> => {
+export const safeCastParams = <T = QueryParams>(
+  params: T
+): Record<string, unknown> => {
   return params as Record<string, unknown>;
 };
 
 // Type guards for runtime validation (optional)
-export const isStrapiResponse = <T>(response: unknown): response is StrapiResponse<T> => {
+export const isStrapiResponse = <T>(
+  response: unknown
+): response is StrapiResponse<T> => {
   return (
     typeof response === 'object' &&
     response !== null &&
@@ -297,7 +310,9 @@ export const isStrapiResponse = <T>(response: unknown): response is StrapiRespon
   );
 };
 
-export const isStrapiSingleResponse = <T>(response: unknown): response is StrapiSingleResponse<T> => {
+export const isStrapiSingleResponse = <T>(
+  response: unknown
+): response is StrapiSingleResponse<T> => {
   return (
     typeof response === 'object' &&
     response !== null &&

@@ -1,15 +1,18 @@
 import Link from 'next/link';
-import { categoryService } from '@repo/strapi-client';
+import { cachedFind, type Category } from '@repo/strapi-client';
 
 export async function CategoriesMenu() {
-  let categories = [];
+  let categories: Category[] = [];
 
   try {
-    const response = await categoryService.getAll({
+    const response = await cachedFind('categories', {
       sort: ['name:asc'],
-      pagination: { limit: 10 }, // Limit to 10 categories for header
+      pagination: { pageSize: 10 }, // Limit to 10 categories for header
+    }, {
+      revalidate: 900, // 15 minutes - header menu changes very infrequently
+      tags: ['categories', 'categories-menu', 'header']
     });
-    categories = response.data;
+    categories = (response?.data as unknown as Category[]) || [];
   } catch (error) {
     console.error('Failed to fetch categories:', error);
     return null;
@@ -22,7 +25,7 @@ export async function CategoriesMenu() {
   return (
     <nav className="categories-menu">
       <ul className="flex items-center space-x-1 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-        {categories.map((category) => (
+        {categories.map((category: Category) => (
           <li key={category.id}>
             <Link
               href={`/category/${category.slug}`}

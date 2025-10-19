@@ -1,4 +1,4 @@
-import { footerService } from '@repo/strapi-client';
+import { cachedFindSingleType } from '@repo/strapi-client';
 import {
   Facebook,
   Github,
@@ -10,6 +10,36 @@ import {
   Youtube
 } from 'lucide-react';
 import Link from 'next/link';
+
+// Footer types matching the actual Strapi schema
+interface FooterLink {
+  id: number;
+  label: string;
+  url: string;
+  isExternal: boolean;
+  openInNewTab?: boolean;
+}
+
+interface FooterColumn {
+  id: number;
+  title: string;
+  links: FooterLink[];
+}
+
+interface FooterSocialLink {
+  id: number;
+  platform: string;
+  url: string;
+  label: string;
+}
+
+interface FooterData {
+  id: number;
+  columns: FooterColumn[];
+  socialLinks: FooterSocialLink[];
+  copyright: string;
+  bottomLinks: FooterLink[];
+}
 
 const socialIcons = {
   github: Github,
@@ -29,7 +59,27 @@ interface FooterProps {
 }
 
 export async function Footer({ locale }: FooterProps): Promise<React.JSX.Element> {
-  const footerData = await footerService.getFooter(locale);
+  let footerData: FooterData | null = null;
+
+  try {
+    const response = await cachedFindSingleType('footer', {
+      populate: {
+        columns: {
+          populate: {
+            links: true
+          }
+        },
+        socialLinks: true,
+        bottomLinks: true,
+      }
+    }, {
+      revalidate: 1800, // 30 minutes - footer changes very rarely
+      tags: ['footer', 'global', 'single-type']
+    });
+    footerData = response?.data as unknown as FooterData | null;
+  } catch (error) {
+    console.error('Error fetching footer data:', error);
+  }
   // Fallback footer if no data from Strapi
   if (!footerData) {
     return (
@@ -85,8 +135,8 @@ export async function Footer({ locale }: FooterProps): Promise<React.JSX.Element
         {/* Social Links */}
         {footerData.socialLinks && footerData.socialLinks.length > 0 && (
           <div className='mb-8 flex justify-center space-x-6'>
-            {footerData.socialLinks.map((social) => {
-              const Icon = socialIcons[social.platform];
+            {footerData.socialLinks.map((social: any) => {
+              const Icon = socialIcons[social.platform as keyof typeof socialIcons];
               if (!Icon) return null;
 
               return (

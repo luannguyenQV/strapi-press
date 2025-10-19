@@ -7,15 +7,15 @@ type MetadataGenerator = Omit<Metadata, 'description' | 'title'> & {
   image?: string;
 };
 
-const applicationName = 'next-forge';
+const applicationName = process.env.NEXT_PUBLIC_APP_NAME;
 const author: Metadata['authors'] = {
-  name: 'Vercel',
-  url: 'https://vercel.com/',
+  name: 'Luan Nguyen',
+  url: 'https://luanguyen.me/',
 };
-const publisher = 'Vercel';
-const twitterHandle = '@vercel';
+const publisher = 'Luan Nguyen';
+const twitterHandle = '@luanguyen';
 const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
-const productionUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+const productionUrl = process.env.NEXT_PUBLIC_APP_URL;
 
 export const createMetadata = ({
   title,

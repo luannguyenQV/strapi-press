@@ -4,9 +4,10 @@ import { fonts } from '@repo/design-system/lib/fonts';
 import { cn } from '@repo/design-system/lib/utils';
 import { getDictionary } from '@repo/internationalization';
 import type { Metadata, Viewport } from 'next';
+import type React from 'react';
+import { Providers } from '../../lib/providers';
 import { Footer } from './components/footer';
 import { Header } from './components/header';
-import { Providers } from '../../lib/providers';
 
 type RootLayoutProperties = {
   readonly children: React.ReactNode;
