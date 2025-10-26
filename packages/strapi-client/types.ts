@@ -162,7 +162,7 @@ export interface SEO {
 export interface ArticleFilters {
   title?: { $contains?: string; $containsi?: string };
   slug?: { $eq?: string; $ne?: string };
-  featured?: boolean | { $eq?: boolean; $ne?: boolean }; // Supports both boolean and operator syntax
+  featured?: boolean | { $eq?: boolean; $ne?: boolean; $null?: boolean }; // Supports boolean, operator, and null check
   publishedAt?: {
     $gte?: string;
     $lte?: string;
@@ -180,6 +180,7 @@ export interface ArticleFilters {
     title?: { $contains?: string; $containsi?: string };
     description?: { $contains?: string; $containsi?: string };
     content?: { $contains?: string; $containsi?: string };
+    featured?: { $eq?: boolean; $ne?: boolean; $null?: boolean };
   }>;
 }
 

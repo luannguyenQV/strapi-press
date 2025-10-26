@@ -67,7 +67,11 @@
       "WebFetch(domain:docs.strapi.io)",
       "Bash(git checkout:*)",
       "Bash(pnpm --filter web typecheck)",
-      "mcp__serena__list_memories"
+      "mcp__serena__list_memories",
+      "Bash(timeout 5 curl -s \"http://localhost:1337/api/articles?pagination[pageSize]=2\")",
+      "Bash(.specify/scripts/bash/check-prerequisites.sh:*)",
+      "Bash(pnpm --filter @repo/strapi-client add:*)",
+      "Bash(pnpm --filter @repo/strapi-client build:*)"
     ],
     "deny": []
   },

@@ -1,8 +1,6 @@
-import { Button } from '@repo/design-system/components/ui/button';
 import type { Dictionary } from '@repo/internationalization';
 import { type Article, cachedFind } from '@repo/strapi-client';
-import Link from 'next/link';
-import { ArticleListItem } from '../../components/article';
+import { ArticleListItem, LoadMoreArticles } from '../../components/article';
 
 type ArticlesProps = {
   dictionary: Dictionary;
@@ -10,9 +8,16 @@ type ArticlesProps = {
 
 export const Articles = async (props: ArticlesProps) => {
   try {
-    // Fetch featured articles from Strapi with Next.js ISR caching
+    // Fetch articles from Strapi with Next.js ISR caching
     const response = await cachedFind('articles', {
-      // filters: { featured: false },
+      // Filter for non-featured articles (featured = false OR null)
+      // Note: If you want ALL articles, remove the filters line
+      filters: {
+        $or: [
+          { featured: { $eq: false } },
+          { featured: { $null: true } }
+        ]
+      },
       sort: ['publishedAt:desc'],
       pagination: { pageSize: 6 },
       populate: {
@@ -34,20 +39,16 @@ export const Articles = async (props: ArticlesProps) => {
 
     return (
       <div className='w-full max-w-4xl py-6'>
-        <div className="container flex justify-center">
-          {/* Articles List - Vertical Stack */}
+        <div className="flex flex-col">
+          {/* Initial articles (Page 1) - Server-rendered with ISR cache */}
           <div className="space-y-3">
             {articles.map((article: Article) => (
               <ArticleListItem key={article.id} article={article} />
             ))}
           </div>
 
-          {/* View More Button */}
-        </div>
-        <div className="mt-12 flex justify-center">
-          <Button asChild size="lg">
-            <Link href="/blog">View All Articles</Link>
-          </Button>
+          {/* Load More articles (Page 2+) - Client-side with TanStack Query */}
+          <LoadMoreArticles pageSize={6} />
         </div>
       </div>
     );

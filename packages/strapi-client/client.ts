@@ -1,10 +1,16 @@
 /**
  * Official Strapi client configuration with Next.js ISR caching
  * Uses @strapi/client for proper API integration with unstable_cache for persistent caching
+ *
+ * Cache Key Strategy:
+ * - Uses fast-json-stable-stringify for deterministic cache key generation
+ * - Ensures consistent cache keys regardless of object property ordering
+ * - Example: {a:1, b:2} and {b:2, a:1} produce identical cache keys
  */
 
 import { strapi } from '@strapi/client';
 import { unstable_cache } from 'next/cache';
+import stringify from 'fast-json-stable-stringify';
 import type {
   QueryParams,
   StrapiResponse,
@@ -53,8 +59,6 @@ export const cachedFind = async <T extends object = Record<string, unknown>>(
   params?: QueryParams,
   options?: CacheOptions
 ): Promise<StrapiResponse<T>> => {
-  const cacheKey = `strapi-${contentType}-${JSON.stringify(params || {})}`;
-
   const cachedFn = unstable_cache(
     async () => {
       if (process.env.NODE_ENV === 'development') {
@@ -64,7 +68,7 @@ export const cachedFind = async <T extends object = Record<string, unknown>>(
         .collection(contentType)
         .find(params) as unknown as Promise<StrapiResponse<T>>;
     },
-    [cacheKey],
+    ['strapi', contentType, stringify(params || {})],
     {
       revalidate: options?.revalidate ?? 300, // Default 5 minutes
       tags: options?.tags ?? [contentType, 'strapi', `${contentType}-list`],
@@ -98,8 +102,6 @@ export const cachedFindOne = async <T extends object = Record<string, unknown>>(
   params?: QueryParams,
   options?: CacheOptions
 ): Promise<StrapiSingleResponse<T>> => {
-  const cacheKey = `strapi-${contentType}-${id}-${JSON.stringify(params || {})}`;
-
   const cachedFn = unstable_cache(
     async () => {
       if (process.env.NODE_ENV === 'development') {
@@ -111,7 +113,7 @@ export const cachedFindOne = async <T extends object = Record<string, unknown>>(
         StrapiSingleResponse<T>
       >;
     },
-    [cacheKey],
+    ['strapi', contentType, String(id), stringify(params || {})],
     {
       revalidate: options?.revalidate ?? 600, // Default 10 minutes for single documents
       tags: options?.tags ?? [contentType, 'strapi', `${contentType}-${id}`],
@@ -145,8 +147,6 @@ export const cachedFindSingleType = async <
   params?: QueryParams,
   options?: CacheOptions
 ): Promise<StrapiSingleResponse<T>> => {
-  const cacheKey = `strapi-single-${contentType}-${JSON.stringify(params || {})}`;
-
   const cachedFn = unstable_cache(
     async () => {
       if (process.env.NODE_ENV === 'development') {
@@ -156,7 +156,7 @@ export const cachedFindSingleType = async <
         .collection(contentType)
         .find(params) as unknown as Promise<StrapiSingleResponse<T>>;
     },
-    [cacheKey],
+    ['strapi-single', contentType, stringify(params || {})],
     {
       revalidate: options?.revalidate ?? 1800, // Default 30 minutes for single types (rarely change)
       tags: options?.tags ?? [contentType, 'strapi', 'single-type'],

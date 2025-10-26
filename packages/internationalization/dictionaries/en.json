@@ -200,6 +200,49 @@
           "cta": "Book the meeting"
         }
       }
+    },
+    "search": {
+      "meta": {
+        "title": "Search Articles",
+        "titleWithQuery": "Search: {query}",
+        "description": "Search through our articles to find what you need",
+        "descriptionWithQuery": "Search results for \"{query}\" - Find articles about {query}"
+      },
+      "page": {
+        "title": "Search article",
+        "searchResults": "Search Results",
+        "searchArticles": "Search Articles",
+        "showingResultsFor": "Showing results for",
+        "enterSearchTerm": "Enter a search term to find articles",
+        "popularTopics": "Popular Topics:",
+        "browseAllArticles": "Browse all articles"
+      },
+      "input": {
+        "placeholder": "Search articles...",
+        "ariaLabel": "Search articles"
+      },
+      "results": {
+        "found": "Found",
+        "results": "results",
+        "noResultsTitle": "No results found",
+        "noResultsDescription": "Try adjusting your search terms or filters",
+        "errorTitle": "Something went wrong",
+        "errorDescription": "Unable to load search results. Please try again later."
+      },
+      "filters": {
+        "category": "Category",
+        "sort": "Sort by",
+        "sortDateDesc": "Newest first",
+        "sortDateAsc": "Oldest first",
+        "sortTitleAsc": "Title (A-Z)",
+        "sortTitleDesc": "Title (Z-A)"
+      },
+      "pagination": {
+        "previous": "Previous",
+        "next": "Next",
+        "page": "Page",
+        "of": "of"
+      }
     }
   }
 }

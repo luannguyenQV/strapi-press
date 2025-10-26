@@ -469,6 +469,9 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.45.0
         version: 5.90.2(react@19.1.0)
+      fast-json-stable-stringify:
+        specifier: ^2.1.0
+        version: 2.1.0
       next:
         specifier: ^15.3.2
         version: 15.3.2(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -3307,6 +3310,9 @@ packages:
 
   fast-json-parse@1.0.3:
     resolution: {integrity: sha512-FRWsaZRWEJ1ESVNbDWmsAlqDk96gPQezzLghafp5J4GUKjbCz3OkAHuZs5TuPEtkbVQERysLp9xv6c24fBm8Aw==}
+
+  fast-json-stable-stringify@2.1.0:
+    resolution: {integrity: sha512-lhd/wF+Lk98HZoTCtlVraHtfh5XYijIjalXck7saUtuanSDyLMxnHhSXEDJqHxD7msR8D0uCmqlkwjCV8xvwHw==}
 
   fast-uri@3.0.6:
     resolution: {integrity: sha512-Atfo14OibSv5wAp4VWNsFYE1AchQRTv9cBGWET4pZWHzYshFSS9NQI6I57rdKn9croWVMbYFbLhJ+yJvmZIIHw==}
@@ -8754,6 +8760,8 @@ snapshots:
       micromatch: 4.0.8
 
   fast-json-parse@1.0.3: {}
+
+  fast-json-stable-stringify@2.1.0: {}
 
   fast-uri@3.0.6: {}
 

@@ -170,10 +170,7 @@ export const createDeleteMutation = <T>(
         const response = await strapiClient.collection(contentType).delete(id);
         return bridgeSingleResponse<T>(response);
       },
-      onSuccess: (
-        data: StrapiSingleResponse<T>,
-        deletedId: string
-      ) => {
+      onSuccess: (data: StrapiSingleResponse<T>, deletedId: string) => {
         // Remove from cache
         queryClient.removeQueries({ queryKey: queryKeyFactory(deletedId) });
         // Invalidate collection queries

@@ -8,7 +8,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '@repo/design-system/components/ui/navigation-menu';
-import { MoveRight } from 'lucide-react';
+import { MoveRight, Search } from 'lucide-react';
 import Link from 'next/link';
 
 import type { Dictionary } from '@repo/internationalization';
@@ -94,7 +94,12 @@ export const Header = async ({ dictionary }: HeaderProps) => {
           />
           <p className="whitespace-nowrap font-semibold">StrapiPress</p>
         </Link>
-        <div className="flex w-full justify-end gap-2">
+        <div className="flex w-full items-center justify-end gap-2">
+          <Button variant="ghost" size="icon" asChild>
+            <Link href="/search" aria-label="Search articles">
+              <Search className="h-5 w-5" />
+            </Link>
+          </Button>
           <GithubMenu />
           <LanguageSwitcher />
           <div className="hidden md:inline">

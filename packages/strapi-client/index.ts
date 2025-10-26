@@ -21,11 +21,15 @@ export {
   cachedFind,
   cachedFindOne,
   cachedFindSingleType,
-  type CacheOptions
+  type CacheOptions,
 } from './client';
 
 // Export TanStack Query hooks (for Client Components - Interactive features only)
-export { useSearchArticles, useIncrementViewCount } from './hooks/articles';
+export {
+  useSearchArticles,
+  useIncrementViewCount,
+  useInfiniteArticles,
+} from './hooks/articles';
 export * from './hooks/categories';
 export * from './hooks/footer';
 
@@ -43,3 +47,5 @@ export * from './utils/hookFactory';
 
 // Legacy support - re-export for backward compatibility
 export { strapiClient as strapi } from './client';
+
+export { DEFAULT_PAGE_SIZE } from './constant';
