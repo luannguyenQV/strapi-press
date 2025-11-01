@@ -2,7 +2,7 @@
 
 import { Button } from '@repo/design-system/components/ui/button';
 import type { Article, StrapiResponse } from '@repo/strapi-client';
-import { useInfiniteArticles } from '@repo/strapi-client';
+import { DEFAULT_PAGE_SIZE, useInfiniteArticles } from '@repo/strapi-client';
 import type { InfiniteData } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { ArticleListItem } from './list-item';
@@ -31,7 +31,7 @@ interface LoadMoreArticlesProps {
  * - Client Component (this) handles page 2+ with LoadMoreArticles
  */
 export function LoadMoreArticles({
-  pageSize = 6,
+  pageSize = DEFAULT_PAGE_SIZE,
   filters,
   sort,
 }: LoadMoreArticlesProps) {
@@ -76,9 +76,9 @@ export function LoadMoreArticles({
   const infiniteData = data as InfiniteData<StrapiResponse<Article>>;
 
   return (
-    <>
+    <div className='py-8'>
       {/* Render all loaded pages */}
-      <div className="space-y-3">
+      <div className="space-y-8">
         {infiniteData.pages.map((page, pageIndex) =>
           page.data.map((article: Article) => (
             <ArticleListItem
@@ -118,6 +118,6 @@ export function LoadMoreArticles({
           </p>
         </div>
       )}
-    </>
+    </div>
   );
 }

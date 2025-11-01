@@ -71,7 +71,11 @@
       "Bash(timeout 5 curl -s \"http://localhost:1337/api/articles?pagination[pageSize]=2\")",
       "Bash(.specify/scripts/bash/check-prerequisites.sh:*)",
       "Bash(pnpm --filter @repo/strapi-client add:*)",
-      "Bash(pnpm --filter @repo/strapi-client build:*)"
+      "Bash(pnpm --filter @repo/strapi-client build:*)",
+      "WebFetch(domain:ui.shadcn.com)",
+      "Bash(pnpm --filter @repo/design-system typecheck:*)",
+      "SlashCommand(/speckit.specify)",
+      "Bash(TOTAL_ARTICLES=5 pnpm seed:bulk:*)"
     ],
     "deny": []
   },

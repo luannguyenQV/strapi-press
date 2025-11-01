@@ -1,5 +1,6 @@
 import { Badge } from '@repo/design-system/components/ui/badge';
 import { Card, CardContent } from '@repo/design-system/components/ui/card';
+import { TypographyH3, TypographyP } from '@repo/design-system';
 import type { Article } from '@repo/strapi-client';
 import { Calendar, Clock, User } from 'lucide-react';
 import Image from 'next/image';
@@ -56,14 +57,14 @@ export function SearchResultCard({ article, query }: SearchResultCardProps) {
           )}
 
           {/* Title */}
-          <h3 className="mb-3 font-semibold text-lg leading-tight transition-colors hover:text-primary">
+          <TypographyH3 className="mb-3 text-lg transition-colors hover:text-primary">
             <Link href={`/blog/${article.slug}`}>{article.title}</Link>
-          </h3>
+          </TypographyH3>
 
           {/* Description */}
-          <p className="mb-4 line-clamp-3 text-muted-foreground text-sm leading-relaxed">
+          <TypographyP className="mb-4 line-clamp-3 text-muted-foreground text-sm [&:not(:first-child)]:mt-0">
             {article.description}
-          </p>
+          </TypographyP>
 
           {/* Metadata */}
           <div className="flex flex-wrap items-center gap-3 text-muted-foreground text-xs">

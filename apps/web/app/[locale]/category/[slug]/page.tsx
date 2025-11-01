@@ -1,12 +1,12 @@
-import { cachedFind, type Category, type Article } from '@repo/strapi-client';
 import { Badge } from '@repo/design-system/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@repo/design-system/components/ui/card';
 import { getDictionary } from '@repo/internationalization';
 import { createMetadata } from '@repo/seo/metadata';
+import { type Article, type Category, cachedFind } from '@repo/strapi-client';
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import Image from 'next/image';
 
 type CategoryPageProps = {
   params: Promise<{
@@ -91,15 +91,15 @@ const CategoryPage = async ({ params }: CategoryPageProps): Promise<React.JSX.El
     return (
       <div className="container mx-auto px-4 py-8">
         {/* Category Header */}
-        <div className="text-center mb-12">
-          <Badge variant="secondary" className="mb-4 text-lg px-4 py-2 capitalize">
+        <div className='mb-12 text-center'>
+          <Badge variant="secondary" className='mb-4 px-4 py-2 text-lg capitalize'>
             {category.name}
           </Badge>
-          <h1 className="text-4xl font-bold tracking-tight mb-4">
+          <h1 className='mb-4 font-bold text-4xl tracking-tight'>
             {category.name} Articles
           </h1>
           {category.description && (
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className='mx-auto max-w-2xl text-muted-foreground text-xl'>
               {category.description}
             </p>
           )}
@@ -114,7 +114,7 @@ const CategoryPage = async ({ params }: CategoryPageProps): Promise<React.JSX.El
                 href={`/${locale}/blog/${article.slug}`}
                 className="group"
               >
-                <Card className="h-full hover:shadow-lg transition-all duration-200 group-hover:scale-[1.02]">
+                <Card className='h-full transition-all duration-200 hover:shadow-lg group-hover:scale-[1.02]'>
                   {article.cover?.url && (
                     <div className="relative aspect-video overflow-hidden rounded-t-lg">
                       <Image
@@ -127,7 +127,7 @@ const CategoryPage = async ({ params }: CategoryPageProps): Promise<React.JSX.El
                     </div>
                   )}
                   <CardHeader>
-                    <CardTitle className="line-clamp-2 group-hover:text-primary transition-colors">
+                    <CardTitle className='line-clamp-2 transition-colors group-hover:text-primary'>
                       {article.title}
                     </CardTitle>
                     {article.description && (
@@ -137,7 +137,7 @@ const CategoryPage = async ({ params }: CategoryPageProps): Promise<React.JSX.El
                     )}
                   </CardHeader>
                   <CardContent>
-                    <div className="flex items-center text-sm text-muted-foreground">
+                    <div className='flex items-center text-muted-foreground text-sm'>
                       {article.author?.name && (
                         <>
                           <span>{article.author.name}</span>
@@ -160,14 +160,14 @@ const CategoryPage = async ({ params }: CategoryPageProps): Promise<React.JSX.El
             ))}
           </div>
         ) : (
-          <div className="text-center py-12">
-            <h3 className="text-2xl font-semibold mb-4">No articles found</h3>
-            <p className="text-muted-foreground mb-6">
+          <div className='py-12 text-center'>
+            <h3 className='mb-4 font-semibold text-2xl'>No articles found</h3>
+            <p className='mb-6 text-muted-foreground'>
               There are no articles in the {category.name} category yet.
             </p>
             <Link
               href={`/${locale}`}
-              className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+              className='inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground text-sm shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50'
             >
               Browse All Articles
             </Link>
@@ -178,7 +178,7 @@ const CategoryPage = async ({ params }: CategoryPageProps): Promise<React.JSX.El
         <div className="mt-12 text-center">
           <Link
             href={`/${locale}#categories`}
-            className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors"
+            className='inline-flex items-center text-muted-foreground text-sm transition-colors hover:text-primary'
           >
             ← Back to all categories
           </Link>
@@ -189,13 +189,13 @@ const CategoryPage = async ({ params }: CategoryPageProps): Promise<React.JSX.El
     console.error('Error loading category page:', error);
     return (
       <div className="container mx-auto px-4 py-8 text-center">
-        <h1 className="text-2xl font-bold mb-4">Error Loading Category</h1>
-        <p className="text-muted-foreground mb-6">
+        <h1 className='mb-4 font-bold text-2xl'>Error Loading Category</h1>
+        <p className='mb-6 text-muted-foreground'>
           We encountered an error while loading this category. Please try again later.
         </p>
         <Link
           href={`/${locale}`}
-          className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90"
+          className='inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground text-sm shadow transition-colors hover:bg-primary/90'
         >
           Go Home
         </Link>

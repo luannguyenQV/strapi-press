@@ -7,6 +7,7 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import type React from "react";
 import { useState } from 'react';
 
 interface ProvidersProps {
@@ -14,7 +15,6 @@ interface ProvidersProps {
 }
 
 export function Providers({ children }: ProvidersProps) {
-  // Create QueryClient instance with optimized defaults
   const [queryClient] = useState(
     () => new QueryClient({
       defaultOptions: {
@@ -29,9 +29,12 @@ export function Providers({ children }: ProvidersProps) {
           refetchOnMount: true,        // Refetch when component mounts
 
           // Error handling
-          retry: (failureCount, error: any) => {
+          retry: (failureCount, error: unknown) => {
             // Don't retry on 4xx errors
-            if (error?.status >= 400 && error?.status < 500) {
+            function hasStatus(e: unknown): e is { status: number } {
+              return typeof e === 'object' && e !== null && 'status' in e && typeof (e as { status: number }).status === 'number';
+            }
+            if (hasStatus(error) && error.status >= 400 && error.status < 500) {
               return false;
             }
             // Retry up to 3 times for other errors

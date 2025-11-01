@@ -1,5 +1,5 @@
 import { Skeleton } from '@repo/design-system/components/ui/skeleton';
-import { ArticleListItemSkeleton } from '../../components/article';
+import { ArticleListItemSkeleton } from '.';
 
 /**
  * ArticlesListSkeleton - Loading state for Articles component

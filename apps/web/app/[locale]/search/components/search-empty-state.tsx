@@ -1,4 +1,5 @@
 import type { Dictionary } from '@repo/internationalization';
+import { TypographyH2, TypographyH3, TypographyP } from '@repo/design-system';
 import { Search } from 'lucide-react';
 import Link from 'next/link';
 
@@ -14,13 +15,13 @@ export function SearchEmptyState({ dictionary }: { dictionary: Dictionary }) {
   return (
     <div className="flex flex-col items-center justify-center py-12 text-center">
       <Search className="mb-4 h-12 w-12 text-muted-foreground" />
-      <h2 className="mb-2 font-semibold text-2xl">{dictionary.web.search.page.searchArticles}</h2>
-      <p className="mb-8 max-w-md text-muted-foreground">
+      <TypographyH2 className="mb-2">{dictionary.web.search.page.searchArticles}</TypographyH2>
+      <TypographyP className="mb-8 max-w-md text-muted-foreground [&:not(:first-child)]:mt-0">
         {dictionary.web.search.page.enterSearchTerm}
-      </p>
+      </TypographyP>
 
       <div className="space-y-4">
-        <h3 className="font-medium text-sm">{dictionary.web.search.page.popularTopics}</h3>
+        <TypographyH3 className="text-sm">{dictionary.web.search.page.popularTopics}</TypographyH3>
         <div className="flex flex-wrap justify-center gap-2">
           <Link
             href="/search?q=next.js"

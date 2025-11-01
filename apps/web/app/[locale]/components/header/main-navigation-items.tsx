@@ -8,13 +8,7 @@ type NavigationItem = {
 };
 
 export function getMainNavigationItems(dictionary: Dictionary): NavigationItem[] {
-  const navigationItems: NavigationItem[] = [
-    {
-      title: dictionary.web.header.home,
-      href: '/',
-      description: '',
-    }
-  ];
+  const navigationItems: NavigationItem[] = [];
 
   return navigationItems
 }

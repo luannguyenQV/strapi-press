@@ -1,12 +1,12 @@
+import { Articles } from '@/components/articles/articles';
+import { ArticlesListSkeleton } from '@/components/articles/articles-skeleton';
+import { FeaturedArticles } from '@/components/articles/featured-articles';
+import { PageWrapper } from '@repo/design-system';
 import { getDictionary } from '@repo/internationalization';
 import { createMetadata } from '@repo/seo/metadata';
 import type { Metadata } from 'next';
 import type React from 'react';
 import { Suspense } from 'react';
-import { Articles } from './components/articles';
-import { ArticlesListSkeleton } from './components/articles-skeleton';
-import { FeaturedArticles } from './components/featured-articles';
-import { FeaturedArticlesSkeleton } from './components/featured-articles-skeleton';
 
 type HomeProps = {
   params: Promise<{
@@ -42,17 +42,15 @@ const Home = async ({ params }: HomeProps): Promise<React.ReactNode> => {
   const dictionary = await getDictionary(locale);
 
   return (
-    <div className='container mx-auto flex flex-col items-center px-4 py-8'>
-      {/* PPR: FeaturedArticles streams in with ISR caching */}
-      <Suspense fallback={<FeaturedArticlesSkeleton />}>
+    <PageWrapper>
+      <Suspense fallback={<div />}>
         <FeaturedArticles />
       </Suspense>
 
-      {/* PPR: Articles section with independent loading state */}
       <Suspense fallback={<ArticlesListSkeleton />}>
         <Articles dictionary={dictionary} />
       </Suspense>
-    </div>
+    </PageWrapper>
   );
 };
 

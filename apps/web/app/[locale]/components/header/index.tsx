@@ -13,12 +13,12 @@ import Link from 'next/link';
 
 import type { Dictionary } from '@repo/internationalization';
 import Image from 'next/image';
-import { LanguageSwitcher } from './language-switcher';
-import { getMainNavigationItems } from './main-navigation-items';
-import { MobileMenu } from './mobile-menu';
-import Logo from './logo.svg';
 import { CategoriesMenu } from './categories-menu';
 import { GithubMenu } from './github-menu';
+import { LanguageSwitcher } from './language-switcher';
+import Logo from './logo.svg';
+import { getMainNavigationItems } from './main-navigation-items';
+import { MobileMenu } from './mobile-menu';
 
 type HeaderProps = {
   dictionary: Dictionary;
@@ -29,7 +29,7 @@ export const Header = async ({ dictionary }: HeaderProps) => {
 
   return (
     <header className="sticky top-0 left-0 z-40 w-full border-b bg-background">
-      <div className="container relative mx-auto flex min-h-12 flex-row items-center gap-4 lg:grid lg:grid-cols-3">
+      <div className="container relative mx-auto flex min-h-16 flex-row items-center gap-4 py-3 lg:grid lg:grid-cols-3">
         <div className="hidden flex-row items-center justify-start gap-4 lg:flex">
           <NavigationMenu className="flex items-start justify-start">
             <NavigationMenuList className="flex flex-row justify-start gap-4">
@@ -88,11 +88,11 @@ export const Header = async ({ dictionary }: HeaderProps) => {
           <Image
             src={Logo}
             alt="Logo"
-            width={24}
-            height={24}
+            width={28}
+            height={28}
             className="dark:invert"
           />
-          <p className="whitespace-nowrap font-semibold">StrapiPress</p>
+          <p className="whitespace-nowrap font-semibold text-base md:text-lg">StrapiPress</p>
         </Link>
         <div className="flex w-full items-center justify-end gap-2">
           <Button variant="ghost" size="icon" asChild>
@@ -110,7 +110,7 @@ export const Header = async ({ dictionary }: HeaderProps) => {
       </div>
       {/* Categories Menu */}
       <div className="border-t bg-gray-50/50 dark:bg-gray-900/50">
-        <div className="container mx-auto px-4 py-2">
+        <div className="container mx-auto">
           <CategoriesMenu />
         </div>
       </div>
