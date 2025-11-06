@@ -158,11 +158,26 @@ export interface SEO {
   structuredData?: Record<string, unknown>;
 }
 
-// Filter interfaces
+/**
+ * Strapi v5 Logical Filter Operators
+ * Supports $and, $or, $not for complex queries
+ */
+export type StrapiLogicalFilters<T> = {
+  $and?: Array<T | StrapiLogicalFilters<T>>;
+  $or?: Array<T | StrapiLogicalFilters<T>>;
+  $not?: T | StrapiLogicalFilters<T>;
+};
+
+/**
+ * Complete Strapi filter type that supports both direct filters and logical operators
+ */
+export type StrapiFilterQuery<T> = T | StrapiLogicalFilters<T> | (T & StrapiLogicalFilters<T>);
+
+// Filter interfaces - Base filter properties without logical operators
 export interface ArticleFilters {
   title?: { $contains?: string; $containsi?: string };
   slug?: { $eq?: string; $ne?: string };
-  featured?: boolean | { $eq?: boolean; $ne?: boolean; $null?: boolean }; // Supports boolean, operator, and null check
+  featured?: { $eq?: boolean; $ne?: boolean; $null?: boolean };
   publishedAt?: {
     $gte?: string;
     $lte?: string;
@@ -176,13 +191,15 @@ export interface ArticleFilters {
     slug?: { $eq?: string };
     documentId?: { $eq?: string };
   };
-  $or?: Array<{
-    title?: { $contains?: string; $containsi?: string };
-    description?: { $contains?: string; $containsi?: string };
-    content?: { $contains?: string; $containsi?: string };
-    featured?: { $eq?: boolean; $ne?: boolean; $null?: boolean };
-  }>;
+  // Index signature for Strapi client compatibility
+  [key: string]: unknown;
 }
+
+/**
+ * Complete article filter query type (base filters + logical operators)
+ * Use this for complex queries with $and, $or, $not
+ */
+export type ArticleFilterQuery = StrapiFilterQuery<ArticleFilters>;
 
 // Query parameter interfaces
 export interface FilterParams {
@@ -214,7 +231,7 @@ export interface PopulateParams {
 }
 
 export interface QueryParams {
-  filters?: FilterParams;
+  filters?: FilterParams | ArticleFilterQuery;
   sort?: string | string[];
   pagination?: PaginationParams;
   populate?: string | string[] | PopulateParams;

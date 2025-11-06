@@ -9,7 +9,7 @@ export async function CategoriesMenu() {
       sort: ['name:asc'],
       pagination: { pageSize: 10 }, // Limit to 10 categories for header
     }, {
-      revalidate: 900, // 15 minutes - header menu changes very infrequently
+      revalidate: false, // Build-time only - category taxonomy is static
       tags: ['categories', 'categories-menu', 'header']
     });
     categories = (response?.data as unknown as Category[]) || [];

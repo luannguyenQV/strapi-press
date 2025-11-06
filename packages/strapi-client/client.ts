@@ -9,8 +9,8 @@
  */
 
 import { strapi } from '@strapi/client';
-import { unstable_cache } from 'next/cache';
 import stringify from 'fast-json-stable-stringify';
+import { unstable_cache } from 'next/cache';
 import type {
   QueryParams,
   StrapiResponse,

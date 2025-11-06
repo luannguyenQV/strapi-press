@@ -8,6 +8,7 @@ import {
   SelectValue,
 } from '@repo/design-system/components/ui/select';
 import type { Dictionary } from '@repo/internationalization';
+import type { Category } from '@repo/strapi-client';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 interface SearchFiltersProps {
@@ -15,6 +16,7 @@ interface SearchFiltersProps {
   currentSort: string;
   query: string;
   dictionary: Dictionary;
+  categories: Category[];
 }
 
 /**
@@ -25,7 +27,7 @@ interface SearchFiltersProps {
  * - Sort options (date, title)
  * - Updates URL parameters on change
  */
-export function SearchFilters({ currentCategory, currentSort, query, dictionary }: SearchFiltersProps) {
+export function SearchFilters({ currentCategory, currentSort, query, dictionary, categories }: SearchFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -53,12 +55,20 @@ export function SearchFilters({ currentCategory, currentSort, query, dictionary 
           <SelectValue placeholder={dictionary.web.search.filters.category} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">All Categories</SelectItem>
-          <SelectItem value="web-dev">Web Development</SelectItem>
-          <SelectItem value="javascript">JavaScript</SelectItem>
-          <SelectItem value="typescript">TypeScript</SelectItem>
-          <SelectItem value="react">React</SelectItem>
-          <SelectItem value="nextjs">Next.js</SelectItem>
+          <SelectItem value="all">
+            {dictionary.web.search.filters.allCategories || 'All Categories'}
+          </SelectItem>
+          {categories.length === 0 ? (
+            <SelectItem value="none" disabled>
+              {dictionary.web.search.filters.noCategories || 'No categories available'}
+            </SelectItem>
+          ) : (
+            categories.map((category) => (
+              <SelectItem key={category.slug} value={category.slug}>
+                {category.name}
+              </SelectItem>
+            ))
+          )}
         </SelectContent>
       </Select>
 

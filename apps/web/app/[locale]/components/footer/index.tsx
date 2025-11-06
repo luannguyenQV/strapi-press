@@ -73,7 +73,7 @@ export async function Footer({ locale }: FooterProps): Promise<React.JSX.Element
         bottomLinks: true,
       }
     }, {
-      revalidate: 1800, // 30 minutes - footer changes very rarely
+      revalidate: false, // Build-time only - footer content is static
       tags: ['footer', 'global', 'single-type']
     });
     footerData = response?.data as unknown as FooterData | null;

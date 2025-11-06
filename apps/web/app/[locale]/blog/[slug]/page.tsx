@@ -1,11 +1,6 @@
 
-import { env } from '@/env';
 import type { Metadata } from 'next';
 
-const protocol = env.VERCEL_PROJECT_PRODUCTION_URL?.startsWith('https')
-  ? 'https'
-  : 'http';
-const url = new URL(`${protocol}://${env.VERCEL_PROJECT_PRODUCTION_URL}`);
 
 type BlogPostProperties = {
   readonly params: Promise<{

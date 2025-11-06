@@ -53,7 +53,7 @@ export function PageWrapper({
   return (
     <Component
       className={cn(
-        'container px-2 md:px-3 lg:px-4',
+        'container px-2 md:px-3 lg:px-4 space-y-8',
         variantClasses[variant],
         paddingClasses[padding],
         className

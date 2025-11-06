@@ -1,28 +1,23 @@
 'use client';
 
+import { TypographyH1 } from '@repo/design-system';
 import { Input } from '@repo/design-system/components/ui/input';
 import type { Dictionary } from '@repo/internationalization';
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 
 type SearchInputProps = {
   initialQuery?: string;
   dictionary: Dictionary;
+  locale: string;
 };
 
-export const SearchInput = ({ initialQuery = '', dictionary }: SearchInputProps) => {
+export const SearchInput = ({ initialQuery = '', dictionary, locale }: SearchInputProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [query, setQuery] = useState(initialQuery);
-
-  // Sync with URL when navigating
-  useEffect(() => {
-    const urlQuery = searchParams.get('q') || '';
-    if (urlQuery !== query) {
-      setQuery(urlQuery);
-    }
-  }, [searchParams, query]);
 
   const handleSearch = (value: string) => {
     setQuery(value);
@@ -46,23 +41,37 @@ export const SearchInput = ({ initialQuery = '', dictionary }: SearchInputProps)
     }
   };
 
+  const handleCancel = () => {
+    router.push(`/${locale}`);
+  };
+
   return (
-    <div className="w-full">
-      <h1 className="mb-4 font-bold text-2xl md:text-3xl">
+    <div>
+      <TypographyH1 className='hidden'>
         {dictionary.web.search.page.title}
-      </h1>
+      </TypographyH1>
       <div className="relative">
-        <Search className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-muted-foreground" />
+        <Search className='-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 h-4 w-4 text-muted-foreground' />
         <Input
           type="text"
           placeholder={dictionary.web.search.input.placeholder}
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => {
+            setQuery(e.target.value)
+          }}
           onKeyDown={handleKeyDown}
           onBlur={() => handleSearch(query)}
-          className="pl-10"
+          className="px-10"
           aria-label={dictionary.web.search.input.ariaLabel}
         />
+        <button
+          type="button"
+          onClick={handleCancel}
+          className="-translate-y-1/2 absolute top-1/2 right-3 rounded-full p-1 text-muted-foreground transition-all hover:bg-muted hover:text-foreground"
+          aria-label="Cancel search and return home"
+        >
+          <X className="h-4 w-4" />
+        </button>
       </div>
     </div>
   );

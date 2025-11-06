@@ -20,7 +20,7 @@ import { DEFAULT_PAGE_SIZE } from '../constant';
 import { queryKeys } from '../queries/keys';
 import type {
   Article,
-  ArticleFilters,
+  ArticleFilterQuery,
   StrapiResponse,
   StrapiSingleResponse,
 } from '../types';
@@ -30,7 +30,7 @@ import { bridgeArticleCollection, safeCastParams } from '../types';
 export interface ArticleQueryParams {
   page?: number;
   pageSize?: number;
-  filters?: ArticleFilters;
+  filters?: ArticleFilterQuery;
   sort?: string | string[];
   populate?: string | string[] | object;
 }

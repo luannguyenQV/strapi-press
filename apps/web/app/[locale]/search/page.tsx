@@ -1,11 +1,14 @@
+import { Articles } from '@/components/articles/articles';
+import { ArticlesListSkeleton } from '@/components/articles/articles-skeleton';
+import { SearchEmptyState } from '@/components/search/search-empty-state';
+import { SearchFilters } from '@/components/search/search-filters';
+import { PageWrapper } from '@repo/design-system/components/ui/page-wrapper';
 import { getDictionary } from '@repo/internationalization';
 import { createMetadata } from '@repo/seo/metadata';
+import { type Category, cachedFind } from '@repo/strapi-client';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { SearchEmptyState } from './components/search-empty-state';
-import { SearchInput } from './components/search-input';
-import { SearchResults } from './components/search-results';
-import { SearchResultsSkeleton } from './components/search-results-skeleton';
+import { SearchInput } from '../../../components/search/search-input';
 
 type SearchPageProps = {
   params: Promise<{
@@ -63,31 +66,53 @@ const SearchPage = async ({ params, searchParams }: SearchPageProps) => {
   const category = searchParamsResolved.category || 'all';
   const sort = searchParamsResolved.sort || 'date-desc';
 
-  return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Search Input - Static shell */}
-      <div className="mb-8">
-        <SearchInput initialQuery={query} dictionary={dictionary} />
-      </div>
+  // Fetch categories from backend with ISR cache
+  const categoriesResponse = await cachedFind('categories', {
+    sort: ['name:asc'],
+    pagination: { pageSize: 100 }
+  }, {
+    revalidate: 600, // 10 minutes - categories change infrequently
+    tags: ['categories']
+  });
+  const categories = (categoriesResponse?.data as unknown as Category[]) || [];
 
-      {/* Dynamic content with PPR */}
+  // Parse sort parameter (date-desc → 'desc', date-asc → 'asc')
+  const sortBy = sort.includes('asc') ? 'asc' : 'desc';
+
+  return (
+    <PageWrapper>
+      <SearchInput initialQuery={query} dictionary={dictionary} locale={locale} />
+
       {query ? (
-        <Suspense
-          key={`${query}-${page}-${category}-${sort}`}
-          fallback={<SearchResultsSkeleton />}
-        >
-          <SearchResults
-            query={query}
-            page={page}
-            category={category}
-            sort={sort}
-            dictionary={dictionary}
-          />
-        </Suspense>
+        <>
+          {/* Search Filters */}
+          <div className="mb-6">
+            <SearchFilters
+              currentCategory={category}
+              currentSort={sort}
+              query={query}
+              dictionary={dictionary}
+              categories={categories}
+            />
+          </div>
+
+          {/* Search Results */}
+          <Suspense
+            key={`${query}-${page}-${category}-${sort}`}
+            fallback={<ArticlesListSkeleton />}
+          >
+            <Articles
+              dictionary={dictionary}
+              searchQuery={query}
+              categorySlug={category !== 'all' ? category : undefined}
+              sortBy={sortBy}
+            />
+          </Suspense>
+        </>
       ) : (
         <SearchEmptyState dictionary={dictionary} />
       )}
-    </div>
+    </PageWrapper>
   );
 };
 

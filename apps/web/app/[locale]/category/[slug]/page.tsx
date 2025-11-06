@@ -25,7 +25,7 @@ export const generateMetadata = async ({
     const response = await cachedFind('categories', {
       filters: { slug: { $eq: slug } }
     }, {
-      revalidate: 600, // 10 minutes - category metadata changes infrequently
+      revalidate: false, // Build-time only - category metadata is static
       tags: ['categories', `category-${slug}`, 'metadata']
     });
     const category = response?.data?.[0] as unknown as Category | undefined;
@@ -58,7 +58,7 @@ const CategoryPage = async ({ params }: CategoryPageProps): Promise<React.JSX.El
     const categoryResponse = await cachedFind('categories', {
       filters: { slug: { $eq: slug } }
     }, {
-      revalidate: 600, // 10 minutes - category data changes infrequently
+      revalidate: false, // Build-time only - category data is static
       tags: ['categories', `category-${slug}`, 'category-page']
     });
     const category = categoryResponse?.data?.[0] as unknown as Category | undefined;

@@ -12,22 +12,22 @@ import { Skeleton } from '@repo/design-system/components/ui/skeleton';
  */
 export function ArticleListItemSkeleton() {
   return (
-    <Card className="overflow-hidden transition-all">
-      <div className="grid gap-0 md:grid-cols-[300px_1fr]">
+    <Card className="overflow-hidden py-0 transition-all">
+      <div className="grid grid-cols-[20%_1fr] items-center gap-4 md:grid-cols-[30%_1fr]">
         {/* Image Skeleton */}
-        <Skeleton className="aspect-[4/3] w-full md:aspect-auto md:h-full" />
+        <Skeleton className="aspect-square overflow-hidden rounded-sm md:aspect-[16/9] md:rounded-md" />
 
         {/* Content Skeleton */}
-        <div className="flex flex-col justify-between p-6 md:p-8">
-          <div className="space-y-3">
+        <div className="flex flex-col justify-between md:p-4">
+          <div>
             {/* Title Skeleton - 2 lines */}
-            <div className="space-y-2">
-              <Skeleton className="h-7 w-full md:h-8" />
-              <Skeleton className="h-7 w-3/4 md:h-8" />
+            <div className="mb-2 space-y-2">
+              <Skeleton className="h-5 w-full md:h-6" />
+              <Skeleton className="h-5 w-3/4 md:h-6" />
             </div>
 
-            {/* Description Skeleton - 3 lines */}
-            <div className="space-y-2">
+            {/* Description Skeleton - 3 lines, hidden on mobile */}
+            <div className="hidden space-y-2 md:block">
               <Skeleton className="h-4 w-full md:h-5" />
               <Skeleton className="h-4 w-full md:h-5" />
               <Skeleton className="h-4 w-2/3 md:h-5" />
@@ -35,7 +35,7 @@ export function ArticleListItemSkeleton() {
           </div>
 
           {/* Metadata Skeleton */}
-          <div className="mt-4 flex flex-wrap items-center gap-4">
+          <div className="mt-0 flex flex-wrap items-center gap-5 text-xs md:mt-4 md:text-sm">
             {/* Author */}
             <div className="flex items-center gap-2">
               <Skeleton className="h-6 w-6 rounded-full" />
@@ -44,9 +44,6 @@ export function ArticleListItemSkeleton() {
 
             {/* Date */}
             <Skeleton className="h-4 w-32" />
-
-            {/* Reading time */}
-            <Skeleton className="h-4 w-20" />
           </div>
         </div>
       </div>

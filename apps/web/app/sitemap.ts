@@ -29,7 +29,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       fields: ['slug', 'updatedAt'],
       pagination: { pageSize: 100 },
     }, {
-      revalidate: 3600,
+      revalidate: false, // Build-time only - categories are static
       tags: ['sitemap', 'categories']
     });
 
@@ -38,7 +38,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       fields: ['slug', 'updatedAt'],
       pagination: { pageSize: 100 },
     }, {
-      revalidate: 3600,
+      revalidate: false, // Build-time only - authors are static
       tags: ['sitemap', 'authors']
     });
 

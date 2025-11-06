@@ -232,6 +232,8 @@
       "filters": {
         "category": "Category",
         "sort": "Sort by",
+        "allCategories": "All Categories",
+        "noCategories": "No categories available",
         "sortDateDesc": "Newest first",
         "sortDateAsc": "Oldest first",
         "sortTitleAsc": "Title (A-Z)",

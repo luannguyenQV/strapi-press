@@ -75,7 +75,8 @@
       "WebFetch(domain:ui.shadcn.com)",
       "Bash(pnpm --filter @repo/design-system typecheck:*)",
       "SlashCommand(/speckit.specify)",
-      "Bash(TOTAL_ARTICLES=5 pnpm seed:bulk:*)"
+      "Bash(TOTAL_ARTICLES=5 pnpm seed:bulk:*)",
+      "WebFetch(domain:strapi.io)"
     ],
     "deny": []
   },

@@ -1,20 +1,26 @@
 'use client';
 
 import { Button } from '@repo/design-system/components/ui/button';
-import type { Article, StrapiResponse } from '@repo/strapi-client';
+import type { Article, ArticleFilterQuery, StrapiResponse } from '@repo/strapi-client';
 import { DEFAULT_PAGE_SIZE, useInfiniteArticles } from '@repo/strapi-client';
 import type { InfiniteData } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { ArticleListItem } from './list-item';
 import { ArticleListItemsSkeleton } from './list-items.skeleton';
 
-interface LoadMoreArticlesProps {
+interface InfinityArticlesProps {
   /** Number of articles per page (should match server-side pageSize) */
   pageSize?: number;
-  /** Optional filters to apply (e.g., category, featured) */
-  filters?: Record<string, unknown>;
-  /** Optional sort order */
-  sort?: string | string[];
+  /** Sort order for publishedAt field */
+  sortBy?: 'asc' | 'desc';
+  /** Filter by author slug */
+  authorSlug?: string;
+  /** Filter by category slug */
+  categorySlug?: string;
+  /** Filter by featured status: true (only featured), false (only non-featured), undefined (all) */
+  featured?: boolean;
+  /** Search query for title (case-insensitive) */
+  searchQuery?: string;
 }
 
 /**
@@ -28,13 +34,63 @@ interface LoadMoreArticlesProps {
  *
  * Usage:
  * - Server Component renders page 1 with Articles component
- * - Client Component (this) handles page 2+ with LoadMoreArticles
+ * - Client Component (this) handles page 2+ with InfinityArticles
  */
-export function LoadMoreArticles({
+export function InfinityArticles({
   pageSize = DEFAULT_PAGE_SIZE,
-  filters,
-  sort,
-}: LoadMoreArticlesProps) {
+  sortBy = 'desc',
+  authorSlug,
+  categorySlug,
+  featured,
+  searchQuery,
+}: InfinityArticlesProps) {
+  // Build filters array for $and operator (same as server component)
+  const filterConditions: ArticleFilterQuery[] = [];
+
+  // Add search filter if provided
+  if (searchQuery && searchQuery.trim().length > 0) {
+    filterConditions.push({
+      title: { $containsi: searchQuery.trim() }
+    });
+  }
+
+  // Add featured filter if provided
+  if (featured !== undefined) {
+    if (featured === true) {
+      // Only show featured articles
+      filterConditions.push({
+        featured: { $eq: true }
+      });
+    } else {
+      // Only show non-featured articles (featured = false OR null)
+      filterConditions.push({
+        $or: [
+          { featured: { $eq: false } },
+          { featured: { $null: true } }
+        ]
+      });
+    }
+  }
+
+  // Add author filter if provided
+  if (authorSlug) {
+    filterConditions.push({
+      author: { slug: { $eq: authorSlug } }
+    });
+  }
+
+  // Add category filter if provided
+  if (categorySlug) {
+    filterConditions.push({
+      category: { slug: { $eq: categorySlug } }
+    });
+  }
+
+  // Build final filter object
+  const filters: ArticleFilterQuery = filterConditions.length > 0
+    ? { $and: filterConditions }
+    : {};
+
   const {
     data,
     fetchNextPage,
@@ -46,12 +102,13 @@ export function LoadMoreArticles({
   } = useInfiniteArticles({
     pageSize,
     filters,
-    sort,
+    sort: [`publishedAt:${sortBy}`],
   });
 
   // Initial loading state (first render)
   if (isLoading) {
-    return <ArticleListItemsSkeleton count={3} />;
+    // biome-ignore lint/correctness/noUndeclaredVariables: <explanation>
+    return <ArticleListItemsSkeleton />
   }
 
   // Error state
