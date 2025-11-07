@@ -1,3 +1,4 @@
+import { BACKEND_URL } from '@/constants';
 import {
   TypographyH1,
   TypographyP,
@@ -21,7 +22,7 @@ import Link from 'next/link';
 export async function FeaturedArticles() {
   try {
     // Fetch featured articles with ISR caching
-    const response = await cachedFind('articles', {
+    const response = await cachedFind<Article>('articles', {
       filters: { featured: true },
       sort: ['publishedAt:desc'],
       pagination: { pageSize: 1 }, // 1 main + 2 secondary
@@ -35,7 +36,7 @@ export async function FeaturedArticles() {
       tags: ['articles', 'featured-articles', 'homepage']
     });
 
-    const articles = (response?.data as unknown as Article[]) || [];
+    const articles = response?.data
 
     if (!articles || articles.length === 0) {
       return null;
@@ -50,7 +51,7 @@ export async function FeaturedArticles() {
             <Link href={`/blog/${featuredArticle.slug}`} className="block">
               <div className='relative aspect-[16/9] overflow-hidden md:rounded'>
                 <Image
-                  src={`${process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337'}${featuredArticle.cover.url}`}
+                  src={`${BACKEND_URL}${featuredArticle.cover.url}`}
                   alt={featuredArticle.cover.alternativeText || featuredArticle.title}
                   fill
                   className='object-cover transition-transform duration-300 hover:scale-105'
@@ -90,10 +91,11 @@ export async function FeaturedArticles() {
                 <span className="font-medium">{featuredArticle.author.name}</span>
               </div>
             )}
-            <div className="flex items-center gap-1">
-              <Calendar className="h-4 w-4" />
-              <span>{new Date(featuredArticle.publishedAt).toLocaleDateString()}</span>
-            </div>
+            {featuredArticle?.publishedAt ?
+              <div className="flex items-center gap-1">
+                <Calendar className="h-4 w-4" />
+                <span>{new Date(featuredArticle?.publishedAt).toLocaleDateString()}</span>
+              </div> : null}
           </div>
         </div>
       </Card>

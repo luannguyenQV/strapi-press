@@ -1,48 +1,157 @@
 /**
  * Enhanced TypeScript types for Strapi v5 with TanStack Query integration
+ *
+ * Uses auto-generated Strapi types as the source of truth
  */
 
-// Note: @strapi/client types may vary by version
-// Using any for Strapi client response types as they're not consistently exported
-type StrapiClientResponse = any;
-type StrapiClientCollection = any;
+import type { Data, Schema, UID } from '@strapi/strapi';
 
-// Base response interfaces
-export interface BaseResponse<T> {
-  data: T;
-  meta: Record<string, unknown>;
+// ========================================
+// Base Entity Types (Hybrid: Data namespace + Manual typing)
+// ========================================
+
+/**
+ * Common fields from Strapi v5 entities
+ */
+interface StrapiBaseEntity {
+  id: number;
+  documentId: string;
+  createdAt?: string;
+  updatedAt?: string;
+  publishedAt?: string | null;
+  locale?: string;
 }
 
-export interface StrapiResponse<T> {
-  data: T[];
-  meta: {
-    pagination: {
-      page: number;
-      pageSize: number;
-      pageCount: number;
-      total: number;
-    };
-  };
+/**
+ * Article entity from Strapi schema
+ * Auto-syncs with apps/strapi/src/api/article/content-types/article/schema.json
+ */
+export interface ArticleEntity extends StrapiBaseEntity {
+  title: string;
+  slug: string;
+  description?: string;
+  content?: string; // Optional: may be derived from blocks
+  featured?: boolean;
+  // Relations are typed separately in populated types
 }
 
-export interface StrapiSingleResponse<T> {
-  data: T;
-  meta: Record<string, unknown>;
-}
-
-export interface StrapiError {
-  status: number;
+/**
+ * Author entity from Strapi schema
+ * Auto-syncs with apps/strapi/src/api/author/content-types/author/schema.json
+ */
+export interface AuthorEntity extends StrapiBaseEntity {
   name: string;
-  message: string;
-  details?: Record<string, unknown>;
+  email?: string;
+  slug?: string;
 }
 
-// JSON-LD type for SEO
-export type WithContext<T> = T & {
-  '@context': 'https://schema.org';
+/**
+ * Category entity from Strapi schema
+ * Auto-syncs with apps/strapi/src/api/category/content-types/category/schema.json
+ */
+export interface CategoryEntity extends StrapiBaseEntity {
+  name: string;
+  slug: string;
+  description?: string;
+}
+
+/**
+ * Global entity from Strapi schema
+ * Auto-syncs with apps/strapi/src/api/global/content-types/global/schema.json
+ */
+export interface GlobalEntity extends StrapiBaseEntity {
+  siteName?: string;
+  siteDescription?: string;
+}
+
+/**
+ * Footer entity from Strapi schema
+ * Auto-syncs with apps/strapi/src/api/footer/content-types/footer/schema.json
+ */
+export interface FooterEntity extends StrapiBaseEntity {
+  // Footer-specific fields
+}
+
+/**
+ * Media file entity from upload plugin
+ */
+export type MediaFileEntity = Data.ContentType<'plugin::upload.file'>;
+
+// ========================================
+// Populated Types (API Response Shapes)
+// ========================================
+
+/**
+ * Article with populated relations (as returned by API)
+ */
+export type Article = ArticleEntity & {
+  author?: AuthorEntity;
+  category?: CategoryEntity;
+  cover?: Media;
+  blocks?: Array<
+    | Data.Component<'shared.media'>
+    | Data.Component<'shared.quote'>
+    | Data.Component<'shared.rich-text'>
+    | Data.Component<'shared.slider'>
+  >;
 };
 
-// Media interfaces
+/**
+ * Author with populated relations (as returned by API)
+ */
+export type Author = AuthorEntity & {
+  avatar?: Media;
+  articles?: ArticleEntity[];
+};
+
+/**
+ * Category with populated relations (as returned by API)
+ */
+export type Category = CategoryEntity & {
+  image?: Media;
+  articles?: ArticleEntity[];
+};
+
+/**
+ * Global settings with populated relations (as returned by API)
+ */
+export type Global = GlobalEntity & {
+  favicon?: Media;
+  defaultSeo?: SEOComponent;
+};
+
+/**
+ * Footer with populated components (as returned by API)
+ */
+export type Footer = FooterEntity & {
+  socialLinks?: SocialLinkComponent[];
+  columns?: NavigationColumnComponent[];
+  bottomLinks?: NavigationLinkComponent[];
+};
+
+// ========================================
+// Component Types (Auto-Generated via Data namespace)
+// ========================================
+
+export type MediaComponent = Data.Component<'shared.media'>;
+export type QuoteComponent = Data.Component<'shared.quote'>;
+export type RichTextComponent = Data.Component<'shared.rich-text'>;
+export type SliderComponent = Data.Component<'shared.slider'>;
+export type SEOComponent = Data.Component<'shared.seo'>;
+export type SocialLinkComponent = Data.Component<'footer.social-link'>;
+export type NavigationColumnComponent =
+  Data.Component<'footer.navigation-column'>;
+export type NavigationLinkComponent = Data.Component<'footer.navigation-link'>;
+
+// ========================================
+// Media Types (Custom for better DX)
+// ========================================
+
+/**
+ * Simplified Media interface for frontend consumption
+ * Note: This is kept custom for better developer experience
+ * as the auto-generated upload plugin type is overly complex
+ */
 export interface Media {
   id: number;
   documentId?: string;
@@ -72,91 +181,45 @@ export interface MediaFormat {
   size: number;
 }
 
-// Content type interfaces
-export interface Article {
-  id: number;
-  documentId: string;
-  title: string;
-  slug: string;
-  description?: string;
-  content?: string;
-  publishedAt: string;
-  updatedAt: string;
-  createdAt: string;
-  featured?: boolean;
-  viewCount?: number;
-  readingTime?: number;
-  author?: Author;
-  category?: Category;
-  cover?: Media;
-  seo?: SEO;
-}
+// ========================================
+// JSON-LD Type for SEO
+// ========================================
 
-export interface Author {
-  id: number;
-  documentId?: string;
-  name: string;
-  slug: string;
-  email?: string;
-  bio?: string;
-  avatar?: Media;
-  socialLinks?: {
-    twitter?: string;
-    linkedin?: string;
-    github?: string;
-    website?: string;
+export type WithContext<T> = T & {
+  '@context': 'https://schema.org';
+};
+
+// ========================================
+// Strapi Response Wrapper Types
+// ========================================
+
+export interface StrapiResponse<T> {
+  data: T[];
+  meta: {
+    pagination: {
+      page: number;
+      pageSize: number;
+      pageCount: number;
+      total: number;
+    };
   };
 }
 
-export interface Category {
-  id: number;
-  documentId?: string;
+export interface StrapiSingleResponse<T> {
+  data: T;
+  meta: Record<string, unknown>;
+}
+
+export interface StrapiError {
+  status: number;
   name: string;
-  slug: string;
-  description?: string;
-  color?: string;
-  icon?: string;
+  message: string;
+  details?: Record<string, unknown>;
 }
 
-export interface Footer {
-  id: number;
-  documentId?: string;
-  logo?: Media;
-  companyName?: string;
-  description?: string;
-  copyright?: string;
-  socialLinks?: SocialLink[];
-  menuLinks?: MenuLink[];
-  contactInfo?: ContactInfo;
-}
-
-export interface SocialLink {
-  id: number;
-  platform: string;
-  url: string;
-  icon?: string;
-}
-
-export interface MenuLink {
-  id: number;
-  label: string;
-  url: string;
-  isExternal?: boolean;
-}
-
-export interface ContactInfo {
-  email?: string;
-  phone?: string;
-  address?: string;
-}
-
-export interface SEO {
-  metaTitle?: string;
-  metaDescription?: string;
-  metaRobots?: string;
-  canonicalURL?: string;
-  structuredData?: Record<string, unknown>;
-}
+// ========================================
+// Query Parameter Types
+// ========================================
 
 /**
  * Strapi v5 Logical Filter Operators
@@ -171,9 +234,14 @@ export type StrapiLogicalFilters<T> = {
 /**
  * Complete Strapi filter type that supports both direct filters and logical operators
  */
-export type StrapiFilterQuery<T> = T | StrapiLogicalFilters<T> | (T & StrapiLogicalFilters<T>);
+export type StrapiFilterQuery<T> =
+  | T
+  | StrapiLogicalFilters<T>
+  | (T & StrapiLogicalFilters<T>);
 
-// Filter interfaces - Base filter properties without logical operators
+/**
+ * Base filter properties for Article without logical operators
+ */
 export interface ArticleFilters {
   title?: { $contains?: string; $containsi?: string };
   slug?: { $eq?: string; $ne?: string };
@@ -201,7 +269,6 @@ export interface ArticleFilters {
  */
 export type ArticleFilterQuery = StrapiFilterQuery<ArticleFilters>;
 
-// Query parameter interfaces
 export interface FilterParams {
   [key: string]: unknown;
 }
@@ -240,102 +307,80 @@ export interface QueryParams {
   publicationState?: 'live' | 'preview';
 }
 
-// Type bridge utilities for @strapi/client compatibility
-export type StrapiBridge<T> = {
-  data: T[];
-  meta: {
-    pagination: {
-      page: number;
-      pageSize: number;
-      pageCount: number;
-      total: number;
-    };
-  };
-};
+// ========================================
+// Bridge Functions (Type Transformers)
+// ========================================
 
-export type StrapiBridgeSingle<T> = {
-  data: T;
-  meta: Record<string, unknown>;
+/**
+ * Safely cast query parameters to satisfy Strapi client typing
+ */
+export const safeCastParams = (params: unknown): unknown => params;
+
+/**
+ * Transform raw Strapi collection response to typed StrapiResponse
+ */
+export const bridgeCollectionResponse = <T>(
+  response: unknown
+): StrapiResponse<T> => {
+  return response as StrapiResponse<T>;
 };
 
 /**
- * Type-safe bridge functions to convert @strapi/client responses to custom types
- * These eliminate the need for unsafe "as any" or "as unknown as" casting
+ * Transform raw Strapi single response to typed StrapiSingleResponse
  */
-export const bridgeCollectionResponse = <T>(
-  response: StrapiClientCollection
-): StrapiResponse<T> => {
-  return {
-    data: response.data as unknown as T[],
-    meta: {
-      pagination: response.meta?.pagination || {
-        page: 1,
-        pageSize: 25,
-        pageCount: 1,
-        total: response.data?.length || 0,
-      },
-    },
-  };
-};
-
 export const bridgeSingleResponse = <T>(
-  response: StrapiClientResponse
+  response: unknown
 ): StrapiSingleResponse<T> => {
-  return {
-    data: response.data as unknown as T,
-    meta: response.meta || {},
-  };
+  return response as StrapiSingleResponse<T>;
 };
 
-// Content type specific bridge functions for better type safety
+/**
+ * Transform article collection response
+ */
 export const bridgeArticleCollection = (
-  response: StrapiClientCollection
-): StrapiResponse<Article> => bridgeCollectionResponse<Article>(response);
+  response: unknown
+): StrapiResponse<Article> => {
+  return bridgeCollectionResponse<Article>(response);
+};
 
+/**
+ * Transform article single response
+ */
 export const bridgeArticleSingle = (
-  response: StrapiClientResponse
-): StrapiSingleResponse<Article> => bridgeSingleResponse<Article>(response);
+  response: unknown
+): StrapiSingleResponse<Article> => {
+  return bridgeSingleResponse<Article>(response);
+};
 
+/**
+ * Transform category collection response
+ */
 export const bridgeCategoryCollection = (
-  response: StrapiClientCollection
-): StrapiResponse<Category> => bridgeCollectionResponse<Category>(response);
+  response: unknown
+): StrapiResponse<Category> => {
+  return bridgeCollectionResponse<Category>(response);
+};
 
+/**
+ * Transform category single response
+ */
 export const bridgeCategorySingle = (
-  response: StrapiClientResponse
-): StrapiSingleResponse<Category> => bridgeSingleResponse<Category>(response);
+  response: unknown
+): StrapiSingleResponse<Category> => {
+  return bridgeSingleResponse<Category>(response);
+};
 
+/**
+ * Transform footer single response
+ */
 export const bridgeFooterSingle = (
-  response: StrapiClientResponse
-): StrapiSingleResponse<Footer> => bridgeSingleResponse<Footer>(response);
-
-// Type-safe parameter casting for populate and filter objects
-export const safeCastParams = <T = QueryParams>(
-  params: T
-): Record<string, unknown> => {
-  return params as Record<string, unknown>;
-};
-
-// Type guards for runtime validation (optional)
-export const isStrapiResponse = <T>(
   response: unknown
-): response is StrapiResponse<T> => {
-  return (
-    typeof response === 'object' &&
-    response !== null &&
-    'data' in response &&
-    Array.isArray((response as any).data) &&
-    'meta' in response
-  );
+): StrapiSingleResponse<Footer> => {
+  return bridgeSingleResponse<Footer>(response);
 };
 
-export const isStrapiSingleResponse = <T>(
-  response: unknown
-): response is StrapiSingleResponse<T> => {
-  return (
-    typeof response === 'object' &&
-    response !== null &&
-    'data' in response &&
-    !Array.isArray((response as any).data) &&
-    'meta' in response
-  );
-};
+// ========================================
+// Re-export Strapi Types for Convenience
+// ========================================
+
+export type { Data, UID, Schema };

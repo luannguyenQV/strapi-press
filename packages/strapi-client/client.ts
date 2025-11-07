@@ -59,14 +59,14 @@ export const cachedFind = async <T extends object = Record<string, unknown>>(
   params?: QueryParams,
   options?: CacheOptions
 ): Promise<StrapiResponse<T>> => {
-  const cachedFn = unstable_cache(
+  const cachedFn = await unstable_cache(
     async () => {
       if (process.env.NODE_ENV === 'development') {
         console.log(`[Cache MISS] Fetching ${contentType}`, params);
       }
-      return strapiClient
+      return (await strapiClient
         .collection(contentType)
-        .find(params) as unknown as Promise<StrapiResponse<T>>;
+        .find(params)) as unknown as StrapiResponse<T>;
     },
     ['strapi', contentType, stringify(params || {})],
     {
@@ -102,16 +102,14 @@ export const cachedFindOne = async <T extends object = Record<string, unknown>>(
   params?: QueryParams,
   options?: CacheOptions
 ): Promise<StrapiSingleResponse<T>> => {
-  const cachedFn = unstable_cache(
+  const cachedFn = await unstable_cache(
     async () => {
       if (process.env.NODE_ENV === 'development') {
         console.log(`[Cache MISS] Fetching ${contentType}/${id}`, params);
       }
-      return strapiClient
+      return (await strapiClient
         .collection(contentType)
-        .findOne(String(id), params) as unknown as Promise<
-        StrapiSingleResponse<T>
-      >;
+        .findOne(String(id), params)) as unknown as StrapiSingleResponse<T>;
     },
     ['strapi', contentType, String(id), stringify(params || {})],
     {
@@ -147,14 +145,14 @@ export const cachedFindSingleType = async <
   params?: QueryParams,
   options?: CacheOptions
 ): Promise<StrapiSingleResponse<T>> => {
-  const cachedFn = unstable_cache(
+  const cachedFn = await unstable_cache(
     async () => {
       if (process.env.NODE_ENV === 'development') {
         console.log(`[Cache MISS] Fetching single type ${contentType}`, params);
       }
-      return strapiClient
+      return (await strapiClient
         .collection(contentType)
-        .find(params) as unknown as Promise<StrapiSingleResponse<T>>;
+        .find(params)) as unknown as StrapiSingleResponse<T>;
     },
     ['strapi-single', contentType, stringify(params || {})],
     {

@@ -74,7 +74,7 @@ export const Articles = async ({
       : {};
 
     // Fetch articles from Strapi with Next.js ISR caching
-    const response = await cachedFind('articles', {
+    const response = await cachedFind<Article>('articles', {
       filters,
       sort: [`publishedAt:${sortBy}`],
       pagination: { pageSize: DEFAULT_PAGE_SIZE },
@@ -87,7 +87,7 @@ export const Articles = async ({
       revalidate: 300, // 5 minutes - articles change moderately
       tags: ['articles', 'articles-list', 'featured-articles']
     });
-    const articles = (response?.data as unknown as Article[]) || [];
+    const articles = response?.data
 
     if (articles.length === 0) {
       return (

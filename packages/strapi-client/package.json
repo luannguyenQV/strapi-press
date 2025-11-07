@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@strapi/client": "^1.5.0",
+    "@strapi/strapi": "5.16.0",
     "@tanstack/react-query": "^5.45.0",
     "fast-json-stable-stringify": "^2.1.0",
     "next": "^15.3.2",
