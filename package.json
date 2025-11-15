@@ -14,7 +14,7 @@
   "author": "StrapiPress Team",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/strapipress.git"
+    "url": "https://github.com/luannguyenQV/strapi-press.git"
   },
   "homepage": "https://strapipress.com",
   "bin": {
@@ -26,6 +26,7 @@
     "dev": "concurrently \"turbo dev --filter=web\" \"cd apps/strapi && pnpm develop\"",
     "dev:web": "turbo dev --filter=web",
     "dev:strapi": "cd apps/strapi && pnpm develop",
+    "install:strapi": "cd apps/strapi && pnpm install --ignore-workspace",
     "lint": "ultracite lint",
     "format": "ultracite format",
     "test": "turbo test",
@@ -54,7 +55,7 @@
   "engines": {
     "node": ">=18"
   },
-  "packageManager": "pnpm@10.13.1",
+  "packageManager": "pnpm@10.22.0",
   "dependencies": {
     "@clack/prompts": "^0.11.0",
     "@strapi/client": "^1.5.0",

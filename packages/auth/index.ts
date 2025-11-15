@@ -17,7 +17,7 @@ export const signOut: AuthKit['signOut'] = authKit.signOut;
 // Wrap the auth function to add Clerk-like properties
 export const auth = async () => {
   const session = await authKit.auth();
-  
+
   return {
     ...session,
     orgId: session?.user?.id ? 'default-org' : null, // Placeholder organization

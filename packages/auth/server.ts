@@ -60,5 +60,9 @@ export type OrganizationMembershipJSON = {
 
 export type WebhookEvent = {
   type: string;
-  data: UserJSON | OrganizationJSON | OrganizationMembershipJSON | DeletedObjectJSON;
+  data:
+    | UserJSON
+    | OrganizationJSON
+    | OrganizationMembershipJSON
+    | DeletedObjectJSON;
 };

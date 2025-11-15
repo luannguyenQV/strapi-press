@@ -15,7 +15,7 @@ export const SignIn = (): React.JSX.Element => {
       <Button onClick={handleSignIn} className="w-full">
         Sign in
       </Button>
-      <p className="text-muted-foreground text-sm text-center">
+      <p className='text-center text-muted-foreground text-sm'>
         NextAuth sign-in implementation needed
       </p>
     </div>

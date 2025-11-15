@@ -314,7 +314,7 @@ export interface QueryParams {
 /**
  * Safely cast query parameters to satisfy Strapi client typing
  */
-export const safeCastParams = (params: unknown): unknown => params;
+export const safeCastParams = (params: QueryParams): unknown => params;
 
 /**
  * Transform raw Strapi collection response to typed StrapiResponse

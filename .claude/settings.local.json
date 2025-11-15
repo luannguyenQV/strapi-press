@@ -76,7 +76,13 @@
       "Bash(pnpm --filter @repo/design-system typecheck:*)",
       "SlashCommand(/speckit.specify)",
       "Bash(TOTAL_ARTICLES=5 pnpm seed:bulk:*)",
-      "WebFetch(domain:strapi.io)"
+      "WebFetch(domain:strapi.io)",
+      "Bash(node --version)",
+      "Bash(pnpm --version:*)",
+      "Bash(pnpm approve-builds:*)",
+      "Bash(pnpm list:*)",
+      "Bash(timeout 10 pnpm develop:*)",
+      "Bash(pnpm strapi:*)"
     ],
     "deny": []
   },

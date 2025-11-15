@@ -49,19 +49,27 @@
 
 ```bash
 # Clone and install
-git clone [repo] strapipress
+git clone https://github.com/luannguyenQV/strapi-press strapipress
 cd strapipress
+
+# Install workspace dependencies
 pnpm install
 
-# Start development
+# Install Strapi dependencies (separate from workspace)
+pnpm install:strapi
+# or: cd apps/strapi && pnpm install
+
+# Start both apps (recommended)
 pnpm dev
 
+# Or start individually:
+pnpm dev:web      # Next.js frontend only
+pnpm dev:strapi   # Strapi CMS only
+
 # Visit:
-# Frontend: http://localhost:3000
+# Frontend: http://localhost:3001
 # Strapi Admin: http://localhost:1337/admin
 ```
-
-See **[QUICK_START.md](./QUICK_START.md)** for detailed setup instructions.
 
 ## 📚 **Documentation**
 

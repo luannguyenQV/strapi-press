@@ -1,3 +1,4 @@
+import { BACKEND_URL } from '@/constants';
 import { TypographyH3, TypographyP } from '@repo/design-system';
 import { Badge } from '@repo/design-system/components/ui/badge';
 import { Card } from '@repo/design-system/components/ui/card';
@@ -23,22 +24,20 @@ interface ArticleListItemProps {
  * - Hover effects and transitions
  */
 export function ArticleListItem({ article, locale = 'en' }: ArticleListItemProps) {
-  const publishedAt = new Date(article.publishedAt).toLocaleDateString(locale, {
+  const publishedAt = article?.publishedAt ? new Date(article?.publishedAt).toLocaleDateString(locale, {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
-  });
+  }) : ''
 
   return (
     <Card className='overflow-hidden py-0 transition-all'>
-      {/* Grid Layout: Mobile (vertical) → Desktop (horizontal with 30% image) */}
       <div className='grid grid-cols-[20%_1fr] items-center gap-4 md:grid-cols-[30%_1fr]'>
-        {/* Article Image - Square on mobile, 16:9 on desktop */}
         <div className='relative aspect-square overflow-hidden rounded-sm md:aspect-[16/9] md:rounded-md'>
           {article.cover?.url ? (
             <Link href={`/blog/${article.slug}`} className='group relative block h-full w-full'>
               <Image
-                src={`${process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337'}${article.cover.url}`}
+                src={`${BACKEND_URL}${article.cover.url}`}
                 alt={article.cover.alternativeText || article.title}
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"

@@ -3811,9 +3811,6 @@ packages:
   '@types/negotiator@0.6.3':
     resolution: {integrity: sha512-JkXTOdKs5MF086b/pt8C3+yVp3iDUwG635L7oCH6HvJvvr6lSUU5oe/gLXnPEfYRROHjJIPgCV6cuAg8gGkntQ==}
 
-  '@types/node@20.19.24':
-    resolution: {integrity: sha512-FE5u0ezmi6y9OZEzlJfg37mqqf6ZDSF2V/NLjUyGrR9uTZ7Sb9F7bLNZ03S4XVUNRWGA7Ck4c1kK+YnuWjl+DA==}
-
   '@types/node@22.15.21':
     resolution: {integrity: sha512-EV/37Td6c+MgKAbkcLG6vqZ2zEYHD7bvSrzqqs2RIhbA6w3x+Dqz8MZM3sP6kGTeLrdoOgKZe+Xja7tUB2DNkQ==}
 
@@ -13762,7 +13759,7 @@ snapshots:
   '@types/glob@7.2.0':
     dependencies:
       '@types/minimatch': 5.1.2
-      '@types/node': 20.19.24
+      '@types/node': 22.15.21
 
   '@types/hast@3.0.4':
     dependencies:
@@ -13851,10 +13848,6 @@ snapshots:
 
   '@types/negotiator@0.6.3': {}
 
-  '@types/node@20.19.24':
-    dependencies:
-      undici-types: 6.21.0
-
   '@types/node@22.15.21':
     dependencies:
       undici-types: 6.21.0
@@ -13921,7 +13914,7 @@ snapshots:
 
   '@types/through@0.0.33':
     dependencies:
-      '@types/node': 20.19.24
+      '@types/node': 22.15.21
 
   '@types/tinycolor2@1.4.6': {}
 
@@ -16670,7 +16663,7 @@ snapshots:
 
   jest-worker@27.5.1:
     dependencies:
-      '@types/node': 20.19.24
+      '@types/node': 22.15.21
       merge-stream: 2.0.0
       supports-color: 8.1.1
 

@@ -66,6 +66,9 @@ export const prefetchArticle = (queryClient: QueryClient, id: string) => {
             },
             category: true,
             cover: true,
+            blocks: {
+              populate: '*',
+            },
           },
         })
       );
@@ -91,6 +94,9 @@ export const prefetchArticleBySlug = (
             },
             category: true,
             cover: true,
+            blocks: {
+              populate: '*',
+            },
           },
         })
       );
