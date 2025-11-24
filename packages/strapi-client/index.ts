@@ -22,6 +22,9 @@ export { queryKeys } from './queries/keys';
 // Export all types
 export * from './types';
 
+// Export validation schemas and utilities
+export * from './schemas/article';
+
 // Export hook factory utilities for advanced usage
 export * from './utils/hookFactory';
 

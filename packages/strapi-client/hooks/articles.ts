@@ -5,14 +5,19 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { strapiClient } from '../client';
 import { queryKeys } from '../queries/keys';
-import type { Article, ArticleFilterQuery, StrapiResponse } from '../types';
+import type {
+  Article,
+  ArticleFilterQuery,
+  PopulateParams,
+  StrapiResponse,
+} from '../types';
 import { bridgeCollectionResponse, safeCastParams } from '../types';
 
 interface UseInfiniteArticlesParams {
   pageSize?: number;
   filters?: ArticleFilterQuery;
   sort?: string | string[];
-  populate?: string | string[] | object;
+  populate?: string | string[] | PopulateParams;
 }
 
 /**
@@ -24,14 +29,18 @@ export const useInfiniteArticles = ({
   sort = ['publishedAt:desc'],
   populate = {
     author: {
-      populate: ['avatar'],
+      populate: { avatar: true },
     },
     category: true,
     cover: true,
   },
 }: UseInfiniteArticlesParams = {}) => {
   return useInfiniteQuery({
-    queryKey: [...queryKeys.articles(), 'infinite', { pageSize, filters, sort }],
+    queryKey: [
+      ...queryKeys.articles(),
+      'infinite',
+      { pageSize, filters, sort },
+    ],
     queryFn: async ({ pageParam = 1 }) => {
       const response = await strapiClient.collection('articles').find(
         safeCastParams({

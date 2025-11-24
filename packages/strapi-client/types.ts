@@ -5,6 +5,14 @@
  */
 
 import type { Data, Schema, UID } from '@strapi/strapi';
+import type {
+  ApiArticleArticle,
+  ApiAuthorAuthor,
+  ApiCategoryCategory,
+  ApiFooterFooter,
+  ApiGlobalGlobal,
+  PluginUploadFile,
+} from '../../apps/strapi/types/generated/contentTypes';
 
 // ========================================
 // Base Entity Types (Hybrid: Data namespace + Manual typing)
@@ -24,58 +32,171 @@ interface StrapiBaseEntity {
 
 /**
  * Article entity from Strapi schema
- * Auto-syncs with apps/strapi/src/api/article/content-types/article/schema.json
+ *
+ * SINGLE SOURCE OF TRUTH: All types extracted from auto-generated ApiArticleArticle schema
+ * Located at: apps/strapi/types/generated/contentTypes.d.ts
+ *
+ * When Strapi regenerates types, this automatically updates with no manual maintenance.
  */
-export interface ArticleEntity extends StrapiBaseEntity {
-  title: string;
-  slug: string;
-  description?: string;
-  content?: string; // Optional: may be derived from blocks
-  featured?: boolean;
-  // Relations are typed separately in populated types
-}
+type ArticleAttributes = ResolveAttributes<
+  Omit<
+    ApiArticleArticle['attributes'],
+    | 'createdAt'
+    | 'createdBy'
+    | 'updatedAt'
+    | 'updatedBy'
+    | 'publishedAt'
+    | 'locale'
+    | 'localizations'
+    | 'author' // Relation - goes in populated type
+    | 'category' // Relation - goes in populated type
+    | 'cover' // Media - goes in populated type
+    | 'blocks' // DynamicZone - goes in populated type
+  >
+>;
+
+export interface ArticleEntity extends StrapiBaseEntity, ArticleAttributes {}
 
 /**
  * Author entity from Strapi schema
- * Auto-syncs with apps/strapi/src/api/author/content-types/author/schema.json
+ *
+ * SINGLE SOURCE OF TRUTH: All types extracted from auto-generated ApiAuthorAuthor schema
+ * Located at: apps/strapi/types/generated/contentTypes.d.ts
+ *
+ * When Strapi regenerates types, this automatically updates with no manual maintenance.
  */
-export interface AuthorEntity extends StrapiBaseEntity {
-  name: string;
-  email?: string;
-  slug?: string;
-}
+type AuthorAttributes = ResolveAttributes<
+  Omit<
+    ApiAuthorAuthor['attributes'],
+    | 'createdAt'
+    | 'createdBy'
+    | 'updatedAt'
+    | 'updatedBy'
+    | 'publishedAt'
+    | 'locale'
+    | 'localizations'
+    | 'articles' // Relation - goes in populated type
+    | 'avatar' // Media - goes in populated type
+  >
+>;
+
+export interface AuthorEntity extends StrapiBaseEntity, AuthorAttributes {}
 
 /**
  * Category entity from Strapi schema
- * Auto-syncs with apps/strapi/src/api/category/content-types/category/schema.json
+ *
+ * SINGLE SOURCE OF TRUTH: All types extracted from auto-generated ApiCategoryCategory schema
+ * Located at: apps/strapi/types/generated/contentTypes.d.ts
+ *
+ * When Strapi regenerates types, this automatically updates with no manual maintenance.
  */
-export interface CategoryEntity extends StrapiBaseEntity {
-  name: string;
-  slug: string;
-  description?: string;
-}
+type CategoryAttributes = ResolveAttributes<
+  Omit<
+    ApiCategoryCategory['attributes'],
+    | 'createdAt'
+    | 'createdBy'
+    | 'updatedAt'
+    | 'updatedBy'
+    | 'publishedAt'
+    | 'locale'
+    | 'localizations'
+    | 'articles' // Relation - goes in populated type
+    | 'image' // Media - goes in populated type
+  >
+>;
+
+export interface CategoryEntity extends StrapiBaseEntity, CategoryAttributes {}
 
 /**
  * Global entity from Strapi schema
- * Auto-syncs with apps/strapi/src/api/global/content-types/global/schema.json
+ *
+ * SINGLE SOURCE OF TRUTH: All types extracted from auto-generated ApiGlobalGlobal schema
+ * Located at: apps/strapi/types/generated/contentTypes.d.ts
+ *
+ * When Strapi regenerates types, this automatically updates with no manual maintenance.
  */
-export interface GlobalEntity extends StrapiBaseEntity {
-  siteName?: string;
-  siteDescription?: string;
-}
+type GlobalAttributes = ResolveAttributes<
+  Omit<
+    ApiGlobalGlobal['attributes'],
+    | 'createdAt'
+    | 'createdBy'
+    | 'updatedAt'
+    | 'updatedBy'
+    | 'publishedAt'
+    | 'locale'
+    | 'localizations'
+    | 'favicon' // Media - goes in populated type
+    | 'defaultSeo' // Component - goes in populated type
+  >
+>;
+
+export interface GlobalEntity extends StrapiBaseEntity, GlobalAttributes {}
 
 /**
  * Footer entity from Strapi schema
- * Auto-syncs with apps/strapi/src/api/footer/content-types/footer/schema.json
+ *
+ * SINGLE SOURCE OF TRUTH: All types extracted from auto-generated ApiFooterFooter schema
+ * Located at: apps/strapi/types/generated/contentTypes.d.ts
+ *
+ * When Strapi regenerates types, this automatically updates with no manual maintenance.
+ * Note: Even though locale/localizations are public in Footer, they must be excluded
+ * to avoid conflict with StrapiBaseEntity which already provides them.
  */
-export interface FooterEntity extends StrapiBaseEntity {
-  // Footer-specific fields
-}
+type FooterAttributes = ResolveAttributes<
+  Omit<
+    ApiFooterFooter['attributes'],
+    | 'createdAt'
+    | 'createdBy'
+    | 'updatedAt'
+    | 'updatedBy'
+    | 'publishedAt'
+    | 'locale' // Must exclude to avoid conflict with StrapiBaseEntity
+    | 'localizations' // Must exclude to avoid conflict with StrapiBaseEntity
+    | 'socialLinks' // Component - goes in populated type
+    | 'columns' // Component - goes in populated type
+    | 'bottomLinks' // Component - goes in populated type
+  >
+>;
+
+export interface FooterEntity extends StrapiBaseEntity, FooterAttributes {}
 
 /**
- * Media file entity from upload plugin
+ * Utility type: Resolves Schema.Attribute.* types to actual TypeScript types
+ * This allows us to extract types from Strapi's auto-generated schemas
  */
-export type MediaFileEntity = Data.ContentType<'plugin::upload.file'>;
+type ResolveAttributes<
+  TAttrs extends Record<string, Schema.Attribute.AnyAttribute>,
+> = {
+  [K in keyof TAttrs]: Schema.Attribute.Value<TAttrs[K]>;
+};
+
+/**
+ * Media file entity from Strapi upload plugin
+ *
+ * SINGLE SOURCE OF TRUTH: All types extracted from auto-generated PluginUploadFile schema
+ * Located at: apps/strapi/types/generated/contentTypes.d.ts
+ *
+ * When Strapi regenerates types, this automatically updates with no manual maintenance.
+ *
+ * Note: Data.ContentType<'plugin::upload.file'> only provides id/documentId (runtime entity),
+ * so we extract the full attribute types from the schema definition instead.
+ */
+type MediaFileAttributes = ResolveAttributes<
+  Omit<
+    PluginUploadFile['attributes'],
+    | 'createdAt'
+    | 'createdBy'
+    | 'updatedAt'
+    | 'updatedBy'
+    | 'publishedAt'
+    | 'locale'
+    | 'localizations'
+  >
+>;
+
+export interface MediaFileEntity
+  extends StrapiBaseEntity,
+    MediaFileAttributes {}
 
 // ========================================
 // Populated Types (API Response Shapes)
@@ -87,7 +208,7 @@ export type MediaFileEntity = Data.ContentType<'plugin::upload.file'>;
 export type Article = ArticleEntity & {
   author?: AuthorEntity;
   category?: CategoryEntity;
-  cover?: Media;
+  cover?: MediaFileEntity;
   blocks?: Array<
     | Data.Component<'shared.media'>
     | Data.Component<'shared.quote'>
@@ -100,7 +221,7 @@ export type Article = ArticleEntity & {
  * Author with populated relations (as returned by API)
  */
 export type Author = AuthorEntity & {
-  avatar?: Media;
+  avatar?: MediaFileEntity;
   articles?: ArticleEntity[];
 };
 
@@ -108,7 +229,7 @@ export type Author = AuthorEntity & {
  * Category with populated relations (as returned by API)
  */
 export type Category = CategoryEntity & {
-  image?: Media;
+  image?: MediaFileEntity;
   articles?: ArticleEntity[];
 };
 
@@ -116,7 +237,7 @@ export type Category = CategoryEntity & {
  * Global settings with populated relations (as returned by API)
  */
 export type Global = GlobalEntity & {
-  favicon?: Media;
+  favicon?: MediaFileEntity;
   defaultSeo?: SEOComponent;
 };
 
@@ -142,44 +263,6 @@ export type SocialLinkComponent = Data.Component<'footer.social-link'>;
 export type NavigationColumnComponent =
   Data.Component<'footer.navigation-column'>;
 export type NavigationLinkComponent = Data.Component<'footer.navigation-link'>;
-
-// ========================================
-// Media Types (Custom for better DX)
-// ========================================
-
-/**
- * Simplified Media interface for frontend consumption
- * Note: This is kept custom for better developer experience
- * as the auto-generated upload plugin type is overly complex
- */
-export interface Media {
-  id: number;
-  documentId?: string;
-  name: string;
-  alternativeText?: string;
-  caption?: string;
-  width: number;
-  height: number;
-  formats?: {
-    thumbnail?: MediaFormat;
-    small?: MediaFormat;
-    medium?: MediaFormat;
-    large?: MediaFormat;
-  };
-  url: string;
-  previewUrl?: string;
-  provider?: string;
-  mime?: string;
-  size?: number;
-}
-
-export interface MediaFormat {
-  name: string;
-  url: string;
-  width: number;
-  height: number;
-  size: number;
-}
 
 // ========================================
 // JSON-LD Type for SEO
@@ -314,7 +397,8 @@ export interface QueryParams {
 /**
  * Safely cast query parameters to satisfy Strapi client typing
  */
-export const safeCastParams = (params: QueryParams): unknown => params;
+export const safeCastParams = (params: QueryParams): Record<string, unknown> =>
+  params as unknown as Record<string, unknown>;
 
 /**
  * Transform raw Strapi collection response to typed StrapiResponse

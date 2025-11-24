@@ -73,8 +73,7 @@ pnpm dev:strapi   # Strapi CMS only
 
 ## 📚 **Documentation**
 
-- 📖 **[Quick Start Guide](./QUICK_START.md)** - Get running in 5 minutes
-- 🗺️ **[Implementation Plan](./docs/plan/index.md)** - Full development roadmap
+- ️ **[Implementation Plan](./docs/plan/index.md)** - Full development roadmap
 - 🚀 **[Deployment Guide](./docs/deployment-guide.md)** - Free tier hosting setup
 - 🧩 **[Component Architecture](./docs/component-architecture.md)** - Frontend structure
 

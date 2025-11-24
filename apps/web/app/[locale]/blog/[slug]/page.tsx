@@ -1,9 +1,24 @@
 import { BACKEND_URL } from '@/constants';
-import { PageWrapper } from '@repo/design-system';
+import { getArticleBySlug } from '@/lib/articles/fetch-article';
+import {
+  AuthorCard,
+  BlockRenderer,
+  PageWrapper,
+  TypographyH1,
+  TypographyH3,
+  TypographyLead,
+  TypographyMuted,
+} from '@repo/design-system';
 import { getDictionary } from '@repo/internationalization';
-import { createMetadata } from '@repo/seo/metadata';
-import { type Article, type Data, type QueryParams, cachedFind, safeCastParams } from '@repo/strapi-client';
+import {
+  createArticleSchema,
+  createMetadata,
+  JsonLd,
+} from '@repo/seo';
+import type { ArticleEntity } from '@repo/strapi-client';
+import { cachedFind, safeCastParams, validateArticles } from '@repo/strapi-client';
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 
 type BlogPostProps = {
@@ -20,25 +35,8 @@ export const generateMetadata = async ({
   const dictionary = await getDictionary(locale);
 
   try {
-    const response = await cachedFind(
-      'articles',
-      safeCastParams({
-        filters: { slug: { $eq: slug } },
-        populate: {
-          author: {
-            populate: ['avatar'],
-          },
-          category: true,
-          cover: true,
-        },
-      } as QueryParams),
-      {
-        revalidate: 300, // 5 minutes ISR
-        tags: ['articles', `article-${slug}`, 'metadata'],
-      }
-    );
-
-    const article = response?.data?.[0] as unknown as Article | undefined;
+    // Use shared fetch utility (deduplicated with page component)
+    const article = await getArticleBySlug(slug);
 
     if (!article) {
       return createMetadata({
@@ -47,41 +45,45 @@ export const generateMetadata = async ({
       });
     }
 
+    // Build cover image URL correctly
+    const coverImageUrl =
+      article.cover?.url ? `${BACKEND_URL}${article.cover.url}` : undefined;
 
     return createMetadata({
       title: `${article.title} | ${dictionary.web.common.siteName}`,
       description: article.description || '',
-      openGraph: BACKEND_URL
+      openGraph: coverImageUrl
         ? {
-          title: article.title,
-          description: article.description || undefined,
-          type: 'article',
-          publishedTime: article.publishedAt || undefined,
-          authors: article.author?.name ? [article.author.name] : undefined,
-          images: [
-            {
-              url: BACKEND_URL,
-              width: article.cover?.width || 1200,
-              height: article.cover?.height || 630,
-              alt: article.cover?.alternativeText || article.title,
-            },
-          ],
-        }
+            title: article.title,
+            description: article.description || undefined,
+            type: 'article',
+            publishedTime: article.publishedAt || undefined,
+            authors: article.author?.name ? [article.author.name] : undefined,
+            images: [
+              {
+                url: coverImageUrl,
+                width: article.cover?.width || 1200,
+                height: article.cover?.height || 630,
+                alt: article.cover?.alternativeText || article.title,
+              },
+            ],
+          }
         : {
-          title: article.title,
-          description: article.description || undefined,
-          type: 'article',
-          publishedTime: article.publishedAt || undefined,
-          authors: article.author?.name ? [article.author.name] : undefined,
-        },
+            title: article.title,
+            description: article.description || undefined,
+            type: 'article',
+            publishedTime: article.publishedAt || undefined,
+            authors: article.author?.name ? [article.author.name] : undefined,
+          },
       twitter: {
         card: 'summary_large_image',
         title: article.title,
         description: article.description || undefined,
-        images: BACKEND_URL ? [BACKEND_URL] : undefined,
+        images: coverImageUrl ? [coverImageUrl] : undefined,
       },
     });
-  } catch {
+  } catch (error) {
+    console.error('Error generating metadata for article:', error);
     return createMetadata({
       title: `Blog | ${dictionary.web.common.siteName}`,
       description: 'Read our latest articles',
@@ -103,12 +105,13 @@ export async function generateStaticParams() {
       }
     );
 
-    const articles = (response?.data || []) as unknown as Article[];
+    const articles = validateArticles(response?.data || []);
 
     return articles.map((article) => ({
       slug: article.slug,
     }));
-  } catch {
+  } catch (error) {
+    console.error('Error generating static params:', error);
     return [];
   }
 }
@@ -117,55 +120,53 @@ const BlogPost = async ({ params }: BlogPostProps) => {
   const { locale, slug } = await params;
 
   try {
-    const response = await cachedFind(
-      'articles',
-      safeCastParams({
-        filters: { slug: { $eq: slug } },
-        populate: {
-          author: {
-            populate: ['avatar'],
-          },
-          category: true,
-          cover: true,
-          blocks: {
-            populate: '*',
-          },
-        },
-      }),
-      {
-        revalidate: 300, // 5 minutes ISR
-        tags: ['articles', `article-${slug}`],
-      }
-    );
-
-    const article = response?.data?.[0] as unknown as Article | undefined;
+    // Use shared fetch utility (deduplicated with generateMetadata)
+    const article = await getArticleBySlug(slug);
 
     if (!article) {
       notFound();
     }
 
+    // Generate JSON-LD structured data
+    const articleSchema = createArticleSchema({
+      title: article.title,
+      description: article.description,
+      publishedAt: article.publishedAt,
+      updatedAt: article.updatedAt,
+      author: article.author
+        ? {
+            name: article.author.name,
+            email: article.author.email,
+          }
+        : undefined,
+      coverImage: article.cover
+        ? {
+            url: article.cover.url,
+            width: article.cover.width,
+            height: article.cover.height,
+            alt: article.cover.alternativeText,
+          }
+        : undefined,
+      url: `${BACKEND_URL}/${locale}/blog/${article.slug}`,
+      backendUrl: BACKEND_URL,
+    });
+
     return (
       <PageWrapper>
+        <JsonLd code={articleSchema} />
         <div className="container mx-auto px-4 py-8">
           <div className="mx-auto max-w-7xl">
-            {/* 2-column responsive grid: main content + sidebar */}
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_300px]">
-              {/* Main Content Area - Order 2 on mobile, 1 on desktop */}
               <article className="order-2 lg:order-1">
-                <h1 className='mb-4 font-bold text-4xl'>{article.title}</h1>
+                <TypographyH1 className='mb-4'>{article.title}</TypographyH1>
                 {article.description && (
-                  <p className='mb-6 text-muted-foreground text-xl'>
+                  <TypographyLead className='mb-6'>
                     {article.description}
-                  </p>
+                  </TypographyLead>
                 )}
 
                 {/* Metadata Row */}
                 <div className='mb-8 flex flex-wrap items-center gap-4 text-muted-foreground text-sm'>
-                  {article.category && (
-                    <span className="rounded-md bg-primary/10 px-3 py-1 font-medium text-primary">
-                      {article.category.name}
-                    </span>
-                  )}
                   {article.author && (
                     <span className="flex items-center gap-2">
                       <span className="text-foreground">{article.author.name}</span>
@@ -184,98 +185,35 @@ const BlogPost = async ({ params }: BlogPostProps) => {
 
                 {/* Cover Image */}
                 {article.cover && (
-                  <div className="mb-8">
-                    <img
-                      src={`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:1337'}${article.cover.url}`}
+                  <div className="relative mb-8 aspect-video w-full overflow-hidden rounded-lg">
+                    <Image
+                      src={`${BACKEND_URL}${article.cover.url}`}
                       alt={article.cover.alternativeText || article.title}
-                      className="h-auto w-full rounded-lg object-cover"
+                      fill
+                      priority
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
                     />
                   </div>
                 )}
 
                 {/* Article Content - Blocks */}
-                <div className="prose prose-lg dark:prose-invert max-w-none">
-                  {article.blocks?.map((block, index) => {
-                    const component = block.__component;
-
-                    if (component === 'shared.rich-text') {
-                      const richTextBlock = block as Data.Component<'shared.rich-text'>;
-                      return (
-                        <div
-                          key={index}
-                          dangerouslySetInnerHTML={{ __html: richTextBlock.body }}
-                        />
-                      );
-                    }
-
-                    if (component === 'shared.media') {
-                      const mediaBlock = block as Data.Component<'shared.media'>;
-                      const file = mediaBlock.file;
-                      return (
-                        <div key={index} className="my-8">
-                          <img
-                            src={`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:1337'}${file.url}`}
-                            alt={file.alternativeText || ''}
-                            className="h-auto w-full rounded-lg"
-                          />
-                        </div>
-                      );
-                    }
-
-                    if (component === 'shared.quote') {
-                      const quoteBlock = block as Data.Component<'shared.quote'>;
-                      return (
-                        <blockquote
-                          key={index}
-                          className='my-8 border-primary border-l-4 pl-6 italic'
-                        >
-                          <p className="text-lg">{quoteBlock.body}</p>
-                          {quoteBlock.title && (
-                            <footer className='mt-2 font-medium text-sm'>
-                              — {quoteBlock.title}
-                            </footer>
-                          )}
-                        </blockquote>
-                      );
-                    }
-
-                    return null;
-                  })}
-                </div>
+                <BlockRenderer
+                  blocks={article.blocks || []}
+                  backendUrl={BACKEND_URL}
+                />
               </article>
 
-              {/* Sidebar - Order 1 on mobile, 2 on desktop */}
-              <aside className='order-1 lg:sticky lg:top-4 lg:order-2 lg:self-start'>
-                <div className="space-y-6">
-                  {/* Author Card Placeholder */}
-                  {article.author && (
-                    <div className="rounded-lg border bg-card p-6">
-                      <h3 className="mb-4 font-semibold">About the Author</h3>
-                      <div className="flex items-center gap-3">
-                        {article.author.name && (
-                          <div className='flex size-12 items-center justify-center rounded-full bg-primary/10 font-semibold text-lg text-primary'>
-                            {article.author.name[0]}
-                          </div>
-                        )}
-                        <div>
-                          <p className="font-medium">{article.author.name}</p>
-                          {article.author.email && (
-                            <p className='text-muted-foreground text-sm'>
-                              {article.author.email}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  )}
+              <aside className='order-1 space-y-6 lg:order-2'>
+                {article.author && (
+                  <AuthorCard author={article.author} />
+                )}
 
-                  {/* Table of Contents Placeholder */}
-                  <div className="rounded-lg border bg-card p-6">
-                    <h3 className="mb-4 font-semibold">Table of Contents</h3>
-                    <p className='text-muted-foreground text-sm'>
-                      TOC will be auto-generated from article headings
-                    </p>
-                  </div>
+                <div className="rounded-lg border bg-card p-6 lg:sticky lg:top-32">
+                  <TypographyH3 className="mb-4">Table of Contents</TypographyH3>
+                  <TypographyMuted>
+                    TOC will be auto-generated from article headings
+                  </TypographyMuted>
                 </div>
               </aside>
             </div>
@@ -284,7 +222,26 @@ const BlogPost = async ({ params }: BlogPostProps) => {
       </PageWrapper>
     );
   } catch (error) {
+    // Improved error handling with type differentiation
     console.error('Error loading article:', error);
+
+    // If it's a known error with status code, handle appropriately
+    if (error && typeof error === 'object' && 'status' in error) {
+      const statusError = error as { status: number };
+
+      // 404 errors should show not found page
+      if (statusError.status === 404) {
+        notFound();
+      }
+
+      // 5xx server errors should bubble up to error boundary
+      if (statusError.status >= 500) {
+        throw error;
+      }
+    }
+
+    // Network errors or unknown errors - show not found
+    // (Could be enhanced with custom error page in the future)
     notFound();
   }
 };

@@ -25,6 +25,28 @@ export type { PageWrapperProps } from './components/ui/page-wrapper';
 export { PageHeader } from './components/ui/page-header';
 export type { PageHeaderProps } from './components/ui/page-header';
 
+// Export Widget components
+export {
+  RichTextWidget,
+  MediaWidget,
+  QuoteWidget,
+  SliderWidget,
+  BlockRenderer,
+} from './components/strapi-widgets';
+
+export type {
+  RichTextWidgetProps,
+  MediaWidgetProps,
+  QuoteWidgetProps,
+  SliderWidgetProps,
+  BlockRendererProps,
+  BlockType,
+} from './components/strapi-widgets';
+
+// Export Molecule components
+export { AuthorCard } from './components/molecules/author-card';
+export type { AuthorCardProps } from './components/molecules/author-card';
+
 type DesignSystemProviderProperties = ThemeProviderProps & {
   privacyUrl?: string;
   termsUrl?: string;

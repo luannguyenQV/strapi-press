@@ -13,5 +13,17 @@
       "apps/docs/**/*.json",
       "apps/email/.react-email/**"
     ]
-  }
+  },
+  "overrides": [
+    {
+      "include": ["packages/design-system/components/widgets/**"],
+      "linter": {
+        "rules": {
+          "security": {
+            "noDangerouslySetInnerHtml": "off"
+          }
+        }
+      }
+    }
+  ]
 }

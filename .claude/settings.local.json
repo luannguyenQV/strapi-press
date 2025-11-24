@@ -82,7 +82,15 @@
       "Bash(pnpm approve-builds:*)",
       "Bash(pnpm list:*)",
       "Bash(timeout 10 pnpm develop:*)",
-      "Bash(pnpm strapi:*)"
+      "Bash(pnpm strapi:*)",
+      "Bash(xargs kill:*)",
+      "Bash(pnpm --filter @repo/design-system add:*)",
+      "Bash(pnpm --filter @repo/design-system lint:*)",
+      "Bash(pnpm --filter web add jsdom)",
+      "Bash(pnpm --filter web lint:*)",
+      "Bash(pnpm --filter @repo/design-system lint:fix:*)",
+      "mcp__serena__initial_instructions",
+      "Bash(pnpm --filter @repo/seo typecheck:*)"
     ],
     "deny": []
   },
