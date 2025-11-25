@@ -41,10 +41,12 @@ export async function generateMetadata({
       template: '%s | Next Forge',
       default: 'Next Forge - Production-grade Turborepo Template',
     },
-    description: 'A production-ready Turborepo template with Next.js and Strapi CMS',
+    description:
+      'A production-ready Turborepo template with Next.js and Strapi CMS',
     openGraph: {
       title: 'Next Forge',
-      description: 'A production-ready Turborepo template with Next.js and Strapi CMS',
+      description:
+        'A production-ready Turborepo template with Next.js and Strapi CMS',
       siteName: 'Next Forge',
       locale: locale,
       type: 'website',
@@ -52,7 +54,8 @@ export async function generateMetadata({
     twitter: {
       card: 'summary_large_image',
       title: 'Next Forge',
-      description: 'A production-ready Turborepo template with Next.js and Strapi CMS',
+      description:
+        'A production-ready Turborepo template with Next.js and Strapi CMS',
     },
     robots: {
       index: true,

@@ -12,7 +12,8 @@ import type { Article } from '@repo/strapi-client';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001';
 const SITE_NAME = 'StrapiPress';
-const SITE_DESCRIPTION = 'Thoughts, ideas, and opinions from the StrapiPress team';
+const SITE_DESCRIPTION =
+  'Thoughts, ideas, and opinions from the StrapiPress team';
 
 function escapeXml(unsafe: string): string {
   return unsafe
@@ -68,25 +69,29 @@ function generateRssXml(articles: Article[]): string {
 export async function GET() {
   try {
     // Fetch latest articles
-    const response = await cachedFind('articles', {
-      fields: ['title', 'slug', 'description', 'content', 'publishedAt'],
-      populate: {
-        author: {
-          fields: ['name'],
+    const response = await cachedFind(
+      'articles',
+      {
+        fields: ['title', 'slug', 'description', 'content', 'publishedAt'],
+        populate: {
+          author: {
+            fields: ['name'],
+          },
+          category: {
+            fields: ['name'],
+          },
+          cover: {
+            fields: ['url', 'alternativeText'],
+          },
         },
-        category: {
-          fields: ['name'],
-        },
-        cover: {
-          fields: ['url', 'alternativeText'],
-        },
+        sort: ['publishedAt:desc'],
+        pagination: { pageSize: 50 }, // Last 50 articles
       },
-      sort: ['publishedAt:desc'],
-      pagination: { pageSize: 50 }, // Last 50 articles
-    }, {
-      revalidate: 3600, // 1 hour cache
-      tags: ['rss', 'articles', 'feed']
-    });
+      {
+        revalidate: 3600, // 1 hour cache
+        tags: ['rss', 'articles', 'feed'],
+      }
+    );
 
     const articles = (response?.data as unknown as Article[]) || [];
     const rssXml = generateRssXml(articles);

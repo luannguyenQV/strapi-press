@@ -151,7 +151,7 @@ export const prefetchCategories = (queryClient: QueryClient) => {
       );
       return bridgeCategoryCollection(response);
     },
-    staleTime: Infinity, // Build-time only - categories are static
+    staleTime: Number.POSITIVE_INFINITY, // Build-time only - categories are static
   });
 };
 
@@ -162,7 +162,7 @@ export const prefetchCategory = (queryClient: QueryClient, id: string) => {
       const response = await strapiClient.collection('categories').findOne(id);
       return bridgeCategorySingle(response);
     },
-    staleTime: Infinity, // Build-time only - category data is static
+    staleTime: Number.POSITIVE_INFINITY, // Build-time only - category data is static
   });
 };
 
@@ -180,7 +180,7 @@ export const prefetchCategoryBySlug = (
       );
       return bridgeCategoryCollection(response);
     },
-    staleTime: Infinity, // Build-time only - category data is static
+    staleTime: Number.POSITIVE_INFINITY, // Build-time only - category data is static
   });
 };
 
@@ -200,7 +200,7 @@ export const prefetchFooter = (queryClient: QueryClient) => {
       );
       return bridgeFooterSingle(response);
     },
-    staleTime: Infinity, // Build-time only - footer is static
+    staleTime: Number.POSITIVE_INFINITY, // Build-time only - footer is static
   });
 };
 

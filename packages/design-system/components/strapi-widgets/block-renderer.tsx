@@ -45,7 +45,9 @@ export function BlockRenderer({
         // Media Block
         if (component === 'shared.media') {
           const data = block as Data.Component<'shared.media'>;
-          return <MediaWidget key={index} data={data} backendUrl={backendUrl} />;
+          return (
+            <MediaWidget key={index} data={data} backendUrl={backendUrl} />
+          );
         }
 
         // Quote Block
@@ -57,7 +59,9 @@ export function BlockRenderer({
         // Slider Block
         if (component === 'shared.slider') {
           const data = block as Data.Component<'shared.slider'>;
-          return <SliderWidget key={index} data={data} backendUrl={backendUrl} />;
+          return (
+            <SliderWidget key={index} data={data} backendUrl={backendUrl} />
+          );
         }
 
         return null;

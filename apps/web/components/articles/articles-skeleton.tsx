@@ -6,7 +6,7 @@ import { ArticleListItemSkeleton } from '.';
  */
 export function ArticlesListSkeleton() {
   return (
-    <div className='w-full py-4'>
+    <div className="w-full py-4">
       <div className="space-y-8">
         {[1, 2, 3].map((i) => (
           <ArticleListItemSkeleton key={i} />

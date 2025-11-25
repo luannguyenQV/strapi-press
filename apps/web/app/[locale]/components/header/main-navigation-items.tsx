@@ -7,8 +7,10 @@ type NavigationItem = {
   items?: { title: string; href: string }[];
 };
 
-export function getMainNavigationItems(dictionary: Dictionary): NavigationItem[] {
+export function getMainNavigationItems(
+  dictionary: Dictionary
+): NavigationItem[] {
   const navigationItems: NavigationItem[] = [];
 
-  return navigationItems
+  return navigationItems;
 }

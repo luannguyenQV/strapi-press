@@ -12,7 +12,8 @@ const strapiUrl = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
 
 try {
   const url = new URL(strapiUrl);
-  const isLocalhost = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
+  const isLocalhost =
+    url.hostname === 'localhost' || url.hostname === '127.0.0.1';
 
   if (!isLocalhost) {
     // Production: Add the actual Strapi hostname
@@ -24,7 +25,10 @@ try {
   }
   // Note: localhost is already configured in @repo/next-config base config
 } catch (error) {
-  console.warn('Invalid NEXT_PUBLIC_STRAPI_URL, skipping image remote pattern:', error);
+  console.warn(
+    'Invalid NEXT_PUBLIC_STRAPI_URL, skipping image remote pattern:',
+    error
+  );
 }
 
 if (process.env.NODE_ENV === 'production') {

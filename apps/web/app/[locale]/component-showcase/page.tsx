@@ -1,6 +1,11 @@
 import { PageHeader, PageWrapper } from '@repo/design-system';
 import { Button } from '@repo/design-system/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@repo/design-system/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@repo/design-system/components/ui/card';
 
 /**
  * Component Showcase Page
@@ -16,7 +21,7 @@ export default function ComponentShowcasePage() {
         description="Demonstration of PageWrapper and PageHeader components with various configurations"
         variant="center"
         actions={
-          <div className='flex justify-center gap-4'>
+          <div className="flex justify-center gap-4">
             <Button>Primary Action</Button>
             <Button variant="outline">Secondary Action</Button>
           </div>
@@ -26,7 +31,7 @@ export default function ComponentShowcasePage() {
       <div className="space-y-12">
         {/* Variants Section */}
         <section>
-          <h2 className='mb-6 font-semibold text-2xl'>Layout Variants</h2>
+          <h2 className="mb-6 font-semibold text-2xl">Layout Variants</h2>
           <div className="grid gap-6 md:grid-cols-2">
             <Card>
               <CardHeader>
@@ -34,7 +39,8 @@ export default function ComponentShowcasePage() {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm">
-                  Optimized for long-form reading content like blog posts and articles.
+                  Optimized for long-form reading content like blog posts and
+                  articles.
                 </p>
               </CardContent>
             </Card>
@@ -45,7 +51,8 @@ export default function ComponentShowcasePage() {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm">
-                  Default variant for most content pages. Balanced width for readability.
+                  Default variant for most content pages. Balanced width for
+                  readability.
                 </p>
               </CardContent>
             </Card>
@@ -56,7 +63,8 @@ export default function ComponentShowcasePage() {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm">
-                  Best for dashboards, data tables, and layouts requiring more horizontal space.
+                  Best for dashboards, data tables, and layouts requiring more
+                  horizontal space.
                 </p>
               </CardContent>
             </Card>
@@ -67,7 +75,8 @@ export default function ComponentShowcasePage() {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm">
-                  No max-width constraint. Use for landing pages or custom layouts.
+                  No max-width constraint. Use for landing pages or custom
+                  layouts.
                 </p>
               </CardContent>
             </Card>
@@ -76,7 +85,7 @@ export default function ComponentShowcasePage() {
 
         {/* Padding Options */}
         <section>
-          <h2 className='mb-6 font-semibold text-2xl'>Padding Options</h2>
+          <h2 className="mb-6 font-semibold text-2xl">Padding Options</h2>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {['None', 'Tight', 'Normal', 'Relaxed'].map((option) => (
               <Card key={option}>
@@ -98,7 +107,7 @@ export default function ComponentShowcasePage() {
 
         {/* Usage Example */}
         <section>
-          <h2 className='mb-6 font-semibold text-2xl'>Usage Example</h2>
+          <h2 className="mb-6 font-semibold text-2xl">Usage Example</h2>
           <Card>
             <CardHeader>
               <CardTitle>Basic Page Structure</CardTitle>
@@ -125,22 +134,42 @@ export default function MyPage() {
 
         {/* Features */}
         <section>
-          <h2 className='mb-6 font-semibold text-2xl'>Features</h2>
+          <h2 className="mb-6 font-semibold text-2xl">Features</h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {[
-              { title: 'Semantic HTML', desc: 'Renders as <main>, <article>, <section>, or <div>' },
-              { title: 'Responsive', desc: 'Mobile-first design with adaptive spacing' },
-              { title: 'Accessible', desc: 'ARIA landmarks and keyboard navigation' },
-              { title: 'TypeScript', desc: 'Fully typed with exported interfaces' },
-              { title: 'Zero JS', desc: 'Pure CSS/HTML with no client-side JavaScript' },
-              { title: 'Customizable', desc: 'Accepts className for additional styling' },
+              {
+                title: 'Semantic HTML',
+                desc: 'Renders as <main>, <article>, <section>, or <div>',
+              },
+              {
+                title: 'Responsive',
+                desc: 'Mobile-first design with adaptive spacing',
+              },
+              {
+                title: 'Accessible',
+                desc: 'ARIA landmarks and keyboard navigation',
+              },
+              {
+                title: 'TypeScript',
+                desc: 'Fully typed with exported interfaces',
+              },
+              {
+                title: 'Zero JS',
+                desc: 'Pure CSS/HTML with no client-side JavaScript',
+              },
+              {
+                title: 'Customizable',
+                desc: 'Accepts className for additional styling',
+              },
             ].map((feature) => (
               <Card key={feature.title}>
                 <CardHeader>
                   <CardTitle className="text-base">{feature.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground text-sm">{feature.desc}</p>
+                  <p className="text-muted-foreground text-sm">
+                    {feature.desc}
+                  </p>
                 </CardContent>
               </Card>
             ))}

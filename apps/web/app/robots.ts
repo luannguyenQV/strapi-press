@@ -18,23 +18,16 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: '*',
         allow: '/',
         disallow: [
-          '/api/',           // API routes - no crawling
-          '/admin/',         // Admin panel - no crawling
-          '/_next/',         // Next.js internals
-          '/private/',       // Private content (if any)
+          '/api/', // API routes - no crawling
+          '/admin/', // Admin panel - no crawling
+          '/_next/', // Next.js internals
+          '/private/', // Private content (if any)
         ],
       },
       {
         // Specific rules for major search engines
         userAgent: ['Googlebot', 'Bingbot', 'Slurp'],
-        allow: [
-          '/',
-          '/blog/',
-          '/category/',
-          '/author/',
-          '/about',
-          '/contact',
-        ],
+        allow: ['/', '/blog/', '/category/', '/author/', '/about', '/contact'],
         crawlDelay: 0, // No delay for major search engines
       },
     ],

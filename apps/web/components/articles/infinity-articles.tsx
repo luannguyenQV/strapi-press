@@ -1,7 +1,11 @@
 'use client';
 
 import { Button } from '@repo/design-system/components/ui/button';
-import type { Article, ArticleFilterQuery, StrapiResponse } from '@repo/strapi-client';
+import type {
+  Article,
+  ArticleFilterQuery,
+  StrapiResponse,
+} from '@repo/strapi-client';
 import { DEFAULT_PAGE_SIZE, useInfiniteArticles } from '@repo/strapi-client';
 import type { InfiniteData } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
@@ -50,7 +54,7 @@ export function InfinityArticles({
   // Add search filter if provided
   if (searchQuery && searchQuery.trim().length > 0) {
     filterConditions.push({
-      title: { $containsi: searchQuery.trim() }
+      title: { $containsi: searchQuery.trim() },
     });
   }
 
@@ -59,15 +63,12 @@ export function InfinityArticles({
     if (featured === true) {
       // Only show featured articles
       filterConditions.push({
-        featured: { $eq: true }
+        featured: { $eq: true },
       });
     } else {
       // Only show non-featured articles (featured = false OR null)
       filterConditions.push({
-        $or: [
-          { featured: { $eq: false } },
-          { featured: { $null: true } }
-        ]
+        $or: [{ featured: { $eq: false } }, { featured: { $null: true } }],
       });
     }
   }
@@ -75,21 +76,20 @@ export function InfinityArticles({
   // Add author filter if provided
   if (authorSlug) {
     filterConditions.push({
-      author: { slug: { $eq: authorSlug } }
+      author: { slug: { $eq: authorSlug } },
     });
   }
 
   // Add category filter if provided
   if (categorySlug) {
     filterConditions.push({
-      category: { slug: { $eq: categorySlug } }
+      category: { slug: { $eq: categorySlug } },
     });
   }
 
   // Build final filter object
-  const filters: ArticleFilterQuery = filterConditions.length > 0
-    ? { $and: filterConditions }
-    : {};
+  const filters: ArticleFilterQuery =
+    filterConditions.length > 0 ? { $and: filterConditions } : {};
 
   const {
     data,
@@ -107,8 +107,7 @@ export function InfinityArticles({
 
   // Initial loading state (first render)
   if (isLoading) {
-    // biome-ignore lint/correctness/noUndeclaredVariables: <explanation>
-    return <ArticleListItemsSkeleton />
+    return <ArticleListItemsSkeleton />;
   }
 
   // Error state
@@ -133,7 +132,7 @@ export function InfinityArticles({
   const infiniteData = data as InfiniteData<StrapiResponse<Article>>;
 
   return (
-    <div className='py-8'>
+    <div className="py-8">
       {/* Render all loaded pages */}
       <div className="space-y-8">
         {infiniteData.pages.map((page, pageIndex) =>

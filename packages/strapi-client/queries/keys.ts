@@ -10,7 +10,8 @@ export const queryKeys = {
   // Articles
   articles: () => [...queryKeys.all, 'articles'] as const,
   article: (id: string) => [...queryKeys.articles(), id] as const,
-  articlesByCategory: (categoryId: string) => [...queryKeys.articles(), 'category', categoryId] as const,
+  articlesByCategory: (categoryId: string) =>
+    [...queryKeys.articles(), 'category', categoryId] as const,
 
   // Categories
   categories: () => [...queryKeys.all, 'categories'] as const,

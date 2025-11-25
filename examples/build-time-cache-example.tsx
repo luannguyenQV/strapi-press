@@ -20,13 +20,17 @@ import type { Category } from '@repo/strapi-client/types';
  * Perfect for free-tier Strapi deployments with rate limits!
  */
 export async function CategoriesWithBuildTimeCache() {
-  const response = await cachedFind('categories', {
-    sort: ['name:asc'],
-    pagination: { pageSize: 100 }
-  }, {
-    revalidate: false, // ✅ Cache forever - only fetch at build time
-    tags: ['categories', 'build-time-static']
-  });
+  const response = await cachedFind(
+    'categories',
+    {
+      sort: ['name:asc'],
+      pagination: { pageSize: 100 },
+    },
+    {
+      revalidate: false, // ✅ Cache forever - only fetch at build time
+      tags: ['categories', 'build-time-static'],
+    }
+  );
 
   const categories = (response?.data as unknown as Category[]) || [];
 
@@ -36,9 +40,7 @@ export async function CategoriesWithBuildTimeCache() {
       <ul>
         {categories.map((category) => (
           <li key={category.id}>
-            <a href={`/category/${category.slug}`}>
-              {category.name}
-            </a>
+            <a href={`/category/${category.slug}`}>{category.name}</a>
           </li>
         ))}
       </ul>
@@ -53,16 +55,20 @@ export async function CategoriesWithBuildTimeCache() {
  * This reduces API calls to zero for footer data.
  */
 export async function FooterWithBuildTimeCache() {
-  const response = await cachedFindSingleType('footer', {
-    populate: {
-      logo: true,
-      socialLinks: true,
-      menuLinks: true
+  const response = await cachedFindSingleType(
+    'footer',
+    {
+      populate: {
+        logo: true,
+        socialLinks: true,
+        menuLinks: true,
+      },
+    },
+    {
+      revalidate: false, // ✅ Cache forever
+      tags: ['footer', 'global-settings'],
     }
-  }, {
-    revalidate: false, // ✅ Cache forever
-    tags: ['footer', 'global-settings']
-  });
+  );
 
   const footer = response?.data;
 
@@ -87,21 +93,29 @@ export async function FooterWithBuildTimeCache() {
  */
 export async function HomePage() {
   // Categories: Cached forever at build time
-  const categoriesResponse = await cachedFind('categories', {
-    sort: ['name:asc']
-  }, {
-    revalidate: false, // Build-time only
-    tags: ['categories']
-  });
+  const categoriesResponse = await cachedFind(
+    'categories',
+    {
+      sort: ['name:asc'],
+    },
+    {
+      revalidate: false, // Build-time only
+      tags: ['categories'],
+    }
+  );
 
   // Articles: ISR with 5-minute revalidation
-  const articlesResponse = await cachedFind('articles', {
-    sort: ['publishedAt:desc'],
-    pagination: { pageSize: 10 }
-  }, {
-    revalidate: 300, // 5 minutes
-    tags: ['articles', 'homepage']
-  });
+  const articlesResponse = await cachedFind(
+    'articles',
+    {
+      sort: ['publishedAt:desc'],
+      pagination: { pageSize: 10 },
+    },
+    {
+      revalidate: 300, // 5 minutes
+      tags: ['articles', 'homepage'],
+    }
+  );
 
   const categories = (categoriesResponse?.data as unknown as Category[]) || [];
   const articles = articlesResponse?.data || [];
@@ -134,12 +148,16 @@ export async function HomePage() {
  * use a very long revalidation period like 1 day.
  */
 export async function CategoriesWithDayCache() {
-  const response = await cachedFind('categories', {
-    sort: ['name:asc']
-  }, {
-    revalidate: 60 * 60 * 24, // 1 day (86400 seconds)
-    tags: ['categories']
-  });
+  const response = await cachedFind(
+    'categories',
+    {
+      sort: ['name:asc'],
+    },
+    {
+      revalidate: 60 * 60 * 24, // 1 day (86400 seconds)
+      tags: ['categories'],
+    }
+  );
 
   const categories = (response?.data as unknown as Category[]) || [];
 

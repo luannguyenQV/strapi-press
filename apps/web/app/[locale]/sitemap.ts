@@ -11,13 +11,17 @@ const pages = appFolders
   .map((folder) => folder.name);
 
 // Get blog posts from Strapi
-const blogPostsResponse = await cachedFind('articles', {
-  fields: ['slug'],
-  publicationState: 'live',
-}, {
-  revalidate: 3600, // 1 hour - sitemap changes infrequently
-  tags: ['articles', 'sitemap']
-});
+const blogPostsResponse = await cachedFind(
+  'articles',
+  {
+    fields: ['slug'],
+    publicationState: 'live',
+  },
+  {
+    revalidate: 3600, // 1 hour - sitemap changes infrequently
+    tags: ['articles', 'sitemap'],
+  }
+);
 const blogPosts = (blogPostsResponse?.data as unknown as Article[]) || [];
 
 // Get legal pages from Strapi (if applicable)

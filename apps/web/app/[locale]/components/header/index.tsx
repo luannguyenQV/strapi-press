@@ -92,7 +92,9 @@ export const Header = async ({ dictionary }: HeaderProps) => {
             height={28}
             className="dark:invert"
           />
-          <p className="whitespace-nowrap font-semibold text-base md:text-lg">StrapiPress</p>
+          <p className="whitespace-nowrap font-semibold text-base md:text-lg">
+            StrapiPress
+          </p>
         </Link>
         <div className="flex w-full items-center justify-end gap-2">
           <Button variant="ghost" size="icon" asChild>

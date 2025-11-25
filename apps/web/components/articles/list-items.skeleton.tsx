@@ -13,7 +13,9 @@ interface ArticleListItemsSkeletonProps {
  * - Default count: 10 skeletons
  * - Vertical stack layout with spacing
  */
-export function ArticleListItemsSkeleton({ count = 10 }: ArticleListItemsSkeletonProps) {
+export function ArticleListItemsSkeleton({
+  count = 10,
+}: ArticleListItemsSkeletonProps) {
   return (
     <div className="space-y-3">
       {Array.from({ length: count }).map((_, i) => (

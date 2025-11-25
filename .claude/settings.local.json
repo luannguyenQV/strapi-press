@@ -90,7 +90,18 @@
       "Bash(pnpm --filter web lint:*)",
       "Bash(pnpm --filter @repo/design-system lint:fix:*)",
       "mcp__serena__initial_instructions",
-      "Bash(pnpm --filter @repo/seo typecheck:*)"
+      "Bash(pnpm --filter @repo/seo typecheck:*)",
+      "Bash(pnpm format:*)",
+      "Bash(timeout 5 curl -s \"http://localhost:3001/en/blog/the-internet-s-own-boy\")",
+      "Bash(xargs:*)",
+      "Bash(/dev/null)",
+      "Bash(node -e:*)",
+      "Bash(node test-strapi-client.mjs:*)",
+      "Bash(pkill:*)",
+      "Bash(pnpm dev:strapi:*)",
+      "Bash(sqlite3:*)",
+      "Bash(for dir in bookmark comment follow like tag)",
+      "Bash(do echo \"=== $dir/schema.json ===\" cat /Users/luannguyen/Documents/Git/strapi/apps/strapi/src/api/$dir/content-types/$dir/schema.json)"
     ],
     "deny": []
   },

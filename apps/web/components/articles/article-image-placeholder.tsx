@@ -1,5 +1,3 @@
-
-
 interface ArticleImagePlaceholderProps {
   title: string;
   className?: string;
@@ -16,7 +14,10 @@ interface ArticleImagePlaceholderProps {
  * @param title - Article title (extracts first letter)
  * @param className - Optional additional Tailwind classes
  */
-export function ArticleImagePlaceholder({ title, className = '' }: ArticleImagePlaceholderProps) {
+export function ArticleImagePlaceholder({
+  title,
+  className = '',
+}: ArticleImagePlaceholderProps) {
   // Get first uppercase letter from title
   const firstLetter = title.charAt(0).toUpperCase();
 
@@ -39,10 +40,12 @@ export function ArticleImagePlaceholder({ title, className = '' }: ArticleImageP
   const bgColor = colors[colorIndex];
 
   return (
-    <div className={`flex h-full w-full flex-col items-center justify-center ${bgColor} ${className} p-4`}>
-      <div className='font-bold text-6xl text-white md:text-7xl'>
+    <div
+      className={`flex h-full w-full flex-col items-center justify-center ${bgColor} ${className} p-4`}
+    >
+      <div className="font-bold text-6xl text-white md:text-7xl">
         {firstLetter}
       </div>
-    </div >
+    </div>
   );
 }

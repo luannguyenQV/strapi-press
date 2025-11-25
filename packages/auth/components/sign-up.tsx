@@ -3,7 +3,7 @@ import { signIn } from '../';
 export const SignUp = (): React.JSX.Element => (
   <form
     action={async () => {
-      "use server";
+      'use server';
       await signIn();
     }}
   >

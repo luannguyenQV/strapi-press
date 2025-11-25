@@ -17,8 +17,9 @@ const I18nMiddleware = createI18nMiddleware({
       const acceptedLanguages = negotiator.languages();
 
       // Filter out invalid locales and ensure we have valid locale strings
-      const validLanguages = acceptedLanguages.filter((lang) => 
-        typeof lang === 'string' && lang.length >= 2 && lang.length <= 5
+      const validLanguages = acceptedLanguages.filter(
+        (lang) =>
+          typeof lang === 'string' && lang.length >= 2 && lang.length <= 5
       );
 
       if (validLanguages.length === 0) {

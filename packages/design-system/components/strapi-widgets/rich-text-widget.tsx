@@ -10,19 +10,58 @@ export interface RichTextWidgetProps {
 
 // DOMPurify configuration for safe HTML rendering
 const ALLOWED_TAGS = [
-  'p', 'br', 'strong', 'em', 'u', 's', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-  'ul', 'ol', 'li', 'blockquote', 'a', 'code', 'pre', 'img', 'table',
-  'thead', 'tbody', 'tr', 'th', 'td', 'hr', 'div', 'span', 'sub', 'sup'
+  'p',
+  'br',
+  'strong',
+  'em',
+  'u',
+  's',
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
+  'ul',
+  'ol',
+  'li',
+  'blockquote',
+  'a',
+  'code',
+  'pre',
+  'img',
+  'table',
+  'thead',
+  'tbody',
+  'tr',
+  'th',
+  'td',
+  'hr',
+  'div',
+  'span',
+  'sub',
+  'sup',
 ];
 
 const ALLOWED_ATTR = [
-  'href', 'target', 'rel', 'src', 'alt', 'title', 'class', 'id',
-  'width', 'height', 'align', 'style'
+  'href',
+  'target',
+  'rel',
+  'src',
+  'alt',
+  'title',
+  'class',
+  'id',
+  'width',
+  'height',
+  'align',
+  'style',
 ];
 
 // Only allow safe protocols (https, http, mailto, tel, etc.)
 // Blocks javascript:, data:, vbscript: and other dangerous protocols
-const SAFE_URI_PATTERN = /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp):|[^a-z]|[a-z+.-]+(?:[^a-z+.\-:]|$))/i;
+const SAFE_URI_PATTERN =
+  /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp):|[^a-z]|[a-z+.-]+(?:[^a-z+.\-:]|$))/i;
 
 /**
  * RichTextWidget - Renders sanitized HTML content from Strapi

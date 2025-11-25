@@ -23,19 +23,27 @@ interface ArticleListItemProps {
  * - Author, date, reading time metadata
  * - Hover effects and transitions
  */
-export function ArticleListItem({ article, locale = 'en' }: ArticleListItemProps) {
-  const publishedAt = article?.publishedAt ? new Date(article?.publishedAt).toLocaleDateString(locale, {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  }) : ''
+export function ArticleListItem({
+  article,
+  locale = 'en',
+}: ArticleListItemProps) {
+  const publishedAt = article?.publishedAt
+    ? new Date(article?.publishedAt).toLocaleDateString(locale, {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })
+    : '';
 
   return (
-    <Card className='overflow-hidden py-0 transition-all'>
-      <div className='grid grid-cols-[20%_1fr] items-center gap-4 md:grid-cols-[30%_1fr]'>
-        <div className='relative aspect-square overflow-hidden rounded-sm md:aspect-[16/9] md:rounded-md'>
+    <Card className="overflow-hidden py-0 transition-all">
+      <div className="grid grid-cols-[20%_1fr] items-center gap-4 md:grid-cols-[30%_1fr]">
+        <div className="relative aspect-square overflow-hidden rounded-sm md:aspect-[16/9] md:rounded-md">
           {article.cover?.url ? (
-            <Link href={`/blog/${article.slug}`} className='group relative block h-full w-full'>
+            <Link
+              href={`/blog/${article.slug}`}
+              className="group relative block h-full w-full"
+            >
               <Image
                 src={`${BACKEND_URL}${article.cover.url}`}
                 alt={article.cover.alternativeText || article.title}
@@ -45,17 +53,23 @@ export function ArticleListItem({ article, locale = 'en' }: ArticleListItemProps
               />
             </Link>
           ) : (
-            <Link href={`/blog/${article.slug}`} className='group relative block h-full w-full'>
+            <Link
+              href={`/blog/${article.slug}`}
+              className="group relative block h-full w-full"
+            >
               <ArticleImagePlaceholder title={article.title} />
             </Link>
           )}
 
           {/* Category Badge - Only visible on desktop */}
           {article.category && (
-            <Link href={`/category/${article.category.slug}`} className='absolute top-2 left-2 z-10 hidden md:block'>
+            <Link
+              href={`/category/${article.category.slug}`}
+              className="absolute top-2 left-2 z-10 hidden md:block"
+            >
               <Badge
                 variant="secondary"
-                className='cursor-pointer bg-white/90 capitalize backdrop-blur-sm transition-colors hover:bg-white/100 dark:bg-gray-900/90 dark:hover:bg-gray-900/100'
+                className="cursor-pointer bg-white/90 capitalize backdrop-blur-sm transition-colors hover:bg-white/100 dark:bg-gray-900/90 dark:hover:bg-gray-900/100"
               >
                 {article.category.name}
               </Badge>
@@ -64,21 +78,21 @@ export function ArticleListItem({ article, locale = 'en' }: ArticleListItemProps
         </div>
 
         {/* Article Content */}
-        <div className='flex flex-col justify-between md:p-4 '>
+        <div className="flex flex-col justify-between md:p-4 ">
           <div>
-            <Link href={`/blog/${article.slug}`} className='group block'>
-              <TypographyH3 className='mb-2 line-clamp-2 text-lg transition-colors group-hover:text-primary md:text-xl'>
+            <Link href={`/blog/${article.slug}`} className="group block">
+              <TypographyH3 className="mb-2 line-clamp-2 text-lg transition-colors group-hover:text-primary md:text-xl">
                 {article.title}
               </TypographyH3>
             </Link>
             {/* Description */}
-            <TypographyP className='line-clamp-3 hidden text-muted-foreground text-sm md:block md:text-base [&:not(:first-child)]:mt-0'>
+            <TypographyP className="line-clamp-3 hidden text-muted-foreground text-sm md:block md:text-base [&:not(:first-child)]:mt-0">
               {article.description}
             </TypographyP>
           </div>
 
           {/* Metadata */}
-          <div className='mt-0 flex flex-wrap items-center gap-5 text-muted-foreground text-xs md:mt-4 md:text-sm'>
+          <div className="mt-0 flex flex-wrap items-center gap-5 text-muted-foreground text-xs md:mt-4 md:text-sm">
             {article.author && (
               <Link
                 href={`/author/${article.author.slug || article.author.name.toLowerCase().replace(/\s+/g, '-')}`}

@@ -9,8 +9,11 @@
     "deploy": "strapi deploy",
     "dev": "strapi develop",
     "develop": "strapi develop",
-    "seed:example": "node ./scripts/seed.js",
+    "db:create-indexes": "psql $DATABASE_URL -f ./scripts/create-indexes.sql",
+    "db:verify-indexes": "psql $DATABASE_URL -f ./scripts/verify-indexes.sql",
     "seed:bulk": "node ./scripts/seed-bulk-articles.js",
+    "seed:permissions": "node ./scripts/seed-permissions.js",
+    "seed:social": "node ./scripts/seed-social.js",
     "start": "strapi start",
     "strapi": "strapi",
     "upgrade": "npx @strapi/upgrade latest",
@@ -33,6 +36,7 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "baseline-browser-mapping": "^2.8.31",
     "typescript": "^5"
   },
   "engines": {

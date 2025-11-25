@@ -1,7 +1,7 @@
 import { Articles } from '@/components/articles/articles';
 import { ArticlesListSkeleton } from '@/components/articles/articles-skeleton';
 import { PageWrapper } from '@repo/design-system';
-import { } from '@repo/design-system/components/ui/card';
+import {} from '@repo/design-system/components/ui/card';
 import { getDictionary } from '@repo/internationalization';
 import { createMetadata } from '@repo/seo/metadata';
 import { type Category, cachedFind } from '@repo/strapi-client';
@@ -23,12 +23,16 @@ export const generateMetadata = async ({
   const dictionary = await getDictionary(locale);
 
   try {
-    const response = await cachedFind('categories', {
-      filters: { slug: { $eq: slug } }
-    }, {
-      revalidate: false, // Build-time only - category metadata is static
-      tags: ['categories', `category-${slug}`, 'metadata']
-    });
+    const response = await cachedFind(
+      'categories',
+      {
+        filters: { slug: { $eq: slug } },
+      },
+      {
+        revalidate: false, // Build-time only - category metadata is static
+        tags: ['categories', `category-${slug}`, 'metadata'],
+      }
+    );
     const category = response?.data?.[0] as unknown as Category | undefined;
 
     if (!category) {
@@ -40,7 +44,8 @@ export const generateMetadata = async ({
 
     return createMetadata({
       title: `${category.name} | ${dictionary.web.common.siteName}`,
-      description: category.description || `Articles in the ${category.name} category`,
+      description:
+        category.description || `Articles in the ${category.name} category`,
     });
   } catch {
     return createMetadata({
@@ -50,29 +55,26 @@ export const generateMetadata = async ({
   }
 };
 
-const CategoryPage = async ({ params }: CategoryPageProps): Promise<React.JSX.Element> => {
+const CategoryPage = async ({
+  params,
+}: CategoryPageProps): Promise<React.JSX.Element> => {
   const { locale, slug } = await params;
   const dictionary = await getDictionary(locale);
 
   try {
     return (
       <PageWrapper>
-        <Suspense
-          key={slug}
-          fallback={<ArticlesListSkeleton />}
-        >
+        <Suspense key={slug} fallback={<ArticlesListSkeleton />}>
           <Articles
             dictionary={dictionary}
             categorySlug={slug}
-          // sortBy={sortBy}
+            // sortBy={sortBy}
           />
         </Suspense>
       </PageWrapper>
     );
   } catch {
-    return (
-      <NotFound />
-    )
+    return <NotFound />;
   }
 };
 

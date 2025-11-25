@@ -1,5 +1,5 @@
 import { internationalizationMiddleware } from '@repo/internationalization/middleware';
-import { type NextRequest } from 'next/server';
+import type { NextRequest } from 'next/server';
 
 export const config = {
   // matcher tells Next.js which routes to run the middleware on. This runs the

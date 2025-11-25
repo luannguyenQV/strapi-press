@@ -22,7 +22,10 @@ type SearchPageProps = {
   }>;
 };
 
-export async function generateMetadata({ params, searchParams }: SearchPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+  searchParams,
+}: SearchPageProps): Promise<Metadata> {
   const { locale } = await params;
   const dictionary = await getDictionary(locale);
   const searchParamsResolved = await searchParams;
@@ -37,7 +40,10 @@ export async function generateMetadata({ params, searchParams }: SearchPageProps
 
   return {
     title: `${dictionary.web.search.meta.titleWithQuery.replace('{query}', query)} | StrapiPress`,
-    description: dictionary.web.search.meta.descriptionWithQuery.replace('{query}', query),
+    description: dictionary.web.search.meta.descriptionWithQuery.replace(
+      '{query}',
+      query
+    ),
     robots: 'noindex, follow', // Don't index dynamic search pages
   };
 }
@@ -67,13 +73,17 @@ const SearchPage = async ({ params, searchParams }: SearchPageProps) => {
   const sort = searchParamsResolved.sort || 'date-desc';
 
   // Fetch categories from backend with ISR cache
-  const categoriesResponse = await cachedFind('categories', {
-    sort: ['name:asc'],
-    pagination: { pageSize: 100 }
-  }, {
-    revalidate: 600, // 10 minutes - categories change infrequently
-    tags: ['categories']
-  });
+  const categoriesResponse = await cachedFind(
+    'categories',
+    {
+      sort: ['name:asc'],
+      pagination: { pageSize: 100 },
+    },
+    {
+      revalidate: 600, // 10 minutes - categories change infrequently
+      tags: ['categories'],
+    }
+  );
   const categories = (categoriesResponse?.data as unknown as Category[]) || [];
 
   // Parse sort parameter (date-desc → 'desc', date-asc → 'asc')
@@ -81,7 +91,11 @@ const SearchPage = async ({ params, searchParams }: SearchPageProps) => {
 
   return (
     <PageWrapper>
-      <SearchInput initialQuery={query} dictionary={dictionary} locale={locale} />
+      <SearchInput
+        initialQuery={query}
+        dictionary={dictionary}
+        locale={locale}
+      />
 
       {query ? (
         <>

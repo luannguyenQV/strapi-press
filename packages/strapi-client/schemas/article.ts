@@ -23,7 +23,7 @@ const StrapiBaseEntitySchema = z.object({
 // ========================================
 
 export const MediaFileSchema = StrapiBaseEntitySchema.extend({
-  name: z.string(),
+  name: z.string().optional(),
   alternativeText: z.string().nullable().optional(),
   caption: z.string().nullable().optional(),
   width: z.number().nullable().optional(),
@@ -47,7 +47,7 @@ export type ValidatedMediaFile = z.infer<typeof MediaFileSchema>;
 
 export const AuthorSchema = StrapiBaseEntitySchema.extend({
   name: z.string(),
-  email: z.string().email().optional(),
+  email: z.string().email().optional().nullable(),
   avatar: MediaFileSchema.optional(),
 });
 
@@ -112,7 +112,7 @@ export const ArticleSchema = StrapiBaseEntitySchema.extend({
   title: z.string(),
   description: z.string(),
   slug: z.string(),
-  featured: z.boolean().optional(),
+  featured: z.boolean().nullable().optional(),
   author: AuthorSchema.optional(),
   category: CategorySchema.optional(),
   cover: MediaFileSchema.optional(),

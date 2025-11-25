@@ -19,21 +19,19 @@ interface ErrorProps {
 export function SomethingError({
   title = 'Something went wrong',
   message = 'We encountered an error while loading this content. Please try again later.',
-  className = ''
+  className = '',
 }: ErrorProps) {
   return (
-    <div className={`flex flex-col items-center justify-center py-12 text-center ${className}`}>
+    <div
+      className={`flex flex-col items-center justify-center py-12 text-center ${className}`}
+    >
       <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
         <MessageCircleWarning className="h-8 w-8 text-destructive" />
       </div>
 
-      <h3 className='mb-2 font-semibold text-foreground text-lg'>
-        {title}
-      </h3>
+      <h3 className="mb-2 font-semibold text-foreground text-lg">{title}</h3>
 
-      <p className="max-w-md text-muted-foreground text-sm">
-        {message}
-      </p>
+      <p className="max-w-md text-muted-foreground text-sm">{message}</p>
     </div>
   );
 }

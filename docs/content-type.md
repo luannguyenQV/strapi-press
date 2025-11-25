@@ -102,7 +102,7 @@ The platform uses a **User-centric architecture** where all content and social f
 **Collection:** `articles`
 **Draft & Publish:** Enabled
 
-#### Schema
+#### Article Schema
 
 ```typescript
 {
@@ -110,8 +110,9 @@ The platform uses a **User-centric architecture** where all content and social f
   description: text;          // Required
   slug: string;              // Required, unique
   cover: Media;              // Required, featured image
-  author: Relation;          // manyToOne � User (changed from Author)
-  category: Relation;        // manyToOne � Category
+  author: Relation;          // manyToOne → User (changed from Author)
+  category: Relation;        // manyToOne → Category
+  tags: Relation;            // manyToMany → Tag (max 5 tags)
   blocks: DynamicZone;       // Article content blocks
 
   // Counter fields (denormalized for performance)
@@ -128,11 +129,12 @@ The platform uses a **User-centric architecture** where all content and social f
 
 #### Relations
 
-- **author:** `manyToOne` � `plugin::users-permissions.user`
-- **category:** `manyToOne` � `api::category.category`
-- **comments:** `oneToMany` � `api::comment.comment`
-- **likes:** `oneToMany` � `api::like.like`
-- **bookmarks:** `oneToMany` � `api::bookmark.bookmark`
+- **author:** `manyToOne` → `plugin::users-permissions.user`
+- **category:** `manyToOne` → `api::category.category`
+- **tags:** `manyToMany` → `api::tag.tag` (max 5 per article)
+- **comments:** `oneToMany` → `api::comment.comment`
+- **likes:** `oneToMany` → `api::like.like`
+- **bookmarks:** `oneToMany` → `api::bookmark.bookmark`
 
 #### Permissions
 
@@ -359,6 +361,95 @@ The platform uses a **User-centric architecture** where all content and social f
 
 ---
 
+### 8. Tag
+
+**API ID:** `api::tag.tag`
+**Collection:** `tags`
+**Draft & Publish:** No
+
+#### Schema
+
+```typescript
+{
+  name: string;              // Required, unique (case-insensitive)
+  slug: string;              // Required, unique
+  description: text;         // Optional, tag description
+  color: string;             // Optional, hex color for UI (#3B82F6)
+
+  // Relations
+  articles: Relation;        // manyToMany → Article
+
+  // Metadata (denormalized for performance)
+  usageCount: integer;       // Default: 0, articles using this tag
+
+  // Auto-generated
+  createdAt: datetime;
+  updatedAt: datetime;
+}
+```
+
+#### Relations
+
+- **articles:** `manyToMany` → `api::article.article`
+
+#### Validation Rules
+
+- **name:** 1-30 characters, alphanumeric + spaces + hyphens
+- **slug:** Auto-generated from name, lowercase, hyphenated
+- **color:** Valid hex color format (#RRGGBB) or empty
+- **Uniqueness:** Tag names are case-insensitive unique (normalize before save)
+
+#### Permissions
+
+**Public Role:**
+- ✓ find, findOne, count
+
+**Edit Role:**
+- ✓ find, findOne, count
+- ✓ create (with validation, auto-sanitize name)
+- ✗ update, delete (prevent tag modification after creation)
+
+**Note:** Tags can be created by any authenticated user but cannot be modified. This prevents tag vandalism while allowing organic growth.
+
+#### Custom Controller Logic
+
+**Create:**
+1. Normalize tag name (trim, lowercase for comparison)
+2. Check for existing tag (case-insensitive)
+3. If exists: return existing tag ID (prevent duplicates)
+4. If new: create with sanitized name, auto-generated slug
+5. Return tag entity
+
+**Automatic Cleanup:**
+- Background job (daily): Delete tags with `usageCount = 0` older than 30 days
+- Prevents unused tag accumulation
+
+#### Lifecycle Hooks
+
+- **beforeCreate:**
+  - Normalize and sanitize tag name
+  - Generate slug from name
+  - Validate color format if provided
+  - Check for duplicate (case-insensitive)
+
+#### Tag-Article Association
+
+**Through Article Content Type:**
+```typescript
+// Article schema addition
+{
+  tags: Relation;            // manyToMany → Tag (max 5 tags)
+}
+```
+
+**Association Logic:**
+- Maximum 5 tags per article (enforced in Article controller)
+- When article published: increment `tag.usageCount` for each tag
+- When article unpublished/deleted: decrement `tag.usageCount` for each tag
+- When tags updated on article: adjust counts accordingly
+
+---
+
 ## Deleted Content Types
 
 ### L Author (Removed)
@@ -440,6 +531,18 @@ GET    /api/categories             List categories (public)
 GET    /api/categories/:id         Get single category (public)
 ```
 
+### Tags
+
+```
+GET    /api/tags                   List all tags (public)
+GET    /api/tags/:id               Get single tag (public)
+GET    /api/tags?sort=usageCount:desc&pagination[limit]=10    Popular tags
+GET    /api/tags?filters[articles][id][$eq]=:articleId        Get article tags
+POST   /api/tags                   Create tag (Edit role, auto-deduplicates)
+```
+
+**Note:** Tags cannot be updated or deleted via API. Cleanup happens automatically for unused tags.
+
 ---
 
 ## Security & Policies
@@ -465,7 +568,8 @@ GET    /api/categories/:id         Get single category (public)
 - **Bookmark:** Prevent duplicates, manage counters
 - **Follow:** Prevent duplicates, prevent self-follows
 - **Comment:** Manage counters
-- **Article:** Auto-set author, validate ownership
+- **Article:** Auto-set author, validate ownership, enforce tag limit (max 5)
+- **Tag:** Prevent duplicates (case-insensitive), auto-sanitize names, manage usage counters
 
 ---
 
@@ -492,14 +596,29 @@ CREATE INDEX idx_follows_following ON follows(following_id);
 -- Comments
 CREATE INDEX idx_comments_article ON comments(article_id);
 CREATE INDEX idx_comments_user ON comments(user_id);
+
+-- Tags
+CREATE UNIQUE INDEX idx_tags_name ON tags(LOWER(name));  -- Case-insensitive unique
+CREATE UNIQUE INDEX idx_tags_slug ON tags(slug);
+CREATE INDEX idx_tags_usage_count ON tags(usage_count DESC);  -- Popular tags query
+
+-- Article-Tag Junction (many-to-many)
+CREATE INDEX idx_articles_tags_article ON articles_tags_links(article_id);
+CREATE INDEX idx_articles_tags_tag ON articles_tags_links(tag_id);
 ```
 
 ### Counter Fields
 
-**Denormalized counters** on Article for performance:
+**Denormalized counters** for performance:
+
+**On Article:**
 - `likesCount` - Updated via Like lifecycle hooks
 - `commentsCount` - Updated via Comment lifecycle hooks
 - `bookmarksCount` - Updated via Bookmark lifecycle hooks
+
+**On Tag:**
+
+- `usageCount` - Updated when articles are published/unpublished with tags
 
 **Trade-off:** Slight complexity in controllers for better read performance
 
@@ -519,7 +638,8 @@ CREATE INDEX idx_comments_user ON comments(user_id);
 - [ ] Test role assignment on registration
 
 ### Phase 3: Article Schema Update
-- [ ] Update Article schema (author: Author � User)
+- [ ] Update Article schema (author: Author → User)
+- [ ] Add tags relation (manyToMany → Tag)
 - [ ] Add counter fields (likesCount, commentsCount, bookmarksCount)
 - [ ] Run `pnpm strapi ts:generate-types`
 
@@ -528,6 +648,7 @@ CREATE INDEX idx_comments_user ON comments(user_id);
 - [ ] Create Like content type
 - [ ] Create Bookmark content type
 - [ ] Create Follow content type
+- [ ] Create Tag content type
 - [ ] Run `pnpm strapi ts:generate-types`
 
 ### Phase 5: Controllers & Policies
@@ -536,7 +657,8 @@ CREATE INDEX idx_comments_user ON comments(user_id);
 - [ ] Create Bookmark custom controller
 - [ ] Create Follow custom controller
 - [ ] Create Comment custom controller
-- [ ] Create Article custom controller
+- [ ] Create Tag custom controller (deduplication, sanitization)
+- [ ] Create Article custom controller (tag limit enforcement)
 
 ### Phase 6: Permissions
 - [ ] Configure Public role permissions
@@ -545,8 +667,9 @@ CREATE INDEX idx_comments_user ON comments(user_id);
 
 ### Phase 7: Frontend Integration
 - [ ] Update `@repo/strapi-client` types
-- [ ] Create social feature hooks
-- [ ] Update Article hooks for User population
+- [ ] Create social feature hooks (like, bookmark, follow, comment)
+- [ ] Create tag hooks (useTags, usePopularTags, useCreateTag)
+- [ ] Update Article hooks for User and Tag population
 - [ ] Test API integration
 
 ### Phase 8: Cleanup
@@ -610,8 +733,11 @@ Potential additions to consider:
 
 - **Notifications:** Alert users for likes, comments, follows
 - **Reply to Comments:** Nested comment structure
-- **Article Tags:** Additional categorization beyond categories
+- **Tag Following:** Allow users to follow specific tags for personalized feed
+- **Tag Moderation:** Admin review/merge/delete tags, suggested tags
 - **User Followers Count:** Denormalized counter on User
 - **Reading List:** Similar to bookmarks but with read/unread status
 - **Article Views:** Track article view counts
-- **Search:** Full-text search across articles and users
+- **Search:** Full-text search across articles, users, and tags
+- **Tag Synonyms:** Link related tags (e.g., "js" → "javascript")
+- **Trending Tags:** Calculate trending tags based on recent usage

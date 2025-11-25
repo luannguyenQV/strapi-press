@@ -6,8 +6,8 @@ type AuthProviderProps = {
   children?: React.ReactNode;
 };
 
-export const AuthProvider = ({ children }: AuthProviderProps): React.JSX.Element => {
-  return (
-    <SessionProvider>{children}</SessionProvider>
-  );
+export const AuthProvider = ({
+  children,
+}: AuthProviderProps): React.JSX.Element => {
+  return <SessionProvider>{children}</SessionProvider>;
 };

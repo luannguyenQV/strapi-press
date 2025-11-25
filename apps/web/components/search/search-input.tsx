@@ -14,7 +14,11 @@ type SearchInputProps = {
   locale: string;
 };
 
-export const SearchInput = ({ initialQuery = '', dictionary, locale }: SearchInputProps) => {
+export const SearchInput = ({
+  initialQuery = '',
+  dictionary,
+  locale,
+}: SearchInputProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [query, setQuery] = useState(initialQuery);
@@ -47,17 +51,17 @@ export const SearchInput = ({ initialQuery = '', dictionary, locale }: SearchInp
 
   return (
     <div>
-      <TypographyH1 className='hidden'>
+      <TypographyH1 className="hidden">
         {dictionary.web.search.page.title}
       </TypographyH1>
       <div className="relative">
-        <Search className='-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 h-4 w-4 text-muted-foreground' />
+        <Search className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 h-4 w-4 text-muted-foreground" />
         <Input
           type="text"
           placeholder={dictionary.web.search.input.placeholder}
           value={query}
           onChange={(e) => {
-            setQuery(e.target.value)
+            setQuery(e.target.value);
           }}
           onKeyDown={handleKeyDown}
           onBlur={() => handleSearch(query)}

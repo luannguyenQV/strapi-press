@@ -5,7 +5,7 @@
       "collectionName": "articles",
       "info": {
         "singularName": "article",
-        "pluralName": "articles", 
+        "pluralName": "articles",
         "displayName": "Article",
         "description": "News articles with WordPress-like features"
       },
@@ -89,7 +89,7 @@
         },
         "tags": {
           "type": "relation",
-          "relation": "manyToMany", 
+          "relation": "manyToMany",
           "target": "api::tag.tag",
           "inversedBy": "articles"
         },
@@ -133,7 +133,7 @@
     },
 
     "author": {
-      "kind": "collectionType", 
+      "kind": "collectionType",
       "collectionName": "authors",
       "info": {
         "singularName": "author",
@@ -606,7 +606,7 @@
           "required": false
         },
         "linkedin": {
-          "type": "string", 
+          "type": "string",
           "required": false
         },
         "facebook": {
@@ -767,7 +767,7 @@
           "unique": true
         },
         {
-          "table": "articles", 
+          "table": "articles",
           "columns": ["status", "published_at"],
           "type": "btree"
         },

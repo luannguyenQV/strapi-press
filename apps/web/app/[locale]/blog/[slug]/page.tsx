@@ -10,13 +10,12 @@ import {
   TypographyMuted,
 } from '@repo/design-system';
 import { getDictionary } from '@repo/internationalization';
+import { JsonLd, createArticleSchema, createMetadata } from '@repo/seo';
 import {
-  createArticleSchema,
-  createMetadata,
-  JsonLd,
-} from '@repo/seo';
-import type { ArticleEntity } from '@repo/strapi-client';
-import { cachedFind, safeCastParams, validateArticles } from '@repo/strapi-client';
+  cachedFind,
+  safeCastParams,
+  validateArticles,
+} from '@repo/strapi-client';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
@@ -46,35 +45,36 @@ export const generateMetadata = async ({
     }
 
     // Build cover image URL correctly
-    const coverImageUrl =
-      article.cover?.url ? `${BACKEND_URL}${article.cover.url}` : undefined;
+    const coverImageUrl = article.cover?.url
+      ? `${BACKEND_URL}${article.cover.url}`
+      : undefined;
 
     return createMetadata({
       title: `${article.title} | ${dictionary.web.common.siteName}`,
       description: article.description || '',
       openGraph: coverImageUrl
         ? {
-            title: article.title,
-            description: article.description || undefined,
-            type: 'article',
-            publishedTime: article.publishedAt || undefined,
-            authors: article.author?.name ? [article.author.name] : undefined,
-            images: [
-              {
-                url: coverImageUrl,
-                width: article.cover?.width || 1200,
-                height: article.cover?.height || 630,
-                alt: article.cover?.alternativeText || article.title,
-              },
-            ],
-          }
+          title: article.title,
+          description: article.description || undefined,
+          type: 'article',
+          publishedTime: article.publishedAt || undefined,
+          authors: article.author?.name ? [article.author.name] : undefined,
+          images: [
+            {
+              url: coverImageUrl,
+              width: article.cover?.width || 1200,
+              height: article.cover?.height || 630,
+              alt: article.cover?.alternativeText || article.title,
+            },
+          ],
+        }
         : {
-            title: article.title,
-            description: article.description || undefined,
-            type: 'article',
-            publishedTime: article.publishedAt || undefined,
-            authors: article.author?.name ? [article.author.name] : undefined,
-          },
+          title: article.title,
+          description: article.description || undefined,
+          type: 'article',
+          publishedTime: article.publishedAt || undefined,
+          authors: article.author?.name ? [article.author.name] : undefined,
+        },
       twitter: {
         card: 'summary_large_image',
         title: article.title,
@@ -135,17 +135,17 @@ const BlogPost = async ({ params }: BlogPostProps) => {
       updatedAt: article.updatedAt,
       author: article.author
         ? {
-            name: article.author.name,
-            email: article.author.email,
-          }
+          name: article.author.name,
+          email: article.author.email,
+        }
         : undefined,
       coverImage: article.cover
         ? {
-            url: article.cover.url,
-            width: article.cover.width,
-            height: article.cover.height,
-            alt: article.cover.alternativeText,
-          }
+          url: article.cover.url,
+          width: article.cover.width,
+          height: article.cover.height,
+          alt: article.cover.alternativeText,
+        }
         : undefined,
       url: `${BACKEND_URL}/${locale}/blog/${article.slug}`,
       backendUrl: BACKEND_URL,
@@ -158,27 +158,32 @@ const BlogPost = async ({ params }: BlogPostProps) => {
           <div className="mx-auto max-w-7xl">
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_300px]">
               <article className="order-2 lg:order-1">
-                <TypographyH1 className='mb-4'>{article.title}</TypographyH1>
+                <TypographyH1 className="mb-4">{article.title}</TypographyH1>
                 {article.description && (
-                  <TypographyLead className='mb-6'>
+                  <TypographyLead className="mb-6">
                     {article.description}
                   </TypographyLead>
                 )}
 
                 {/* Metadata Row */}
-                <div className='mb-8 flex flex-wrap items-center gap-4 text-muted-foreground text-sm'>
+                <div className="mb-8 flex flex-wrap items-center gap-4 text-muted-foreground text-sm">
                   {article.author && (
                     <span className="flex items-center gap-2">
-                      <span className="text-foreground">{article.author.name}</span>
+                      <span className="text-foreground">
+                        {article.author.name}
+                      </span>
                     </span>
                   )}
                   {article.publishedAt && (
                     <time dateTime={article.publishedAt}>
-                      {new Date(article.publishedAt).toLocaleDateString(locale, {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
+                      {new Date(article.publishedAt).toLocaleDateString(
+                        locale,
+                        {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                        }
+                      )}
                     </time>
                   )}
                 </div>
@@ -204,13 +209,13 @@ const BlogPost = async ({ params }: BlogPostProps) => {
                 />
               </article>
 
-              <aside className='order-1 space-y-6 lg:order-2'>
-                {article.author && (
-                  <AuthorCard author={article.author} />
-                )}
+              <aside className="order-1 space-y-6 lg:order-2">
+                {article.author && <AuthorCard author={article.author} />}
 
                 <div className="rounded-lg border bg-card p-6 lg:sticky lg:top-32">
-                  <TypographyH3 className="mb-4">Table of Contents</TypographyH3>
+                  <TypographyH3 className="mb-4">
+                    Table of Contents
+                  </TypographyH3>
                   <TypographyMuted>
                     TOC will be auto-generated from article headings
                   </TypographyMuted>

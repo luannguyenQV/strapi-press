@@ -15,32 +15,44 @@ const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001';
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     // Fetch all articles
-    const articlesResponse = await cachedFind('articles', {
-      fields: ['slug', 'updatedAt', 'publishedAt'],
-      pagination: { pageSize: 1000 },
-      sort: ['publishedAt:desc'],
-    }, {
-      revalidate: 3600, // 1 hour cache
-      tags: ['sitemap', 'articles']
-    });
+    const articlesResponse = await cachedFind(
+      'articles',
+      {
+        fields: ['slug', 'updatedAt', 'publishedAt'],
+        pagination: { pageSize: 1000 },
+        sort: ['publishedAt:desc'],
+      },
+      {
+        revalidate: 3600, // 1 hour cache
+        tags: ['sitemap', 'articles'],
+      }
+    );
 
     // Fetch all categories
-    const categoriesResponse = await cachedFind('categories', {
-      fields: ['slug', 'updatedAt'],
-      pagination: { pageSize: 100 },
-    }, {
-      revalidate: false, // Build-time only - categories are static
-      tags: ['sitemap', 'categories']
-    });
+    const categoriesResponse = await cachedFind(
+      'categories',
+      {
+        fields: ['slug', 'updatedAt'],
+        pagination: { pageSize: 100 },
+      },
+      {
+        revalidate: false, // Build-time only - categories are static
+        tags: ['sitemap', 'categories'],
+      }
+    );
 
     // Fetch all authors
-    const authorsResponse = await cachedFind('authors', {
-      fields: ['slug', 'updatedAt'],
-      pagination: { pageSize: 100 },
-    }, {
-      revalidate: false, // Build-time only - authors are static
-      tags: ['sitemap', 'authors']
-    });
+    const authorsResponse = await cachedFind(
+      'authors',
+      {
+        fields: ['slug', 'updatedAt'],
+        pagination: { pageSize: 100 },
+      },
+      {
+        revalidate: false, // Build-time only - authors are static
+        tags: ['sitemap', 'authors'],
+      }
+    );
 
     const articles = articlesResponse?.data || [];
     const categories = categoriesResponse?.data || [];
@@ -93,20 +105,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ];
 
     // Article pages
-    const articlePages: MetadataRoute.Sitemap = articles.map((article: any) => ({
-      url: `${BASE_URL}/blog/${article.slug}`,
-      lastModified: new Date(article.updatedAt || article.publishedAt),
-      changeFrequency: 'weekly' as const,
-      priority: 0.8,
-    }));
+    const articlePages: MetadataRoute.Sitemap = articles.map(
+      (article: any) => ({
+        url: `${BASE_URL}/blog/${article.slug}`,
+        lastModified: new Date(article.updatedAt || article.publishedAt),
+        changeFrequency: 'weekly' as const,
+        priority: 0.8,
+      })
+    );
 
     // Category pages
-    const categoryPages: MetadataRoute.Sitemap = categories.map((category: any) => ({
-      url: `${BASE_URL}/category/${category.slug}`,
-      lastModified: new Date(category.updatedAt),
-      changeFrequency: 'daily' as const,
-      priority: 0.7,
-    }));
+    const categoryPages: MetadataRoute.Sitemap = categories.map(
+      (category: any) => ({
+        url: `${BASE_URL}/category/${category.slug}`,
+        lastModified: new Date(category.updatedAt),
+        changeFrequency: 'daily' as const,
+        priority: 0.7,
+      })
+    );
 
     // Author pages (when implemented)
     const authorPages: MetadataRoute.Sitemap = authors.map((author: any) => ({
@@ -117,12 +133,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
 
     // Combine all pages
-    return [
-      ...staticPages,
-      ...articlePages,
-      ...categoryPages,
-      ...authorPages,
-    ];
+    return [...staticPages, ...articlePages, ...categoryPages, ...authorPages];
   } catch (error) {
     console.error('[Sitemap] Error generating sitemap:', error);
 

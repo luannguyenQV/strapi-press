@@ -27,7 +27,13 @@ interface SearchFiltersProps {
  * - Sort options (date, title)
  * - Updates URL parameters on change
  */
-export function SearchFilters({ currentCategory, currentSort, query, dictionary, categories }: SearchFiltersProps) {
+export function SearchFilters({
+  currentCategory,
+  currentSort,
+  query,
+  dictionary,
+  categories,
+}: SearchFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -60,7 +66,8 @@ export function SearchFilters({ currentCategory, currentSort, query, dictionary,
           </SelectItem>
           {categories.length === 0 ? (
             <SelectItem value="none" disabled>
-              {dictionary.web.search.filters.noCategories || 'No categories available'}
+              {dictionary.web.search.filters.noCategories ||
+                'No categories available'}
             </SelectItem>
           ) : (
             categories.map((category) => (
@@ -78,10 +85,18 @@ export function SearchFilters({ currentCategory, currentSort, query, dictionary,
           <SelectValue placeholder={dictionary.web.search.filters.sort} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="date-desc">{dictionary.web.search.filters.sortDateDesc}</SelectItem>
-          <SelectItem value="date-asc">{dictionary.web.search.filters.sortDateAsc}</SelectItem>
-          <SelectItem value="title-asc">{dictionary.web.search.filters.sortTitleAsc}</SelectItem>
-          <SelectItem value="title-desc">{dictionary.web.search.filters.sortTitleDesc}</SelectItem>
+          <SelectItem value="date-desc">
+            {dictionary.web.search.filters.sortDateDesc}
+          </SelectItem>
+          <SelectItem value="date-asc">
+            {dictionary.web.search.filters.sortDateAsc}
+          </SelectItem>
+          <SelectItem value="title-asc">
+            {dictionary.web.search.filters.sortTitleAsc}
+          </SelectItem>
+          <SelectItem value="title-desc">
+            {dictionary.web.search.filters.sortTitleDesc}
+          </SelectItem>
         </SelectContent>
       </Select>
     </div>

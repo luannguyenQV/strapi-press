@@ -18,9 +18,8 @@ export function MediaWidget({
   const file = data.file as MediaFileEntity | undefined;
 
   if (!file) {
-    return null
-  };
-
+    return null;
+  }
 
   return (
     <div className={`my-8 ${className}`}>

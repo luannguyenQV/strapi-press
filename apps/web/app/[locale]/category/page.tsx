@@ -7,7 +7,13 @@
 import { NoResult } from '@/components/no-result';
 import { PageWrapper, TypographyH1, TypographyP } from '@repo/design-system';
 import { Badge } from '@repo/design-system/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@repo/design-system/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@repo/design-system/components/ui/card';
 import { createMetadata } from '@repo/seo/metadata';
 import { cachedFind } from '@repo/strapi-client';
 import type { Category } from '@repo/strapi-client';
@@ -15,47 +21,56 @@ import { FileText } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-
 export async function generateMetadata(): Promise<Metadata> {
   return createMetadata({
     title: 'Browse Categories',
-    description: 'Explore all article categories and discover content that interests you.',
+    description:
+      'Explore all article categories and discover content that interests you.',
   });
 }
 
 export default async function CategoriesPage() {
   try {
     // Fetch all categories with article counts
-    const categoriesResponse = await cachedFind('categories', {
-      fields: ['name', 'slug', 'description'],
-      populate: {
-        articles: {
-          count: true,
+    const categoriesResponse = await cachedFind(
+      'categories',
+      {
+        fields: ['name', 'slug', 'description'],
+        populate: {
+          articles: {
+            count: true,
+          },
         },
+        sort: ['name:asc'],
+        pagination: { pageSize: 100 },
       },
-      sort: ['name:asc'],
-      pagination: { pageSize: 100 },
-    }, {
-      revalidate: false, // Build-time only - categories are static taxonomy
-      tags: ['categories', 'categories-page']
-    });
+      {
+        revalidate: false, // Build-time only - categories are static taxonomy
+        tags: ['categories', 'categories-page'],
+      }
+    );
 
-    const categories = categoriesResponse?.data as unknown as Category[] || [];
+    const categories =
+      (categoriesResponse?.data as unknown as Category[]) || [];
 
     // Get article counts for each category
     const categoriesWithCounts = await Promise.all(
       categories.map(async (category: Category) => {
-        const articlesResponse = await cachedFind('articles', {
-          filters: {
-            category: {
-              slug: category.slug,
+        const articlesResponse = await cachedFind(
+          'articles',
+          {
+            filters: {
+              category: {
+                slug: category.slug,
+              },
             },
+            pagination: { pageSize: 1 },
           },
-          pagination: { pageSize: 1 },
-        }, {
-          revalidate: 600,
-          tags: [`category-${category.slug}`, 'articles']
-        });
+          {
+            revalidate: 600,
+            tags: [`category-${category.slug}`, 'articles'],
+          }
+        );
 
         return {
           ...category,
@@ -72,11 +87,10 @@ export default async function CategoriesPage() {
       <PageWrapper>
         {/* Page Header */}
         <div className="mb-12 text-center">
-          <TypographyH1>
-            Browse by Category
-          </TypographyH1>
+          <TypographyH1>Browse by Category</TypographyH1>
           <TypographyP className="mx-auto max-w-2xl text-lg text-muted-foreground leading-relaxed">
-            Explore our articles organized by topic. Find the content that matters most to you.
+            Explore our articles organized by topic. Find the content that
+            matters most to you.
           </TypographyP>
         </div>
 
@@ -106,7 +120,7 @@ export default async function CategoriesPage() {
                   )}
                 </CardHeader>
                 <CardContent>
-                  <p className='font-medium text-primary text-sm'>
+                  <p className="font-medium text-primary text-sm">
                     View articles →
                   </p>
                 </CardContent>
@@ -124,15 +138,20 @@ export default async function CategoriesPage() {
             </div>
             <div>
               <p className="font-bold text-3xl">
-                {categoriesWithCounts.reduce((sum, cat) => sum + cat.articleCount, 0)}
+                {categoriesWithCounts.reduce(
+                  (sum, cat) => sum + cat.articleCount,
+                  0
+                )}
               </p>
               <p className="text-muted-foreground text-sm">Total Articles</p>
             </div>
             <div>
               <p className="font-bold text-3xl">
                 {Math.round(
-                  categoriesWithCounts.reduce((sum, cat) => sum + cat.articleCount, 0) /
-                  categories.length
+                  categoriesWithCounts.reduce(
+                    (sum, cat) => sum + cat.articleCount,
+                    0
+                  ) / categories.length
                 )}
               </p>
               <p className="text-muted-foreground text-sm">Avg. per Category</p>

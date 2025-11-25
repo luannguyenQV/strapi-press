@@ -33,9 +33,7 @@ export const MobileMenu = ({ navigationItems }: MobileMenuProps) => {
                   <Link
                     href={item.href}
                     className="flex items-center justify-between"
-                    target={
-                      item.href.startsWith('http') ? '_blank' : undefined
-                    }
+                    target={item.href.startsWith('http') ? '_blank' : undefined}
                     rel={
                       item.href.startsWith('http')
                         ? 'noopener noreferrer'
