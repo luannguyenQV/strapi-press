@@ -1,0 +1,750 @@
+---
+title: API Reference
+description: Complete REST API documentation for StrapiPress social blogging platform
+---
+
+# API Reference
+
+Complete REST API documentation for the StrapiPress social blogging platform.
+
+**Base URL**: `http://localhost:1337/api`
+
+---
+
+## Authentication
+
+All authenticated endpoints require a JWT token in the Authorization header:
+
+```bash
+Authorization: Bearer <jwt_token>
+```
+
+### Login
+
+```bash
+POST /api/auth/local
+```
+
+**Request Body:**
+```json
+{
+  "identifier": "user@example.com",
+  "password": "password123"
+}
+```
+
+**Response:**
+```json
+{
+  "jwt": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": 1,
+    "username": "johndoe",
+    "email": "user@example.com"
+  }
+}
+```
+
+### Register
+
+```bash
+POST /api/auth/local/register
+```
+
+**Request Body:**
+```json
+{
+  "username": "johndoe",
+  "email": "user@example.com",
+  "password": "password123"
+}
+```
+
+### Get Current User
+
+```bash
+GET /api/users/me
+Authorization: Bearer <jwt_token>
+```
+
+### Forgot Password
+
+```bash
+POST /api/auth/forgot-password
+```
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com"
+}
+```
+
+### Reset Password
+
+```bash
+POST /api/auth/reset-password
+```
+
+**Request Body:**
+```json
+{
+  "code": "reset_code_from_email",
+  "password": "newpassword123",
+  "passwordConfirmation": "newpassword123"
+}
+```
+
+---
+
+## Articles
+
+### List Articles
+
+```bash
+GET /api/articles
+```
+
+**Query Parameters:**
+| Parameter | Example | Description |
+|-----------|---------|-------------|
+| `populate` | `*` | Include all relations |
+| `pagination[page]` | `1` | Page number |
+| `pagination[pageSize]` | `10` | Items per page |
+| `sort` | `createdAt:desc` | Sort order |
+| `filters[featured][$eq]` | `true` | Filter featured articles |
+| `filters[category][slug][$eq]` | `tech` | Filter by category slug |
+| `filters[author][id][$eq]` | `1` | Filter by author ID |
+
+**Example Request:**
+```bash
+curl "http://localhost:1337/api/articles?populate=*&pagination[pageSize]=10&sort=createdAt:desc"
+```
+
+**Response:**
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "documentId": "abc123",
+      "title": "Getting Started with React",
+      "slug": "getting-started-with-react",
+      "description": "A beginner's guide to React",
+      "content": "<p>Article content...</p>",
+      "featured": true,
+      "likesCount": 42,
+      "commentsCount": 5,
+      "bookmarksCount": 12,
+      "createdAt": "2024-01-15T10:00:00.000Z",
+      "author": { "id": 1, "username": "johndoe" },
+      "category": { "id": 1, "name": "Technology", "slug": "tech" },
+      "tags": [{ "id": 1, "name": "React", "slug": "react" }]
+    }
+  ],
+  "meta": {
+    "pagination": {
+      "page": 1,
+      "pageSize": 10,
+      "pageCount": 5,
+      "total": 50
+    }
+  }
+}
+```
+
+### Get Single Article
+
+```bash
+GET /api/articles/:documentId
+```
+
+**Example:**
+```bash
+curl "http://localhost:1337/api/articles/abc123?populate=*"
+```
+
+### Get Article by Slug
+
+```bash
+GET /api/articles?filters[slug][$eq]=:slug
+```
+
+**Example:**
+```bash
+curl "http://localhost:1337/api/articles?filters[slug][$eq]=getting-started-with-react&populate=*"
+```
+
+### Create Article (Auth Required)
+
+```bash
+POST /api/articles
+Authorization: Bearer <jwt_token>
+```
+
+**Request Body:**
+```json
+{
+  "data": {
+    "title": "My New Article",
+    "slug": "my-new-article",
+    "description": "Article description",
+    "content": "<p>Article content here...</p>",
+    "category": "category_documentId",
+    "tags": ["tag1_documentId", "tag2_documentId"],
+    "featured": false
+  }
+}
+```
+
+### Update Article (Auth Required)
+
+```bash
+PUT /api/articles/:documentId
+Authorization: Bearer <jwt_token>
+```
+
+**Request Body:**
+```json
+{
+  "data": {
+    "title": "Updated Title",
+    "content": "<p>Updated content...</p>"
+  }
+}
+```
+
+### Delete Article (Auth Required)
+
+```bash
+DELETE /api/articles/:documentId
+Authorization: Bearer <jwt_token>
+```
+
+---
+
+## Categories
+
+### List Categories
+
+```bash
+GET /api/categories
+```
+
+**Example:**
+```bash
+curl "http://localhost:1337/api/categories?populate=*"
+```
+
+**Response:**
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "documentId": "cat123",
+      "name": "Technology",
+      "slug": "technology",
+      "description": "Tech articles and tutorials"
+    }
+  ]
+}
+```
+
+### Get Category by Slug
+
+```bash
+GET /api/categories?filters[slug][$eq]=:slug
+```
+
+---
+
+## Tags
+
+### List Tags
+
+```bash
+GET /api/tags
+```
+
+**Example - Get Popular Tags:**
+```bash
+curl "http://localhost:1337/api/tags?sort=usageCount:desc&pagination[pageSize]=10"
+```
+
+**Response:**
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "documentId": "tag123",
+      "name": "React",
+      "slug": "react",
+      "color": "#3b82f6",
+      "usageCount": 25
+    }
+  ]
+}
+```
+
+### Create Tag (Auth Required)
+
+```bash
+POST /api/tags
+Authorization: Bearer <jwt_token>
+```
+
+**Request Body:**
+```json
+{
+  "data": {
+    "name": "TypeScript",
+    "slug": "typescript",
+    "description": "TypeScript related articles",
+    "color": "#3178c6"
+  }
+}
+```
+
+> **Note:** Tags are deduplicated automatically (case-insensitive). Creating a tag that already exists will return the existing tag.
+
+---
+
+## Comments
+
+### Get Comments for Article
+
+```bash
+GET /api/comments?filters[article][documentId][$eq]=:articleDocumentId
+```
+
+**Example:**
+```bash
+curl "http://localhost:1337/api/comments?filters[article][documentId][$eq]=abc123&populate=user&sort=createdAt:desc"
+```
+
+**Response:**
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "documentId": "com123",
+      "content": "Great article!",
+      "createdAt": "2024-01-15T12:00:00.000Z",
+      "user": {
+        "id": 2,
+        "username": "janedoe"
+      }
+    }
+  ]
+}
+```
+
+### Create Comment (Auth Required)
+
+```bash
+POST /api/comments
+Authorization: Bearer <jwt_token>
+```
+
+**Request Body:**
+```json
+{
+  "data": {
+    "content": "This is a great article!",
+    "article": "article_documentId"
+  }
+}
+```
+
+### Update Comment (Auth Required)
+
+```bash
+PUT /api/comments/:documentId
+Authorization: Bearer <jwt_token>
+```
+
+**Request Body:**
+```json
+{
+  "data": {
+    "content": "Updated comment text"
+  }
+}
+```
+
+### Delete Comment (Auth Required)
+
+```bash
+DELETE /api/comments/:documentId
+Authorization: Bearer <jwt_token>
+```
+
+---
+
+## Likes
+
+### Get Article Likes
+
+```bash
+GET /api/likes?filters[article][documentId][$eq]=:articleDocumentId
+```
+
+### Get User's Likes
+
+```bash
+GET /api/likes?filters[user][id][$eq]=:userId
+Authorization: Bearer <jwt_token>
+```
+
+### Like Article (Auth Required)
+
+```bash
+POST /api/likes
+Authorization: Bearer <jwt_token>
+```
+
+**Request Body:**
+```json
+{
+  "data": {
+    "article": "article_documentId"
+  }
+}
+```
+
+> **Note:** The `user` field is automatically set from the JWT token.
+
+### Unlike Article (Auth Required)
+
+```bash
+DELETE /api/likes/:documentId
+Authorization: Bearer <jwt_token>
+```
+
+---
+
+## Bookmarks
+
+### Get User's Bookmarks
+
+```bash
+GET /api/bookmarks?filters[user][id][$eq]=:userId&populate=article
+Authorization: Bearer <jwt_token>
+```
+
+**Response:**
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "documentId": "bm123",
+      "createdAt": "2024-01-15T10:00:00.000Z",
+      "article": {
+        "id": 5,
+        "title": "Bookmarked Article",
+        "slug": "bookmarked-article"
+      }
+    }
+  ]
+}
+```
+
+### Bookmark Article (Auth Required)
+
+```bash
+POST /api/bookmarks
+Authorization: Bearer <jwt_token>
+```
+
+**Request Body:**
+```json
+{
+  "data": {
+    "article": "article_documentId"
+  }
+}
+```
+
+### Remove Bookmark (Auth Required)
+
+```bash
+DELETE /api/bookmarks/:documentId
+Authorization: Bearer <jwt_token>
+```
+
+---
+
+## Follows
+
+### Get User's Following List
+
+```bash
+GET /api/follows?filters[follower][id][$eq]=:userId&populate=following
+```
+
+**Response:**
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "documentId": "fol123",
+      "following": {
+        "id": 5,
+        "username": "popularuser"
+      }
+    }
+  ]
+}
+```
+
+### Get User's Followers
+
+```bash
+GET /api/follows?filters[following][id][$eq]=:userId&populate=follower
+```
+
+### Follow User (Auth Required)
+
+```bash
+POST /api/follows
+Authorization: Bearer <jwt_token>
+```
+
+**Request Body:**
+```json
+{
+  "data": {
+    "following": "user_id_to_follow"
+  }
+}
+```
+
+> **Note:** The `follower` field is automatically set from the JWT token.
+
+### Unfollow User (Auth Required)
+
+```bash
+DELETE /api/follows/:documentId
+Authorization: Bearer <jwt_token>
+```
+
+---
+
+## Users
+
+### List Users (Public Profiles)
+
+```bash
+GET /api/users
+```
+
+### Get User Profile
+
+```bash
+GET /api/users/:id
+```
+
+**Response:**
+```json
+{
+  "id": 1,
+  "username": "johndoe",
+  "email": "john@example.com",
+  "createdAt": "2024-01-01T00:00:00.000Z"
+}
+```
+
+### Update Current User (Auth Required)
+
+```bash
+PUT /api/users/me
+Authorization: Bearer <jwt_token>
+```
+
+**Request Body:**
+```json
+{
+  "username": "newusername"
+}
+```
+
+---
+
+## Site Content (Singletons)
+
+### Global Settings
+
+```bash
+GET /api/global?populate=*
+```
+
+**Response:**
+```json
+{
+  "data": {
+    "siteName": "StrapiPress",
+    "siteDescription": "A modern blogging platform",
+    "defaultSeo": {
+      "metaTitle": "StrapiPress",
+      "metaDescription": "Welcome to StrapiPress"
+    }
+  }
+}
+```
+
+### About Page
+
+```bash
+GET /api/about?populate=*
+```
+
+### Footer
+
+```bash
+GET /api/footer?populate=*
+```
+
+---
+
+## Query Parameters Reference
+
+### Filtering
+
+| Operator | Example | Description |
+|----------|---------|-------------|
+| `$eq` | `filters[title][$eq]=Hello` | Equal |
+| `$ne` | `filters[title][$ne]=Hello` | Not equal |
+| `$lt` | `filters[age][$lt]=18` | Less than |
+| `$lte` | `filters[age][$lte]=18` | Less than or equal |
+| `$gt` | `filters[age][$gt]=18` | Greater than |
+| `$gte` | `filters[age][$gte]=18` | Greater than or equal |
+| `$in` | `filters[id][$in][0]=1&filters[id][$in][1]=2` | In array |
+| `$contains` | `filters[title][$contains]=hello` | Contains (case-sensitive) |
+| `$containsi` | `filters[title][$containsi]=hello` | Contains (case-insensitive) |
+| `$null` | `filters[image][$null]=true` | Is null |
+| `$notNull` | `filters[image][$notNull]=true` | Is not null |
+
+### Sorting
+
+```bash
+# Single field
+?sort=createdAt:desc
+
+# Multiple fields
+?sort[0]=featured:desc&sort[1]=createdAt:desc
+```
+
+### Pagination
+
+```bash
+# Page-based
+?pagination[page]=1&pagination[pageSize]=10
+
+# Offset-based
+?pagination[start]=0&pagination[limit]=10
+```
+
+### Population (Relations)
+
+```bash
+# All relations
+?populate=*
+
+# Specific relations
+?populate[0]=author&populate[1]=category
+
+# Nested relations
+?populate[author][populate]=*
+```
+
+### Field Selection
+
+```bash
+?fields[0]=title&fields[1]=slug&fields[2]=createdAt
+```
+
+---
+
+## Error Responses
+
+### 400 Bad Request
+```json
+{
+  "data": null,
+  "error": {
+    "status": 400,
+    "name": "ValidationError",
+    "message": "Invalid request body"
+  }
+}
+```
+
+### 401 Unauthorized
+```json
+{
+  "data": null,
+  "error": {
+    "status": 401,
+    "name": "UnauthorizedError",
+    "message": "Missing or invalid credentials"
+  }
+}
+```
+
+### 403 Forbidden
+```json
+{
+  "data": null,
+  "error": {
+    "status": 403,
+    "name": "ForbiddenError",
+    "message": "You are not allowed to perform this action"
+  }
+}
+```
+
+### 404 Not Found
+```json
+{
+  "data": null,
+  "error": {
+    "status": 404,
+    "name": "NotFoundError",
+    "message": "Resource not found"
+  }
+}
+```
+
+---
+
+## Rate Limiting
+
+The API implements rate limiting to prevent abuse:
+
+- **Public endpoints**: 100 requests per minute
+- **Authenticated endpoints**: 200 requests per minute
+
+When rate limited, you'll receive a `429 Too Many Requests` response.
+
+---
+
+## API Endpoints Summary
+
+| Category | Endpoints |
+|----------|-----------|
+| Authentication | 6 |
+| Articles | 5 |
+| Categories | 2 |
+| Tags | 3 |
+| Comments | 4 |
+| Likes | 4 |
+| Bookmarks | 3 |
+| Follows | 4 |
+| Users | 3 |
+| Site Content | 3 |
+| **Total** | **37** |

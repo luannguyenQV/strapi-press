@@ -25,6 +25,7 @@
     "build": "turbo build",
     "dev": "concurrently \"turbo dev --filter=web\" \"cd apps/strapi && pnpm develop\"",
     "dev:web": "turbo dev --filter=web",
+    "dev:docs": "turbo dev --filter=@repo/docs",
     "dev:strapi": "cd apps/strapi && pnpm develop",
     "install:strapi": "cd apps/strapi && pnpm install --ignore-workspace",
     "lint": "ultracite lint",
