@@ -78,33 +78,6 @@ Successfully implemented build-time caching (`revalidate: false`) for static con
 
 ---
 
-### 6. SSR Prefetch Functions
-**File:** `packages/strapi-client/ssr.ts`
-
-Updated all category and footer prefetch functions:
-
-```diff
-// prefetchCategories
-- staleTime: 10 * 60 * 1000,
-+ staleTime: Infinity, // Build-time only - categories are static
-
-// prefetchCategory
-- staleTime: 10 * 60 * 1000,
-+ staleTime: Infinity, // Build-time only - category data is static
-
-// prefetchCategoryBySlug
-- staleTime: 10 * 60 * 1000,
-+ staleTime: Infinity, // Build-time only - category data is static
-
-// prefetchFooter
-- staleTime: 30 * 60 * 1000,
-+ staleTime: Infinity, // Build-time only - footer is static
-```
-
-**Impact:** TanStack Query treats this data as never stale in client-side hydration
-
----
-
 ## Content Type Caching Strategy
 
 ### Build-Time Only (revalidate: false) ✅

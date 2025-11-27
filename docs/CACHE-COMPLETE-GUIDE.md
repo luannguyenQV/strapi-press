@@ -228,26 +228,7 @@ export function SearchResults({ query }) {
 }
 ```
 
-### Step 3: Update SSR Prefetch (if needed)
-
-```typescript
-// packages/strapi-client/ssr.ts
-export const prefetchCategories = (queryClient: QueryClient) => {
-  return queryClient.prefetchQuery({
-    queryKey: queryKeys.categories(),
-    queryFn: async () => {
-      const response = await strapiClient.collection('categories').find({
-        sort: ['name:asc'],
-        pagination: { pageSize: 100 }
-      });
-      return bridgeCategoryCollection(response);
-    },
-    staleTime: Infinity, // ✅ Build-time only
-  });
-};
-```
-
-### Step 4: Test Implementation
+### Step 3: Test Implementation
 
 ```bash
 # Clean build

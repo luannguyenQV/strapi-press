@@ -101,7 +101,8 @@
       "Bash(pnpm dev:strapi:*)",
       "Bash(sqlite3:*)",
       "Bash(for dir in bookmark comment follow like tag)",
-      "Bash(do echo \"=== $dir/schema.json ===\" cat /Users/luannguyen/Documents/Git/strapi/apps/strapi/src/api/$dir/content-types/$dir/schema.json)"
+      "Bash(do echo \"=== $dir/schema.json ===\" cat /Users/luannguyen/Documents/Git/strapi/apps/strapi/src/api/$dir/content-types/$dir/schema.json)",
+      "mcp__serena__edit_memory"
     ],
     "deny": []
   },

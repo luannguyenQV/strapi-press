@@ -1,25 +1,32 @@
 /**
- * Enhanced TypeScript types for Strapi v5 with TanStack Query integration
+ * Type-safe Strapi client types with minimal duplication
  *
- * Uses auto-generated Strapi types as the source of truth
+ * Design principles (inspired by Zod):
+ * 1. Single source of truth - derive all types from Strapi schemas
+ * 2. Composable utilities - reusable type transformers
+ * 3. DRY - no repeated type definitions
  */
 
 import type { Data, Schema, UID } from '@strapi/strapi';
 import type {
   ApiArticleArticle,
-  ApiAuthorAuthor,
+  ApiBookmarkBookmark,
   ApiCategoryCategory,
+  ApiCommentComment,
+  ApiFollowFollow,
   ApiFooterFooter,
   ApiGlobalGlobal,
-  PluginUploadFile,
+  ApiLikeLike,
+  ApiTagTag,
+  PluginUsersPermissionsUser,
 } from '../../apps/strapi/types/generated/contentTypes';
 
-// ========================================
-// Base Entity Types (Hybrid: Data namespace + Manual typing)
-// ========================================
+// ============================================================================
+// UTILITY TYPES - Reusable type transformers (like Zod's z.infer)
+// ============================================================================
 
 /**
- * Common fields from Strapi v5 entities
+ * Common Strapi system fields present on all entities
  */
 interface StrapiBaseEntity {
   id: number;
@@ -31,228 +38,248 @@ interface StrapiBaseEntity {
 }
 
 /**
- * Article entity from Strapi schema
- *
- * SINGLE SOURCE OF TRUTH: All types extracted from auto-generated ApiArticleArticle schema
- * Located at: apps/strapi/types/generated/contentTypes.d.ts
- *
- * When Strapi regenerates types, this automatically updates with no manual maintenance.
+ * Fields automatically managed by Strapi - always exclude from attribute extraction
  */
-type ArticleAttributes = ResolveAttributes<
-  Omit<
-    ApiArticleArticle['attributes'],
-    | 'createdAt'
-    | 'createdBy'
-    | 'updatedAt'
-    | 'updatedBy'
-    | 'publishedAt'
-    | 'locale'
-    | 'localizations'
-    | 'author' // Relation - goes in populated type
-    | 'category' // Relation - goes in populated type
-    | 'cover' // Media - goes in populated type
-    | 'blocks' // DynamicZone - goes in populated type
-  >
->;
-
-export interface ArticleEntity extends StrapiBaseEntity, ArticleAttributes {}
+type StrapiSystemFields =
+  | 'createdAt'
+  | 'createdBy'
+  | 'updatedAt'
+  | 'updatedBy'
+  | 'publishedAt'
+  | 'locale'
+  | 'localizations';
 
 /**
- * Author entity from Strapi schema
- *
- * SINGLE SOURCE OF TRUTH: All types extracted from auto-generated ApiAuthorAuthor schema
- * Located at: apps/strapi/types/generated/contentTypes.d.ts
- *
- * When Strapi regenerates types, this automatically updates with no manual maintenance.
+ * Resolves Strapi schema attributes to TypeScript types
+ * This is the core utility that transforms Strapi's complex schema types
  */
-type AuthorAttributes = ResolveAttributes<
-  Omit<
-    ApiAuthorAuthor['attributes'],
-    | 'createdAt'
-    | 'createdBy'
-    | 'updatedAt'
-    | 'updatedBy'
-    | 'publishedAt'
-    | 'locale'
-    | 'localizations'
-    | 'articles' // Relation - goes in populated type
-    | 'avatar' // Media - goes in populated type
-  >
->;
-
-export interface AuthorEntity extends StrapiBaseEntity, AuthorAttributes {}
-
-/**
- * Category entity from Strapi schema
- *
- * SINGLE SOURCE OF TRUTH: All types extracted from auto-generated ApiCategoryCategory schema
- * Located at: apps/strapi/types/generated/contentTypes.d.ts
- *
- * When Strapi regenerates types, this automatically updates with no manual maintenance.
- */
-type CategoryAttributes = ResolveAttributes<
-  Omit<
-    ApiCategoryCategory['attributes'],
-    | 'createdAt'
-    | 'createdBy'
-    | 'updatedAt'
-    | 'updatedBy'
-    | 'publishedAt'
-    | 'locale'
-    | 'localizations'
-    | 'articles' // Relation - goes in populated type
-    | 'image' // Media - goes in populated type
-  >
->;
-
-export interface CategoryEntity extends StrapiBaseEntity, CategoryAttributes {}
-
-/**
- * Global entity from Strapi schema
- *
- * SINGLE SOURCE OF TRUTH: All types extracted from auto-generated ApiGlobalGlobal schema
- * Located at: apps/strapi/types/generated/contentTypes.d.ts
- *
- * When Strapi regenerates types, this automatically updates with no manual maintenance.
- */
-type GlobalAttributes = ResolveAttributes<
-  Omit<
-    ApiGlobalGlobal['attributes'],
-    | 'createdAt'
-    | 'createdBy'
-    | 'updatedAt'
-    | 'updatedBy'
-    | 'publishedAt'
-    | 'locale'
-    | 'localizations'
-    | 'favicon' // Media - goes in populated type
-    | 'defaultSeo' // Component - goes in populated type
-  >
->;
-
-export interface GlobalEntity extends StrapiBaseEntity, GlobalAttributes {}
-
-/**
- * Footer entity from Strapi schema
- *
- * SINGLE SOURCE OF TRUTH: All types extracted from auto-generated ApiFooterFooter schema
- * Located at: apps/strapi/types/generated/contentTypes.d.ts
- *
- * When Strapi regenerates types, this automatically updates with no manual maintenance.
- * Note: Even though locale/localizations are public in Footer, they must be excluded
- * to avoid conflict with StrapiBaseEntity which already provides them.
- */
-type FooterAttributes = ResolveAttributes<
-  Omit<
-    ApiFooterFooter['attributes'],
-    | 'createdAt'
-    | 'createdBy'
-    | 'updatedAt'
-    | 'updatedBy'
-    | 'publishedAt'
-    | 'locale' // Must exclude to avoid conflict with StrapiBaseEntity
-    | 'localizations' // Must exclude to avoid conflict with StrapiBaseEntity
-    | 'socialLinks' // Component - goes in populated type
-    | 'columns' // Component - goes in populated type
-    | 'bottomLinks' // Component - goes in populated type
-  >
->;
-
-export interface FooterEntity extends StrapiBaseEntity, FooterAttributes {}
-
-/**
- * Utility type: Resolves Schema.Attribute.* types to actual TypeScript types
- * This allows us to extract types from Strapi's auto-generated schemas
- */
-type ResolveAttributes<
-  TAttrs extends Record<string, Schema.Attribute.AnyAttribute>,
-> = {
-  [K in keyof TAttrs]: Schema.Attribute.Value<TAttrs[K]>;
+type ResolveAttributes<T extends Record<string, Schema.Attribute.AnyAttribute>> = {
+  [K in keyof T]: Schema.Attribute.Value<T[K]>;
 };
 
 /**
- * Media file entity from Strapi upload plugin
+ * Extracts entity attributes from a Strapi content type, excluding system fields
+ * and any additional fields (relations, media) that should be in populated type
  *
- * SINGLE SOURCE OF TRUTH: All types extracted from auto-generated PluginUploadFile schema
- * Located at: apps/strapi/types/generated/contentTypes.d.ts
- *
- * When Strapi regenerates types, this automatically updates with no manual maintenance.
- *
- * Note: Data.ContentType<'plugin::upload.file'> only provides id/documentId (runtime entity),
- * so we extract the full attribute types from the schema definition instead.
+ * @example
+ * type ArticleAttrs = ExtractAttributes<ApiArticleArticle, 'author' | 'cover'>;
  */
-type MediaFileAttributes = ResolveAttributes<
-  Omit<
-    PluginUploadFile['attributes'],
-    | 'createdAt'
-    | 'createdBy'
-    | 'updatedAt'
-    | 'updatedBy'
-    | 'publishedAt'
-    | 'locale'
-    | 'localizations'
-  >
->;
-
-export interface MediaFileEntity
-  extends StrapiBaseEntity,
-    MediaFileAttributes {}
-
-// ========================================
-// Populated Types (API Response Shapes)
-// ========================================
+type ExtractAttributes<
+  TContentType extends { attributes: Record<string, Schema.Attribute.AnyAttribute> },
+  TExclude extends string = never,
+> = ResolveAttributes<Omit<TContentType['attributes'], StrapiSystemFields | TExclude>>;
 
 /**
- * Article with populated relations (as returned by API)
+ * Creates an entity type from Strapi content type
+ * Combines base entity fields with extracted attributes
  */
+type CreateEntity<
+  TContentType extends { attributes: Record<string, Schema.Attribute.AnyAttribute> },
+  TExclude extends string = never,
+> = StrapiBaseEntity & ExtractAttributes<TContentType, TExclude>;
+
+// ============================================================================
+// MEDIA TYPE
+// ============================================================================
+
+/**
+ * Media file entity - simplified for API responses
+ * Explicit interface because upload plugin schema differs from API response
+ */
+export interface MediaFileEntity extends StrapiBaseEntity {
+  url: string;
+  name?: string;
+  alternativeText?: string | null;
+  caption?: string | null;
+  width?: number | null;
+  height?: number | null;
+  formats?: Record<string, unknown> | null;
+  hash?: string;
+  ext?: string;
+  mime?: string;
+  size?: number;
+  previewUrl?: string | null;
+  provider?: string;
+  provider_metadata?: Record<string, unknown> | null;
+}
+
+// ============================================================================
+// USER ENTITY (users-permissions plugin)
+// ============================================================================
+
+/** Fields to exclude from User (private + relations) */
+type UserExcludedFields =
+  | 'password'
+  | 'resetPasswordToken'
+  | 'confirmationToken'
+  | 'role'
+  | 'avatar'
+  | 'articles'
+  | 'comments'
+  | 'likes'
+  | 'bookmarks'
+  | 'followers'
+  | 'following';
+
+export type UserEntity = CreateEntity<PluginUsersPermissionsUser, UserExcludedFields>;
+
+export type User = UserEntity & {
+  avatar?: MediaFileEntity;
+  articles?: ArticleEntity[];
+  comments?: CommentEntity[];
+  likes?: LikeEntity[];
+  bookmarks?: BookmarkEntity[];
+  followers?: FollowEntity[];
+  following?: FollowEntity[];
+};
+
+/** Simplified user for embedding (author references) */
+export interface UserInfo {
+  id: number;
+  documentId?: string;
+  username?: string;
+  name?: string;
+  displayName?: string;
+  slug?: string;
+  email?: string | null;
+  bio?: string;
+  avatar?: MediaFileEntity;
+}
+
+/** @deprecated Use UserInfo instead */
+export type Author = UserInfo;
+
+// ============================================================================
+// ARTICLE ENTITY
+// ============================================================================
+
+type ArticleExcludedFields = 'author' | 'category' | 'cover' | 'blocks' | 'tags' | 'comments' | 'likes' | 'bookmarks';
+
+export type ArticleEntity = CreateEntity<ApiArticleArticle, ArticleExcludedFields>;
+
 export type Article = ArticleEntity & {
-  author?: AuthorEntity;
+  author?: UserInfo;
   category?: CategoryEntity;
   cover?: MediaFileEntity;
+  tags?: TagEntity[];
   blocks?: Array<
     | Data.Component<'shared.media'>
     | Data.Component<'shared.quote'>
     | Data.Component<'shared.rich-text'>
     | Data.Component<'shared.slider'>
   >;
+  comments?: CommentEntity[];
+  likes?: LikeEntity[];
+  bookmarks?: BookmarkEntity[];
 };
 
-/**
- * Author with populated relations (as returned by API)
- */
-export type Author = AuthorEntity & {
-  avatar?: MediaFileEntity;
-  articles?: ArticleEntity[];
-};
+// ============================================================================
+// CATEGORY ENTITY
+// ============================================================================
 
-/**
- * Category with populated relations (as returned by API)
- */
+type CategoryExcludedFields = 'articles' | 'image';
+
+export type CategoryEntity = CreateEntity<ApiCategoryCategory, CategoryExcludedFields>;
+
 export type Category = CategoryEntity & {
   image?: MediaFileEntity;
   articles?: ArticleEntity[];
 };
 
-/**
- * Global settings with populated relations (as returned by API)
- */
+// ============================================================================
+// TAG ENTITY
+// ============================================================================
+
+type TagExcludedFields = 'articles';
+
+export type TagEntity = CreateEntity<ApiTagTag, TagExcludedFields>;
+
+export type Tag = TagEntity & {
+  articles?: ArticleEntity[];
+};
+
+// ============================================================================
+// COMMENT ENTITY
+// ============================================================================
+
+type CommentExcludedFields = 'user' | 'article';
+
+export type CommentEntity = CreateEntity<ApiCommentComment, CommentExcludedFields>;
+
+export type Comment = CommentEntity & {
+  user?: UserInfo;
+  article?: ArticleEntity;
+};
+
+// ============================================================================
+// LIKE ENTITY
+// ============================================================================
+
+type LikeExcludedFields = 'user' | 'article';
+
+export type LikeEntity = CreateEntity<ApiLikeLike, LikeExcludedFields>;
+
+export type Like = LikeEntity & {
+  user?: UserInfo;
+  article?: ArticleEntity;
+};
+
+// ============================================================================
+// BOOKMARK ENTITY
+// ============================================================================
+
+type BookmarkExcludedFields = 'user' | 'article';
+
+export type BookmarkEntity = CreateEntity<ApiBookmarkBookmark, BookmarkExcludedFields>;
+
+export type Bookmark = BookmarkEntity & {
+  user?: UserInfo;
+  article?: ArticleEntity;
+};
+
+// ============================================================================
+// FOLLOW ENTITY
+// ============================================================================
+
+type FollowExcludedFields = 'follower' | 'following';
+
+export type FollowEntity = CreateEntity<ApiFollowFollow, FollowExcludedFields>;
+
+export type Follow = FollowEntity & {
+  follower?: UserInfo;
+  following?: UserInfo;
+};
+
+// ============================================================================
+// GLOBAL ENTITY (Singleton)
+// ============================================================================
+
+type GlobalExcludedFields = 'favicon' | 'defaultSeo';
+
+export type GlobalEntity = CreateEntity<ApiGlobalGlobal, GlobalExcludedFields>;
+
 export type Global = GlobalEntity & {
   favicon?: MediaFileEntity;
   defaultSeo?: SEOComponent;
 };
 
-/**
- * Footer with populated components (as returned by API)
- */
+// ============================================================================
+// FOOTER ENTITY (Singleton)
+// ============================================================================
+
+type FooterExcludedFields = 'socialLinks' | 'columns' | 'bottomLinks';
+
+export type FooterEntity = CreateEntity<ApiFooterFooter, FooterExcludedFields>;
+
 export type Footer = FooterEntity & {
   socialLinks?: SocialLinkComponent[];
   columns?: NavigationColumnComponent[];
   bottomLinks?: NavigationLinkComponent[];
 };
 
-// ========================================
-// Component Types (Auto-Generated via Data namespace)
-// ========================================
+// ============================================================================
+// COMPONENT TYPES
+// ============================================================================
 
 export type MediaComponent = Data.Component<'shared.media'>;
 export type QuoteComponent = Data.Component<'shared.quote'>;
@@ -260,31 +287,24 @@ export type RichTextComponent = Data.Component<'shared.rich-text'>;
 export type SliderComponent = Data.Component<'shared.slider'>;
 export type SEOComponent = Data.Component<'shared.seo'>;
 export type SocialLinkComponent = Data.Component<'footer.social-link'>;
-export type NavigationColumnComponent =
-  Data.Component<'footer.navigation-column'>;
+export type NavigationColumnComponent = Data.Component<'footer.navigation-column'>;
 export type NavigationLinkComponent = Data.Component<'footer.navigation-link'>;
 
-// ========================================
-// JSON-LD Type for SEO
-// ========================================
+// ============================================================================
+// API RESPONSE TYPES
+// ============================================================================
 
-export type WithContext<T> = T & {
-  '@context': 'https://schema.org';
-};
-
-// ========================================
-// Strapi Response Wrapper Types
-// ========================================
+export interface StrapiPagination {
+  page: number;
+  pageSize: number;
+  pageCount: number;
+  total: number;
+}
 
 export interface StrapiResponse<T> {
   data: T[];
   meta: {
-    pagination: {
-      page: number;
-      pageSize: number;
-      pageCount: number;
-      total: number;
-    };
+    pagination: StrapiPagination;
   };
 }
 
@@ -300,65 +320,63 @@ export interface StrapiError {
   details?: Record<string, unknown>;
 }
 
-// ========================================
-// Query Parameter Types
-// ========================================
+// ============================================================================
+// QUERY PARAMETER TYPES
+// ============================================================================
 
-/**
- * Strapi v5 Logical Filter Operators
- * Supports $and, $or, $not for complex queries
- */
-export type StrapiLogicalFilters<T> = {
-  $and?: Array<T | StrapiLogicalFilters<T>>;
-  $or?: Array<T | StrapiLogicalFilters<T>>;
-  $not?: T | StrapiLogicalFilters<T>;
-};
+/** Strapi filter operators */
+export interface FilterOperators<T> {
+  $eq?: T;
+  $ne?: T;
+  $lt?: T;
+  $lte?: T;
+  $gt?: T;
+  $gte?: T;
+  $in?: T[];
+  $notIn?: T[];
+  $contains?: string;
+  $containsi?: string;
+  $notContains?: string;
+  $notContainsi?: string;
+  $startsWith?: string;
+  $endsWith?: string;
+  $null?: boolean;
+  $notNull?: boolean;
+  $between?: [T, T];
+}
 
-/**
- * Complete Strapi filter type that supports both direct filters and logical operators
- */
-export type StrapiFilterQuery<T> =
-  | T
-  | StrapiLogicalFilters<T>
-  | (T & StrapiLogicalFilters<T>);
+/** Logical operators for complex queries */
+export interface LogicalOperators<T> {
+  $and?: Array<T | LogicalOperators<T>>;
+  $or?: Array<T | LogicalOperators<T>>;
+  $not?: T | LogicalOperators<T>;
+  [key: string]: Array<T | LogicalOperators<T>> | T | LogicalOperators<T> | undefined;
+}
 
-/**
- * Base filter properties for Article without logical operators
- */
+/** Article-specific filter fields */
 export interface ArticleFilters {
-  title?: { $contains?: string; $containsi?: string };
-  slug?: { $eq?: string; $ne?: string };
-  featured?: { $eq?: boolean; $ne?: boolean; $null?: boolean };
-  publishedAt?: {
-    $gte?: string;
-    $lte?: string;
-    $between?: [string, string];
-  };
+  title?: FilterOperators<string>;
+  slug?: FilterOperators<string>;
+  featured?: FilterOperators<boolean>;
+  publishedAt?: FilterOperators<string>;
   author?: {
-    slug?: { $eq?: string };
-    documentId?: { $eq?: string };
+    id?: FilterOperators<number>;
+    username?: FilterOperators<string>;
+    slug?: FilterOperators<string>;
+    documentId?: FilterOperators<string>;
   };
   category?: {
-    slug?: { $eq?: string };
-    documentId?: { $eq?: string };
+    slug?: FilterOperators<string>;
+    documentId?: FilterOperators<string>;
   };
-  // Index signature for Strapi client compatibility
+  tags?: {
+    slug?: FilterOperators<string>;
+    documentId?: FilterOperators<string>;
+  };
   [key: string]: unknown;
 }
 
-/**
- * Complete article filter query type (base filters + logical operators)
- * Use this for complex queries with $and, $or, $not
- */
-export type ArticleFilterQuery = StrapiFilterQuery<ArticleFilters>;
-
-export interface FilterParams {
-  [key: string]: unknown;
-}
-
-export interface SortParams {
-  [key: string]: 'asc' | 'desc' | 'ASC' | 'DESC';
-}
+export type ArticleFilterQuery = ArticleFilters | LogicalOperators<ArticleFilters>;
 
 export interface PaginationParams {
   page?: number;
@@ -371,17 +389,18 @@ export interface PopulateParams {
   [key: string]:
     | boolean
     | string
+    | string[]
     | PopulateParams
     | {
-        populate?: PopulateParams;
+        populate?: PopulateParams | string | string[];
         fields?: string[];
         sort?: string | string[];
-        filters?: FilterParams;
+        filters?: Record<string, unknown>;
       };
 }
 
 export interface QueryParams {
-  filters?: FilterParams | ArticleFilterQuery;
+  filters?: Record<string, unknown> | ArticleFilterQuery;
   sort?: string | string[];
   pagination?: PaginationParams;
   populate?: string | string[] | PopulateParams;
@@ -390,81 +409,88 @@ export interface QueryParams {
   publicationState?: 'live' | 'preview';
 }
 
-// ========================================
-// Bridge Functions (Type Transformers)
-// ========================================
+// ============================================================================
+// TYPE UTILITIES
+// ============================================================================
+
+/** Type guard for StrapiResponse */
+export const isStrapiResponse = <T>(value: unknown): value is StrapiResponse<T> => {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'data' in value &&
+    Array.isArray((value as StrapiResponse<T>).data) &&
+    'meta' in value
+  );
+};
+
+/** Type guard for StrapiSingleResponse */
+export const isStrapiSingleResponse = <T>(value: unknown): value is StrapiSingleResponse<T> => {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'data' in value &&
+    !Array.isArray((value as StrapiSingleResponse<T>).data) &&
+    'meta' in value
+  );
+};
+
+/** Cast params for Strapi client compatibility */
+export const safeCastParams = (params?: QueryParams): Record<string, unknown> =>
+  (params ?? {}) as Record<string, unknown>;
 
 /**
- * Safely cast query parameters to satisfy Strapi client typing
- */
-export const safeCastParams = (params: QueryParams): Record<string, unknown> =>
-  params as unknown as Record<string, unknown>;
-
-/**
- * Transform raw Strapi collection response to typed StrapiResponse
+ * Bridge collection response with optional runtime validation
+ * @param response - Raw API response
+ * @param validate - Optional Zod schema for runtime validation
  */
 export const bridgeCollectionResponse = <T>(
-  response: unknown
+  response: unknown,
+  validate?: (data: unknown) => T[]
 ): StrapiResponse<T> => {
+  if (!isStrapiResponse<T>(response)) {
+    throw new Error('Invalid collection response structure');
+  }
+  if (validate) {
+    return {
+      ...response,
+      data: validate(response.data),
+    };
+  }
   return response as StrapiResponse<T>;
 };
 
 /**
- * Transform raw Strapi single response to typed StrapiSingleResponse
+ * Bridge single response with optional runtime validation
+ * @param response - Raw API response
+ * @param validate - Optional Zod schema for runtime validation
  */
 export const bridgeSingleResponse = <T>(
-  response: unknown
+  response: unknown,
+  validate?: (data: unknown) => T
 ): StrapiSingleResponse<T> => {
+  if (!isStrapiSingleResponse<T>(response)) {
+    throw new Error('Invalid single response structure');
+  }
+  if (validate) {
+    return {
+      ...response,
+      data: validate(response.data),
+    };
+  }
   return response as StrapiSingleResponse<T>;
 };
 
-/**
- * Transform article collection response
- */
-export const bridgeArticleCollection = (
-  response: unknown
-): StrapiResponse<Article> => {
-  return bridgeCollectionResponse<Article>(response);
+// ============================================================================
+// JSON-LD TYPE
+// ============================================================================
+
+export type WithContext<T> = T & {
+  '@context': 'https://schema.org';
 };
 
-/**
- * Transform article single response
- */
-export const bridgeArticleSingle = (
-  response: unknown
-): StrapiSingleResponse<Article> => {
-  return bridgeSingleResponse<Article>(response);
-};
-
-/**
- * Transform category collection response
- */
-export const bridgeCategoryCollection = (
-  response: unknown
-): StrapiResponse<Category> => {
-  return bridgeCollectionResponse<Category>(response);
-};
-
-/**
- * Transform category single response
- */
-export const bridgeCategorySingle = (
-  response: unknown
-): StrapiSingleResponse<Category> => {
-  return bridgeSingleResponse<Category>(response);
-};
-
-/**
- * Transform footer single response
- */
-export const bridgeFooterSingle = (
-  response: unknown
-): StrapiSingleResponse<Footer> => {
-  return bridgeSingleResponse<Footer>(response);
-};
-
-// ========================================
-// Re-export Strapi Types for Convenience
-// ========================================
+// ============================================================================
+// RE-EXPORTS
+// ============================================================================
 
 export type { Data, UID, Schema };

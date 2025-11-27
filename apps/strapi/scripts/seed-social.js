@@ -91,6 +91,10 @@ async function seedSocialData() {
     await createBookmarks(users, articles);
     await createFollows(users);
 
+    // Step 6: Update denormalized counts
+    await updateArticleCounts(articles);
+    await updateTagCounts(tags);
+
     // Mark as complete AFTER all operations succeed
     await markSeedComplete();
 
@@ -528,6 +532,78 @@ async function createFollows(users) {
   }
 
   console.log(`   ✅ Created ${followCount} follows\n`);
+}
+
+/**
+ * Update denormalized count fields on articles
+ */
+async function updateArticleCounts(articles) {
+  log('📊 Updating article counts...');
+
+  for (const article of articles) {
+    try {
+      // Count related entities
+      const [likesCount, commentsCount, bookmarksCount] = await Promise.all([
+        strapi.db.query('api::like.like').count({
+          where: { article: { documentId: article.documentId } },
+        }),
+        strapi.db.query('api::comment.comment').count({
+          where: { article: { documentId: article.documentId } },
+        }),
+        strapi.db.query('api::bookmark.bookmark').count({
+          where: { article: { documentId: article.documentId } },
+        }),
+      ]);
+
+      // Update article with counts
+      await strapi.documents('api::article.article').update({
+        documentId: article.documentId,
+        data: {
+          likesCount,
+          commentsCount,
+          bookmarksCount,
+        },
+      });
+    } catch (error) {
+      // Silent fail for count updates
+    }
+  }
+
+  console.log(`   ✅ Updated counts for ${articles.length} articles\n`);
+}
+
+/**
+ * Update denormalized usage count on tags
+ */
+async function updateTagCounts(tags) {
+  log('📊 Updating tag usage counts...');
+
+  for (const tag of tags) {
+    try {
+      // Count articles using this tag
+      const usageCount = await strapi.db
+        .query('api::article.article')
+        .count({
+          where: {
+            tags: {
+              documentId: tag.documentId,
+            },
+          },
+        });
+
+      // Update tag with count
+      await strapi.documents('api::tag.tag').update({
+        documentId: tag.documentId,
+        data: {
+          usageCount,
+        },
+      });
+    } catch (error) {
+      // Silent fail for count updates
+    }
+  }
+
+  console.log(`   ✅ Updated usage counts for ${tags.length} tags\n`);
 }
 
 // ============================================================================

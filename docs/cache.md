@@ -786,12 +786,11 @@ export function Providers({ children }) {
 
 ### From Current Architecture
 
-1. **Keep TanStack Query prefetch** for initial SSR (backward compatible)
-2. **Add `unstable_cache`** to `cachedFind` functions
+1. **Use `cachedFind` functions** with `unstable_cache` for server-side caching
+2. **Use TanStack Query hooks** only for client-side interactive features (likes, comments)
 3. **Configure webhooks** for on-demand revalidation
 4. **Test cache invalidation** with Strapi content updates
 5. **Monitor performance** with Core Web Vitals
-6. **Gradually remove** TanStack prefetch if not needed for interactive features
 
 ### Testing Checklist
 

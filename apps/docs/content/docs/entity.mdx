@@ -29,38 +29,57 @@ Complete data model documentation for the StrapiPress social blogging platform. 
 
 ## Entity Relationship Diagram
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                           USER (users-permissions)                       │
-│  id, username, email, password, confirmed, blocked, provider            │
-└─────────────────────────────────────────────────────────────────────────┘
-         │              │              │              │
-         │ 1:N          │ 1:N          │ 1:N          │ N:M
-         ▼              ▼              ▼              ▼
-    ┌─────────┐   ┌─────────┐   ┌──────────┐   ┌─────────┐
-    │ Article │   │ Comment │   │ Bookmark │   │  Follow │
-    │         │   │         │   │          │   │         │
-    │ author  │   │  user   │   │   user   │   │follower │
-    └────┬────┘   └────┬────┘   └────┬─────┘   │following│
-         │              │              │        └─────────┘
-         │              │              │
-         │ N:1          │ N:1          │ N:1
-         ▼              ▼              ▼
-    ┌─────────────────────────────────────┐
-    │              ARTICLE                 │
-    │  title, slug, description, cover,   │
-    │  blocks[], featured, counts...      │
-    └─────────────────────────────────────┘
-         │              │              │
-         │ N:1          │ N:M          │ 1:N
-         ▼              ▼              ▼
-    ┌──────────┐  ┌─────────┐    ┌──────────┐
-    │ Category │  │   Tag   │    │   Like   │
-    │          │  │         │    │          │
-    │ name     │  │ name    │    │ user     │
-    │ slug     │  │ slug    │    │ article  │
-    └──────────┘  │ color   │    └──────────┘
-                  └─────────┘
+```mermaid
+erDiagram
+    USER ||--o{ ARTICLE : "authors"
+    USER ||--o{ COMMENT : "writes"
+    USER ||--o{ BOOKMARK : "saves"
+    USER ||--o{ FOLLOW : "follower"
+    USER ||--o{ FOLLOW : "following"
+
+    ARTICLE ||--o{ COMMENT : "has"
+    ARTICLE ||--o{ LIKE : "has"
+    ARTICLE ||--o{ BOOKMARK : "has"
+    ARTICLE }|--|| CATEGORY : "belongs to"
+    ARTICLE }|--|{ TAG : "tagged with"
+
+    LIKE }|--|| USER : "by"
+    LIKE }|--|| ARTICLE : "on"
+    
+    USER {
+        string username
+        string email
+        string provider
+        boolean confirmed
+        boolean blocked
+    }
+
+    ARTICLE {
+        string title
+        string slug
+        text description
+        boolean featured
+    }
+
+    CATEGORY {
+        string name
+        string slug
+    }
+
+    TAG {
+        string name
+        string slug
+        string color
+    }
+    
+    COMMENT {
+        text content
+    }
+    
+    FOLLOW {
+        relation follower
+        relation following
+    }
 ```
 
 ---

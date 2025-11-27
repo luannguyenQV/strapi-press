@@ -11,10 +11,11 @@
 import { strapi } from '@strapi/client';
 import stringify from 'fast-json-stable-stringify';
 import { unstable_cache } from 'next/cache';
-import type {
-  QueryParams,
-  StrapiResponse,
-  StrapiSingleResponse,
+import type { QueryParams, StrapiResponse, StrapiSingleResponse } from './types';
+import {
+  bridgeCollectionResponse,
+  bridgeSingleResponse,
+  safeCastParams,
 } from './types';
 
 // Create the official Strapi client instance
@@ -64,9 +65,10 @@ export const cachedFind = async <T extends object = Record<string, unknown>>(
       if (process.env.NODE_ENV === 'development') {
         console.log(`[Cache MISS] Fetching ${contentType}`, params);
       }
-      return (await strapiClient
+      const response = await strapiClient
         .collection(contentType)
-        .find(params)) as unknown as StrapiResponse<T>;
+        .find(safeCastParams(params));
+      return bridgeCollectionResponse<T>(response);
     },
     ['strapi', contentType, stringify(params || {})],
     {
@@ -107,9 +109,10 @@ export const cachedFindOne = async <T extends object = Record<string, unknown>>(
       if (process.env.NODE_ENV === 'development') {
         console.log(`[Cache MISS] Fetching ${contentType}/${id}`, params);
       }
-      return (await strapiClient
+      const response = await strapiClient
         .collection(contentType)
-        .findOne(String(id), params)) as unknown as StrapiSingleResponse<T>;
+        .findOne(String(id), safeCastParams(params));
+      return bridgeSingleResponse<T>(response);
     },
     ['strapi', contentType, String(id), stringify(params || {})],
     {
@@ -150,9 +153,10 @@ export const cachedFindSingleType = async <
       if (process.env.NODE_ENV === 'development') {
         console.log(`[Cache MISS] Fetching single type ${contentType}`, params);
       }
-      return (await strapiClient
-        .collection(contentType)
-        .find(params)) as unknown as StrapiSingleResponse<T>;
+      const response = await strapiClient
+        .single(contentType)
+        .find(safeCastParams(params));
+      return bridgeSingleResponse<T>(response);
     },
     ['strapi-single', contentType, stringify(params || {})],
     {

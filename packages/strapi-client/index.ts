@@ -13,9 +13,6 @@ export {
   type CacheOptions,
 } from './client';
 
-// Export SSR utilities (for Server Components and prefetching)
-export * from './ssr';
-
 // Export query keys for advanced usage
 export { queryKeys } from './queries/keys';
 

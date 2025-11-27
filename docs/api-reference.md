@@ -1023,8 +1023,8 @@ curl -X POST "http://localhost:3000/api/revalidate?secret=YOUR_SECRET" \
 ### Complete Integration Example
 
 ```typescript
-// packages/strapi-client/ssr.ts
-import { unstable_cache } from 'next/cache';
+// Using cachedFind from @repo/strapi-client
+import { cachedFind, cachedFindOne } from '@repo/strapi-client';
 import { strapiClient } from './client';
 
 /**

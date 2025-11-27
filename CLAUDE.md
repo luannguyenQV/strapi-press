@@ -117,27 +117,25 @@ The project uses Turborepo with pnpm workspaces:
 
 ### Strapi Client Patterns
 
-The `@repo/strapi-client` package uses TanStack Query for data fetching with two distinct patterns:
+The `@repo/strapi-client` package uses Next.js ISR caching for optimal performance:
 
-**Server-Side Rendering (SSR):**
+**Server Components (Recommended):**
 ```typescript
-// In Server Components
-import { prefetchArticles, createSSRQueryClient } from '@repo/strapi-client/ssr';
-import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
+// Direct fetching with ISR caching
+import { cachedFind } from '@repo/strapi-client';
+import type { Article } from '@repo/strapi-client/types';
 
-const queryClient = createSSRQueryClient();
-await prefetchArticles(queryClient, { pageSize: 10 });
-
-return (
-  <HydrationBoundary state={dehydrate(queryClient)}>
-    <ArticleList /> {/* Client component */}
-  </HydrationBoundary>
+const { data: articles } = await cachedFind<Article>('articles',
+  {
+    populate: { author: { populate: ['avatar'] }, category: true, cover: true },
+    pagination: { pageSize: 10 }
+  },
+  { revalidate: 300, tags: ['articles'] }
 );
 ```
 
-**Client-Side Fetching:**
+**Client Components (when needed):**
 ```typescript
-// In Client Components
 'use client';
 import { useArticles } from '@repo/strapi-client/hooks';
 
@@ -145,11 +143,10 @@ const { data, isLoading } = useArticles({ pageSize: 10 });
 ```
 
 **Key Patterns:**
-- Prefer SSR for public content (better SEO and initial load)
-- Use client-side for user-specific or real-time data
-- Parallel data fetching with `Promise.all()` for performance
-- Cache functions with `unstable_cache` to avoid duplicate requests
-- See `packages/strapi-client/strapi-with-tanstack-best-practice.md` for comprehensive patterns
+- Use `cachedFind` for collections, `cachedFindOne` for single items, `cachedFindSingleType` for singletons
+- Prefer Server Components with ISR for public content (simpler, better caching)
+- Use client-side hooks only for user-specific or real-time data
+- Invalidate cache with `revalidateTag('articles')` when content changes
 
 ### Authentication (Planned)
 

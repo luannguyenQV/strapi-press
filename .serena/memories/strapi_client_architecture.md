@@ -25,7 +25,7 @@
 - **Bridge Pattern**: Transform functions converting Strapi responses to clean interfaces
   - `bridgeCollectionResponse<T>`: Generic collection transformer
   - `bridgeSingleResponse<T>`: Generic single item transformer
-  - Entity-specific bridges (e.g., `bridgeArticleCollection`)
+  - Use generics directly (e.g., `bridgeCollectionResponse<Article>(response)`)
 - **Type Guards**: `isStrapiResponse`, `isStrapiSingleResponse` for runtime validation
 - **Utility**: `safeCastParams` for type-safe parameter handling
 
@@ -50,18 +50,16 @@
   - Intelligent cache management (5-30 minute staleTime)
   - TypeScript-first with full type safety
 
-### 5. SSR Utilities Layer (`ssr.ts`)
-- **Prefetch Functions**: Server-side data fetching for Next.js App Router
-  - `prefetchArticles`: List with filters, pagination
-  - `prefetchArticle`: Single by ID
-  - `prefetchArticleBySlug`: Single by slug
-  - `prefetchFeaturedArticles`: Filtered featured content
-  - Similar patterns for categories and footer
-- **QueryClient Factory**: `createSSRQueryClient` with optimized defaults
-  - StaleTime: 5 minutes (general), 30 minutes (single types)
-  - GcTime: 10 minutes
-  - Smart retry logic (skip 4xx errors, retry up to 3 times)
-  - Server-optimized settings (no window focus refetch)
+### 5. Cached Operations Layer (`client.ts`)
+- **ISR Caching**: Server-side data fetching with Next.js `unstable_cache`
+  - `cachedFind<T>`: Collection queries with ISR (default 5 min)
+  - `cachedFindOne<T>`: Single document queries (default 10 min)
+  - `cachedFindSingleType<T>`: Singleton types like footer (default 30 min)
+- **Cache Features**:
+  - Deterministic cache keys via `fast-json-stable-stringify`
+  - Tag-based invalidation with `revalidateTag()`
+  - Build-time caching with `revalidate: false`
+  - Persistent cache survives page reloads
 
 ### 6. Hook Factory Layer (`utils/hookFactory.ts`)
 - **Purpose**: DRY principle, reduce boilerplate, ensure consistency
@@ -142,11 +140,17 @@ function ArticleList() {
 
 ### Server Component:
 ```tsx
-import { prefetchArticles, createSSRQueryClient } from '@repo/strapi-client';
+import { cachedFind } from '@repo/strapi-client';
+import type { Article } from '@repo/strapi-client/types';
 
 async function Page() {
-  const queryClient = createSSRQueryClient();
-  await prefetchArticles(queryClient, { pageSize: 10 });
+  const { data: articles } = await cachedFind<Article>('articles', {
+    pagination: { pageSize: 10 },
+    populate: { author: true, category: true },
+  }, {
+    revalidate: 300,
+    tags: ['articles'],
+  });
   // ...
 }
 ```

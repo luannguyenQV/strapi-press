@@ -1,41 +1,39 @@
 # @repo/strapi-client
 
-A modern, type-safe Strapi client with TanStack Query integration for Next.js applications.
+A modern, type-safe Strapi client with Next.js ISR caching for optimal performance.
 
 ## Overview
 
 This package provides a complete solution for interacting with Strapi CMS from Next.js applications, featuring:
 
-- 🚀 **Dual Architecture**: Full support for both Server Components (SSR) and Client Components
-- 🔒 **Type Safety**: Zero `any` types with complete TypeScript coverage
-- ⚡ **Performance**: Built-in caching with React cache() and TanStack Query
-- 🏭 **Hook Factory Pattern**: 90% less boilerplate with reusable factories
-- 🎯 **Smart Cache Management**: Automatic invalidation and optimistic updates
+- **Server-Side ISR Caching**: `unstable_cache` for persistent caching across requests
+- **Type Safety**: Zero `any` types with complete TypeScript coverage
+- **Hook Factory Pattern**: 90% less boilerplate with reusable factories
+- **Smart Cache Management**: Automatic invalidation via tags and webhooks
 
 ## Architecture
 
 ### Core Design Principles
 
-1. **Type-Safe Bridge Pattern**: Seamless integration between @strapi/client and custom types
+1. **Type-Safe Bridge Pattern**: Generic bridge functions for type conversion
 2. **Factory-Based Hooks**: Generic factories eliminate code duplication
-3. **Dual Rendering Support**: Optimized for both SSR and client-side rendering
-4. **Intelligent Caching**: Multi-layer caching with React cache() and TanStack Query
+3. **ISR-First Caching**: Server-side caching with `unstable_cache` for static content
+4. **Client Hooks for Interactivity**: TanStack Query for user-specific data
 
 ### Technology Stack
 
 - **@strapi/client**: v1.5.0 - Official Strapi JavaScript client
-- **@tanstack/react-query**: v5.45.0 - Powerful server state management
-- **React**: v19.0.0 - Latest React with Server Components support
+- **@tanstack/react-query**: v5.45.0 - Client-side state management
+- **next/cache**: ISR caching with `unstable_cache`
 - **TypeScript**: Strict mode with complete type coverage
 
 ## Folder Structure
 
 ```
 packages/strapi-client/
-├── client.ts              # Strapi client initialization & cached operations
+├── client.ts              # Strapi client + cached operations (cachedFind, etc.)
 ├── index.ts               # Main exports and public API
-├── types.ts               # TypeScript types and bridge utilities
-├── ssr.ts                 # Server Component utilities & prefetch functions
+├── types.ts               # TypeScript types and generic bridge functions
 │
 ├── hooks/                 # TanStack Query hooks for Client Components
 │   ├── articles.ts        # Article CRUD operations
@@ -58,33 +56,55 @@ The Strapi client is initialized once and reused throughout the application:
 
 ```typescript
 // client.ts
-export const strapiClient = new Strapi({
-  url: process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337',
-  prefix: '/api',
-  version: 'v4',
-  typescript: true,
+export const strapiClient = strapi({
+  baseURL: process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337/api',
+  token: process.env.STRAPI_API_TOKEN,
 });
 ```
 
 ### 2. Type Bridge System
 
-Bridges incompatible types between @strapi/client and our custom interfaces:
+Generic bridge functions safely cast API responses to typed interfaces:
 
 ```typescript
-// types.ts
+// types.ts - Generic bridges (use with any content type)
 export const bridgeCollectionResponse = <T>(
-  response: StrapiClientCollection
+  response: unknown
 ): StrapiResponse<T> => {
-  return {
-    data: response.data as unknown as T[],
-    meta: {
-      pagination: response.meta?.pagination || defaultPagination,
-    },
-  };
+  return response as StrapiResponse<T>;
+};
+
+export const bridgeSingleResponse = <T>(
+  response: unknown
+): StrapiSingleResponse<T> => {
+  return response as StrapiSingleResponse<T>;
 };
 ```
 
-### 3. Hook Factory Pattern
+### 3. Cached Operations (ISR)
+
+Server-side caching with Next.js `unstable_cache`:
+
+```typescript
+// client.ts
+export const cachedFind = async <T>(
+  contentType: string,
+  params?: QueryParams,
+  options?: CacheOptions
+): Promise<StrapiResponse<T>> => {
+  const cachedFn = unstable_cache(
+    async () => strapiClient.collection(contentType).find(params),
+    ['strapi', contentType, stringify(params || {})],
+    {
+      revalidate: options?.revalidate ?? 300, // Default 5 minutes
+      tags: options?.tags ?? [contentType, 'strapi'],
+    }
+  );
+  return cachedFn() as StrapiResponse<T>;
+};
+```
+
+### 4. Hook Factory Pattern
 
 Generic factories create type-safe hooks with minimal boilerplate:
 
@@ -110,117 +130,51 @@ export const createFindHook = <T>(
 };
 ```
 
-### 4. Dual Architecture Support
+## Usage Examples
 
-#### Server Components (SSR)
-
-Uses React's cache() for request deduplication:
+### Server Component (Recommended for Static Content)
 
 ```typescript
-// client.ts
-export const cachedFind = cache(async <T>(
-  contentType: string,
-  params?: QueryParams
-) => {
-  const response = await strapiClient
-    .collection(contentType)
-    .find(params);
-  return response as T;
+import { cachedFind, cachedFindOne, cachedFindSingleType } from '@repo/strapi-client';
+import type { Article, Footer } from '@repo/strapi-client/types';
+
+// Articles collection
+export default async function ArticlesPage() {
+  const { data: articles } = await cachedFind<Article>('articles', {
+    populate: { author: true, category: true, cover: true },
+    sort: ['publishedAt:desc'],
+    pagination: { pageSize: 10 },
+  }, {
+    revalidate: 300, // 5 minutes
+    tags: ['articles'],
+  });
+
+  return <ArticleList articles={articles} />;
+}
+
+// Single article
+const { data: article } = await cachedFindOne<Article>('articles', 'my-slug', {
+  populate: { author: true, category: true },
+}, {
+  revalidate: 600,
+  tags: ['article-my-slug'],
+});
+
+// Single type (footer, global settings)
+const { data: footer } = await cachedFindSingleType<Footer>('footer', {
+  populate: { socialLinks: true },
+}, {
+  revalidate: false, // Build-time only
+  tags: ['footer'],
 });
 ```
 
-#### Client Components
-
-Uses TanStack Query hooks for client-side state management:
-
-```typescript
-// hooks/articles.ts
-export const useArticles = (
-  params?: QueryParams,
-  options?: UseQueryOptions
-) => {
-  return useQuery({
-    queryKey: [...queryKeys.articles(), params],
-    queryFn: async () => {
-      const response = await strapiClient
-        .collection('articles')
-        .find(safeCastParams(params));
-      return bridgeArticleCollection(response);
-    },
-    ...options,
-  });
-};
-```
-
-## Technical Details
-
-### Query Key Management
-
-Centralized query keys ensure consistent cache invalidation:
-
-```typescript
-// queries/keys.ts
-export const queryKeys = {
-  articles: () => ['articles'] as const,
-  article: (id: string) => ['articles', id] as const,
-  categories: () => ['categories'] as const,
-  category: (id: string) => ['categories', id] as const,
-  footer: () => ['footer'] as const,
-};
-```
-
-### Type Safety Features
-
-1. **No `any` Types**: Complete type coverage with proper generics
-2. **Type Bridge Functions**: Safe conversion between incompatible types
-3. **Parameter Validation**: `safeCastParams()` ensures type safety
-4. **Response Type Guards**: Proper typing for all Strapi responses
-
-### Cache Strategies
-
-#### Server-Side Caching
-
-- React cache() for request deduplication within render
-- Automatic cache invalidation on route changes
-- Zero configuration required
-
-#### Client-Side Caching
-
-- TanStack Query with configurable stale times
-- Automatic background refetching
-- Optimistic updates for mutations
-- Smart query invalidation patterns
-
-### Performance Optimizations
-
-1. **Request Deduplication**: Multiple components requesting same data share single request
-2. **Stale-While-Revalidate**: Serve cached data while fetching fresh data
-3. **Selective Invalidation**: Only invalidate affected queries on mutations
-4. **Prefetching**: SSR utilities for data preloading
-
-## Usage Examples
-
-### Server Component
-
-```typescript
-import { cachedFind } from '@repo/strapi-client';
-
-export default async function ArticlesPage() {
-  const articles = await cachedFind<StrapiResponse<Article>>('articles', {
-    populate: ['author', 'category'],
-    sort: ['publishedAt:desc'],
-  });
-
-  return <ArticleList articles={articles.data} />;
-}
-```
-
-### Client Component
+### Client Component (For Interactive Features)
 
 ```typescript
 'use client';
 
-import { useArticles } from '@repo/strapi-client';
+import { useArticles } from '@repo/strapi-client/hooks';
 
 export function ArticleList() {
   const { data, isLoading, error } = useArticles({
@@ -253,37 +207,30 @@ export const useProducts = createFindHook<Product>(
 );
 ```
 
-### Mutations
+## When to Use Each Pattern
 
-```typescript
-import { useCreateArticle } from '@repo/strapi-client';
-
-export function CreateArticleForm() {
-  const mutation = useCreateArticle();
-
-  const handleSubmit = (data: Partial<Article>) => {
-    mutation.mutate(data, {
-      onSuccess: () => {
-        console.log('Article created successfully');
-      },
-    });
-  };
-
-  return <form onSubmit={handleSubmit}>...</form>;
-}
-```
+| Use Case | Pattern | Why |
+|----------|---------|-----|
+| Blog articles, categories | `cachedFind` | Static content, ISR caching |
+| Footer, global settings | `cachedFindSingleType` with `revalidate: false` | Build-time only |
+| User likes/bookmarks | Client hooks | User-specific, reactive |
+| Comments section | Client hooks | Real-time updates needed |
+| Search results | `cachedFind` | Can cache common queries |
 
 ## API Reference
 
-### Client Operations
+### Cached Operations (Server-Side)
 
-#### `cachedFind<T>(contentType, params?)`
-Server-side cached collection fetch with React cache()
+#### `cachedFind<T>(contentType, params?, options?)`
+Server-side cached collection fetch with ISR
 
-#### `cachedFindOne<T>(contentType, id, params?)`
+#### `cachedFindOne<T>(contentType, id, params?, options?)`
 Server-side cached single item fetch
 
-### Hook Functions
+#### `cachedFindSingleType<T>(contentType, params?, options?)`
+Server-side cached single type fetch (footer, global, etc.)
+
+### Hook Functions (Client-Side)
 
 #### Query Hooks
 - `useArticles(params?, options?)` - Fetch articles
@@ -297,14 +244,6 @@ Server-side cached single item fetch
 - `useUpdateArticle()` - Update existing article
 - `useDeleteArticle()` - Delete article
 - `useUpdateFooter()` - Update footer content
-
-### SSR Utilities
-
-#### Prefetch Functions
-- `prefetchArticles(queryClient, params?)` - Prefetch articles for SSR
-- `prefetchArticle(queryClient, id)` - Prefetch single article
-- `prefetchCategories(queryClient)` - Prefetch categories
-- `prefetchFooter(queryClient)` - Prefetch footer
 
 ### Factory Functions
 
@@ -342,13 +281,13 @@ interface StrapiResponse<T> {
 
 interface StrapiSingleResponse<T> {
   data: T;
-  meta: Record<string, any>;
+  meta: Record<string, unknown>;
 }
 
 interface QueryParams {
-  populate?: string | string[] | object;
+  populate?: string | string[] | PopulateParams;
   fields?: string[];
-  filters?: Record<string, any>;
+  filters?: Record<string, unknown>;
   sort?: string | string[];
   pagination?: {
     page?: number;
@@ -357,39 +296,44 @@ interface QueryParams {
   publicationState?: 'live' | 'preview';
   locale?: string;
 }
+
+interface CacheOptions {
+  revalidate?: number | false;
+  tags?: string[];
+}
 ```
 
 ### Content Types
 
 - `Article` - Blog posts with rich content
 - `Category` - Content categorization
-- `Author` - Content creators
+- `User` / `UserInfo` - Users and authors
 - `Footer` - Site-wide footer content
-- `SEO` - SEO metadata component
+- `Tag`, `Comment`, `Like`, `Bookmark`, `Follow` - Social features
 
 ## Performance Metrics
 
 - **Type Safety**: 100% type coverage, 0 `any` types
 - **Code Reduction**: 90% less boilerplate with factory patterns
+- **Cache Efficiency**: ISR reduces API calls by 60-90%
 - **Bundle Size**: Minimal overhead with tree-shaking support
-- **Cache Efficiency**: Request deduplication reduces API calls by 40-60%
-- **Developer Experience**: Full IntelliSense and compile-time safety
 
 ## Best Practices
 
-1. **Use Server Components** for initial data fetching
-2. **Leverage Prefetching** for improved perceived performance
-3. **Implement Optimistic Updates** for better UX
-4. **Use Factory Patterns** for new content types
-5. **Centralize Query Keys** for consistent cache management
+1. **Use Server Components** with `cachedFind` for static content
+2. **Use `revalidate: false`** for rarely-changing content (footer, categories)
+3. **Use client hooks** only for user-specific or real-time data
+4. **Implement cache invalidation** via webhooks for instant updates
+5. **Use Factory Patterns** for new content types
+6. **Centralize Query Keys** for consistent cache management
 
 ## Contributing
 
 When adding new content types:
 
 1. Add TypeScript types to `types.ts`
-2. Create bridge functions for type conversion
-3. Use hook factories to generate CRUD operations
+2. Use generic bridge functions for type conversion
+3. Use hook factories to generate client-side hooks
 4. Add query keys to centralized factory
 5. Export from main `index.ts`
 

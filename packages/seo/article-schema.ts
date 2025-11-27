@@ -11,8 +11,8 @@ export interface ArticleSchemaProps {
   publishedAt?: string | null;
   updatedAt?: string;
   author?: {
-    name: string;
-    email?: string;
+    name?: string;
+    email?: string | null;
   };
   coverImage?: {
     url: string;
@@ -92,12 +92,12 @@ export function createArticleSchema(
  * https://schema.org/Person
  */
 export function createPersonSchema(props: {
-  name: string;
-  email?: string;
+  name?: string;
+  email?: string | null;
 }): Person {
   const schema: Person = {
     '@type': 'Person',
-    name: props.name,
+    name: props.name ?? 'Unknown Author',
   };
 
   if (props.email) {
